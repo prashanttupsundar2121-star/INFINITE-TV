@@ -596,9 +596,35 @@ footer{text-align:center;padding:28px 14px;border-top:1px solid var(--b2);color:
 footer::before{content:'';position:absolute;top:0;left:50%;transform:translateX(-50%);width:100px;height:1.5px;background:linear-gradient(90deg,var(--green),var(--gold),var(--red));}
 footer a{color:var(--green2);text-decoration:none;}
 #searchSec{display:none;}
+
+/* ═══ INTRO SPLASH ═══ */
+#intro{position:fixed;inset:0;background:#000;z-index:999999;display:flex;align-items:center;justify-content:center;overflow:hidden;transition:opacity 1s ease;}
+#introBg{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;filter:brightness(0.35) saturate(1.4) contrast(1.2);z-index:0;}
+.intro-content{position:relative;z-index:1;text-align:center;animation:introZoom 3s ease forwards;}
+.intro-welcome{display:block;font-family:'Outfit',sans-serif;font-size:1rem;font-weight:300;letter-spacing:8px;text-transform:uppercase;color:rgba(255,255,255,0.7);margin-bottom:10px;}
+.intro-logo{display:block;font-family:'Bebas Neue',sans-serif;font-size:clamp(3rem,15vw,5.5rem);letter-spacing:6px;background:linear-gradient(135deg,#00e676,#ffd740,#ff1744);-webkit-background-clip:text;-webkit-text-fill-color:transparent;filter:drop-shadow(0 0 30px rgba(0,230,118,0.6)) drop-shadow(0 0 60px rgba(255,23,68,0.4));line-height:1;}
+.intro-tagline{display:block;font-family:'Outfit',sans-serif;font-size:0.75rem;font-weight:400;letter-spacing:4px;color:rgba(255,255,255,0.5);margin-top:14px;text-transform:uppercase;}
+.intro-bar{width:60px;height:2px;background:linear-gradient(90deg,#00e676,#ff1744);margin:14px auto 0;border-radius:4px;animation:introBar 3s ease forwards;box-shadow:0 0 10px #00e676;}
+@keyframes introZoom{0%{opacity:0;transform:scale(0.4);}50%{opacity:1;transform:scale(1.06);}75%{transform:scale(0.98);}100%{opacity:1;transform:scale(1);}}
+@keyframes introBar{0%{width:0;opacity:0;}60%{opacity:1;}100%{width:120px;opacity:1;}}
+.intro-particle{position:absolute;border-radius:50%;animation:pFloat linear infinite;pointer-events:none;}
+@keyframes pFloat{0%{transform:translateY(100vh) scale(0);opacity:0;}10%{opacity:1;}90%{opacity:1;}100%{transform:translateY(-100px) scale(1.2);opacity:0;}}
 </style>
 </head>
 <body>
+
+<!-- ═══════ INTRO SPLASH ═══════ -->
+<div id="intro">
+  <video autoplay muted playsinline loop id="introBg">
+    <source src="https://cdn.pixabay.com/vimeo/328940142/abstract-21503.mp4" type="video/mp4"/>
+  </video>
+  <div class="intro-content">
+    <span class="intro-welcome">Welcome to</span>
+    <span class="intro-logo">iNFiNiTE TV</span>
+    <span class="intro-tagline">Free • HD • Multi Language</span>
+    <div class="intro-bar"></div>
+  </div>
+</div>
 
 <!-- Background effects -->
 <div class="bg-mesh"></div>
@@ -675,6 +701,31 @@ footer a{color:var(--green2);text-decoration:none;}
   <section id="searchSec">
     <div class="sh"><div class="st" id="srchTtl"><div class="stbar"></div>RESULTS</div></div>
     <div class="ag" id="srchGrid"></div>
+  </section>
+
+  <section>
+    <div class="sh"><div class="st"><div class="stbar"></div>🔥 TRENDING NOW</div></div>
+    <div class="ag" id="trendGrid">
+      <div class="sk skh"></div><div class="sk skh"></div><div class="sk skh"></div>
+      <div class="sk skh"></div><div class="sk skh"></div><div class="sk skh"></div>
+    </div>
+  </section>
+
+  <section>
+    <div class="sh"><div class="st"><div class="stbar"></div>⭐ TOP RATED</div></div>
+    <div class="ag" id="topGrid">
+      <div class="sk skh"></div><div class="sk skh"></div>
+      <div class="sk skh"></div><div class="sk skh"></div>
+      <div class="sk skh"></div><div class="sk skh"></div>
+    </div>
+  </section>
+
+  <section>
+    <div class="sh"><div class="st"><div class="stbar"></div>🎬 MOVIES</div></div>
+    <div class="ag" id="moviesGrid">
+      <div class="sk skh"></div><div class="sk skh"></div>
+      <div class="sk skh"></div><div class="sk skh"></div>
+    </div>
   </section>
 
   <footer>Made with 🔥 by <a href="https://t.me/infinite_animes" target="_blank">iNFiNiTE ANiMES</a></footer>
@@ -876,6 +927,26 @@ function makeCard(a){
   return `<div class="ac" onclick="openDetail(${a.mal_id})"><img src="${img}" alt="${title}" loading="lazy" onerror="this.src=''"/><div class="ac-i"><div class="ac-t">${title}</div>${score?`<div class="ac-s">${score}</div>`:''}</div></div>`;
 }
 
+async function loadTrending(){
+  try{
+    const d=await apiFetch('https://api.jikan.moe/v4/top/anime?filter=airing&limit=12');
+    document.getElementById('trendGrid').innerHTML=d.length?d.map(makeCard).join(''):'<div class="nores">Refresh karo 🔄</div>';
+  }catch{document.getElementById('trendGrid').innerHTML='<div class="nores">Reload karo 🔄</div>';}
+}
+async function loadTop(){
+  await new Promise(r=>setTimeout(r,1500));
+  try{
+    const d=await apiFetch('https://api.jikan.moe/v4/top/anime?limit=12');
+    document.getElementById('topGrid').innerHTML=d.length?d.map(makeCard).join(''):'<div class="nores">Could not load.</div>';
+  }catch{document.getElementById('topGrid').innerHTML='<div class="nores">Reload karo 🔄</div>';}
+}
+async function loadMovies(){
+  await new Promise(r=>setTimeout(r,3000));
+  try{
+    const d=await apiFetch('https://api.jikan.moe/v4/top/anime?type=movie&limit=8');
+    document.getElementById('moviesGrid').innerHTML=d.length?d.map(makeCard).join(''):'<div class="nores">Could not load.</div>';
+  }catch{document.getElementById('moviesGrid').innerHTML='<div class="nores">Reload karo 🔄</div>';}
+}
 async function doSearch(){
   const q=document.getElementById('srchIn').value.trim();
   if(!q){showToast('⚠️ Type something first!');return;}
@@ -1001,7 +1072,39 @@ document.getElementById('qbox').innerHTML=`"${qq.text}" <span>— ${qq.anime}</s
 
 function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),3200);}
 
+// ── INTRO SPLASH ──
+(function(){
+  // Floating particles
+  const intro=document.getElementById('intro');
+  const colors=['#00e676','#ff1744','#ffd740','#18ffff','#ffffff'];
+  for(let i=0;i<18;i++){
+    const p=document.createElement('div');
+    p.className='intro-particle';
+    const size=Math.random()*5+2;
+    p.style.cssText=`
+      width:${size}px;height:${size}px;
+      background:${colors[Math.floor(Math.random()*colors.length)]};
+      left:${Math.random()*100}%;
+      animation-duration:${Math.random()*4+3}s;
+      animation-delay:${Math.random()*2}s;
+      opacity:0.6;
+      box-shadow:0 0 ${size*2}px currentColor;
+    `;
+    intro.appendChild(p);
+  }
+  // Hide after 4 seconds
+  window.addEventListener('load',()=>{
+    setTimeout(()=>{
+      intro.style.opacity='0';
+      setTimeout(()=>{intro.style.display='none';},1000);
+    },3500);
+  });
+})();
+
 renderCol();
+loadTrending();
+loadTop();
+loadMovies();
 </script>
 </body>
 </html>
