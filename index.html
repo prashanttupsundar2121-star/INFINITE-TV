@@ -380,6 +380,7 @@ section{padding:18px 12px;position:relative;z-index:1;}
 .pp-i{font-size:2.8rem;}
 .pp-t{font-size:0.62rem;font-weight:700;color:var(--green);text-align:center;padding:0 8px;line-height:1.3;}
 .eov{position:absolute;bottom:0;left:0;right:0;background:linear-gradient(transparent,rgba(6,13,6,0.94));padding:26px 9px 8px;font-size:0.64rem;color:#ccc;font-weight:600;z-index:4;}
+.score-ov{position:absolute;top:8px;left:8px;background:rgba(0,0,0,0.75);backdrop-filter:blur(4px);border:1px solid rgba(255,215,64,0.4);color:var(--gold);font-size:0.65rem;font-weight:700;padding:3px 8px;border-radius:50px;z-index:5;}
 .new-badge{position:absolute;top:9px;right:9px;background:linear-gradient(135deg,var(--red3),var(--red));color:#fff;font-size:0.54rem;font-weight:800;padding:3px 8px;border-radius:50px;text-transform:uppercase;letter-spacing:.8px;z-index:5;box-shadow:0 2px 10px var(--rglow);}
 
 .mi{padding:10px 11px 12px;}
@@ -417,7 +418,7 @@ section{padding:18px 12px;position:relative;z-index:1;}
   display:inline-flex;align-items:center;gap:7px;
   background:rgba(255,255,255,0.04);border:1px solid var(--b3);
   border-radius:50px;padding:10px 16px;color:var(--txt2);
-  font-family:'Outfit',sans-serif;font-weight:600;font-size:0.83rem;
+font-family:'Outfit',sans-serif;font-weight:600;font-size:0.83rem;
   text-decoration:none;margin:12px 12px 10px;transition:all .2s;outline:none;
   min-height:42px;/* Mobile tap size */
 }
@@ -881,6 +882,10 @@ const ALL_Q=[{icon:'📱',name:'480p'},{icon:'📺',name:'720p'},{icon:'🖥️'
   }
 })();
 
+// tgLink map — malId → tgLink
+const TG_LINKS = {};
+ANIME_DB.forEach(a=>{ TG_LINKS[a.malId]=a.tgLink; });
+
 // ── Lang badge ──
 function langBadge(lang){
   const m={hindi:{c:'lh',l:'🇮🇳 Hindi'},telugu:{c:'lt',l:'🇮🇳 Telugu'},multi:{c:'lm',l:'🌐 Multi'},english:{c:'le',l:'🌏 English'}};
@@ -894,44 +899,50 @@ function animNum(id,target){
   const t=setInterval(()=>{c=Math.min(c+step,target);el.textContent=c;if(c>=target)clearInterval(t);},35);
 }
 
-// ── Render collection (placeholder first, then lazy load images) ──
+// ── Render collection — click goes to openDetail ──
 function renderCol(){
   const g=document.getElementById('colGrid'),cnt=document.getElementById('colCnt');
   cnt.textContent=ANIME_DB.length+' Anime';
   animNum('statA',ANIME_DB.length);
-  animNum('statE',ANIME_DB.length*12);// Estimated episodes
+  animNum('statE',ANIME_DB.length*12);
   g.innerHTML=ANIME_DB.map((a,i)=>`
-    <div class="mc" onclick="openWatch(${a.id})" data-malid="${a.malId}" style="animation-delay:${i*.05}s">
+    <div class="mc" onclick="openDetail(${a.malId})" style="animation-delay:${i*.04}s">
       <div class="pw">
-        <img id="img_${a.id}" src="" alt="${a.title}" loading="lazy"
-          onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"/>
-        <div class="pp"><div class="pp-i">🎌</div><div class="pp-t">${a.title}</div></div>
+        <img id="img_${a.id}" src=""
+          style="width:100%;height:100%;object-fit:cover;display:none;position:absolute;inset:0;"
+          onload="this.style.display='block';document.getElementById('pp_${a.id}').style.display='none';"
+          onerror="this.style.display='none';"
+        />
+        <div class="pp" id="pp_${a.id}">
+          <div class="pp-i">🎌</div>
+          <div class="pp-t">${a.title}</div>
+        </div>
         <div class="pw-holo"></div>
+        <div class="score-ov" id="scr_${a.id}"></div>
       </div>
       <div class="mi"><div class="mt">${a.title}</div>${langBadge(a.lang)}</div>
     </div>`).join('');
-  // Lazy load images in batches
   loadImagesLazy();
 }
 
-// Load images 4 at a time to avoid rate limits
+// Load images 1 at a time — 500ms gap to avoid rate limit
 async function loadImagesLazy(){
-  const batchSize=4;
-  for(let i=0;i<ANIME_DB.length;i+=batchSize){
-    const batch=ANIME_DB.slice(i,i+batchSize);
-    await Promise.all(batch.map(async a=>{
-      try{
-        const d=await apiFetchOne(`https://api.jikan.moe/v4/anime/${a.malId}`);
+  for(let i=0;i<ANIME_DB.length;i++){
+    const a=ANIME_DB[i];
+    try{
+      const d=await apiFetchOne(`https://api.jikan.moe/v4/anime/${a.malId}`);
+      if(d){
         const imgEl=document.getElementById(`img_${a.id}`);
-        if(imgEl&&d?.images?.jpg?.large_image_url){
-          imgEl.src=d.images.jpg.large_image_url;
-          // Hide placeholder
-          const pp=imgEl.nextElementSibling?.nextElementSibling?.nextElementSibling;
-          if(imgEl.nextElementSibling) imgEl.nextElementSibling.style.display='none';
+        const scrEl=document.getElementById(`scr_${a.id}`);
+        if(imgEl && d.images?.jpg?.large_image_url){
+          imgEl.src = d.images.jpg.large_image_url;
         }
-      }catch{}
-    }));
-    if(i+batchSize<ANIME_DB.length) await new Promise(r=>setTimeout(r,600));
+        if(scrEl && d.score){
+          scrEl.textContent='⭐ '+d.score;
+        }
+      }
+    }catch(e){}
+    await new Promise(r=>setTimeout(r,500));
   }
 }
 
@@ -1069,10 +1080,10 @@ async function openDetail(malId){
   ['detChips','detInfoGrid','detGenres','detLangs','detQuality','detRec','detChannels','detRating','detAlt','detSyn'].forEach(id=>document.getElementById(id).innerHTML='');
   document.getElementById('detBanImg').src='';document.getElementById('detPoster').src='';
 
-  // Check if this anime is in our DB
+  // Check if this anime is in our DB — use specific tgLink
   const dbMatch=ANIME_DB.find(x=>x.malId===malId);
-  // Watch button → specific channel or main channel
-  document.getElementById('detWatchBtn').href=dbMatch?dbMatch.tgLink:DEFAULT_LINK;
+  const watchUrl = TG_LINKS[malId] || DEFAULT_LINK;
+  document.getElementById('detWatchBtn').href = watchUrl;
 
   const a=await apiFetchOne(`https://api.jikan.moe/v4/anime/${malId}`);
   if(!a){document.getElementById('detTtl').textContent='Error loading.';return;}
@@ -1129,9 +1140,9 @@ async function openDetail(malId){
       <div class="rec-name">${ra.title}</div></div>`;
   }).join('')||'<p style="color:var(--muted);font-size:.8rem">No recommendations.</p>';
 
-  // Channel button
+  // Channel button — specific or main
   document.getElementById('detChannels').innerHTML=`
-    <a href="${dbMatch?dbMatch.tgLink:DEFAULT_LINK}" target="_blank" class="ch-btn main">
+    <a href="${watchUrl}" target="_blank" class="ch-btn main">
       <div class="ch-icon">🎌</div>
       <div style="flex:1">
         <div class="ch-name">Watch on Telegram</div>
