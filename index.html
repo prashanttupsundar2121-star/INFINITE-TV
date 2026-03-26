@@ -4,639 +4,251 @@
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0"/>
 <meta name="theme-color" content="#000000"/>
-<title>iNFiNiTE ANiMES</title>
-<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Outfit:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet"/>
+<title>iNFiNiTE TV</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet"/>
 <style>
-/* ═══════════════════════════════════
-   ROOT — GREEN + RED + GOLD THEME
-═══════════════════════════════════ */
-:root{
-  --void:#000000;--deep:#0a0a0a;--surface:#111111;--card:#181818;--card2:#1c1c1c;
-
-  /* Borders */
-  --b1:#ffffff07;--b2:#ffffff10;--b3:#ffffff1a;--b4:#ffffff25;
-
-  /* COLORS */
-  --green:#00e676;       /* Main green */
-  --green2:#69f0ae;      /* Light green */
-  --green3:#00c853;      /* Dark green */
-  --glow:rgba(0,230,118,0.45);
-  --glow2:rgba(105,240,174,0.3);
-
-  --red:#ff1744;         /* Main red */
-  --red2:#ff6d6d;        /* Light red */
-  --red3:#c62828;        /* Dark red */
-  --rglow:rgba(255,23,68,0.45);
-
-  --gold:#ffd740;        /* Gold accent */
-  --orange:#ff6d00;      /* Orange accent */
-  --cyan:#18ffff;        /* Cyan pop */
-
-  --tg:#1d9bd1;--tg2:#0f6fa0;
-  --txt:#e8f5e9;--txt2:#7da07d;--muted:#3a4f3a;
-
-  --r:14px;--r2:20px;--r3:28px;
-}
-
-/* ═══════════════════════════════════
-   RESET & BASE
-═══════════════════════════════════ */
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
-html{scroll-behavior:smooth;}
-body{
-  background:var(--void);
-  color:var(--txt);
-  font-family:'Outfit',sans-serif;
-  min-height:100vh;
-  overflow-x:hidden;
-  /* Mobile touch optimization */
-  -webkit-text-size-adjust:100%;
+:root{
+  --bg:#0d0d0d;--card:#181818;--card2:#222;
+  --green:#00e676;--red:#e50914;--gold:#f5c518;
+  --txt:#ffffff;--txt2:#aaaaaa;--muted:#555;
+  --tg:#1d9bd1;--r:8px;--r2:12px;
 }
+html,body{background:var(--bg);color:var(--txt);font-family:'Outfit',sans-serif;min-height:100vh;overflow-x:hidden;}
+::-webkit-scrollbar{display:none;}
 
-/* Grain texture */
-body::after{
-  content:'';position:fixed;inset:0;
-  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='g'%3E%3CfeTurbulence baseFrequency='0.7' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23g)' opacity='0.02'/%3E%3C/svg%3E");
-  pointer-events:none;z-index:9997;mix-blend-mode:overlay;
-}
+/* ── INTRO ── */
+#intro{position:fixed;inset:0;background:#000;z-index:99999;display:flex;align-items:center;justify-content:center;overflow:hidden;transition:opacity 1s;}
+#introBg{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;filter:brightness(.3) saturate(1.4);}
+.ic{position:relative;z-index:1;text-align:center;animation:izoom 3s ease forwards;}
+.ic-w{display:block;font-family:'Outfit',sans-serif;font-size:.9rem;font-weight:300;letter-spacing:8px;text-transform:uppercase;color:rgba(255,255,255,.6);margin-bottom:8px;}
+.ic-l{display:block;font-family:'Bebas Neue',sans-serif;font-size:clamp(3rem,15vw,5rem);letter-spacing:5px;background:linear-gradient(135deg,var(--green),var(--gold),var(--red));-webkit-background-clip:text;-webkit-text-fill-color:transparent;filter:drop-shadow(0 0 30px rgba(0,230,118,.5));}
+.ic-t{display:block;font-size:.7rem;color:rgba(255,255,255,.4);letter-spacing:4px;text-transform:uppercase;margin-top:10px;}
+.ic-bar{width:0;height:2px;background:linear-gradient(90deg,var(--green),var(--red));margin:12px auto 0;border-radius:4px;animation:ibar 3s ease forwards;box-shadow:0 0 8px var(--green);}
+@keyframes izoom{0%{opacity:0;transform:scale(.4)}50%{opacity:1;transform:scale(1.05)}100%{opacity:1;transform:scale(1)}}
+@keyframes ibar{0%{width:0;opacity:0}60%{opacity:1}100%{width:120px;opacity:1}}
+.ip{position:absolute;border-radius:50%;animation:ipf linear infinite;pointer-events:none;}
+@keyframes ipf{0%{transform:translateY(100vh);opacity:0}10%{opacity:1}90%{opacity:1}100%{transform:translateY(-100px);opacity:0}}
 
-/* Scrollbar */
-::-webkit-scrollbar{width:3px;}
-::-webkit-scrollbar-track{background:var(--void);}
-::-webkit-scrollbar-thumb{background:linear-gradient(var(--green),var(--red));border-radius:4px;}
+/* ── PAGES ── */
+.page{display:none;padding-bottom:70px;}
+.page.active{display:block;}
 
-/* ═══════════════════════════════════
-   ANIMATED BACKGROUND
-═══════════════════════════════════ */
-.orb{position:fixed;border-radius:50%;filter:blur(80px);pointer-events:none;z-index:0;}
-.o1{width:400px;height:400px;background:radial-gradient(circle,rgba(0,230,118,0.1),transparent 70%);top:-150px;left:-100px;animation:of 20s ease-in-out infinite;}
-.o2{width:350px;height:350px;background:radial-gradient(circle,rgba(255,23,68,0.08),transparent 70%);bottom:-100px;right:-80px;animation:of 24s ease-in-out infinite reverse;animation-delay:-10s;}
-.o3{width:280px;height:280px;background:radial-gradient(circle,rgba(255,215,64,0.06),transparent 70%);top:45%;left:55%;animation:of 28s ease-in-out infinite;animation-delay:-18s;}
-@keyframes of{0%,100%{transform:translate(0,0)}33%{transform:translate(20px,-30px)}66%{transform:translate(-15px,18px)}}
+/* ── TOP NAV ── */
+.topnav{position:sticky;top:0;z-index:200;height:56px;background:linear-gradient(to bottom,rgba(0,0,0,.95),rgba(0,0,0,.7));display:flex;align-items:center;justify-content:space-between;padding:0 16px;}
+.tn-logo{font-family:'Bebas Neue',sans-serif;font-size:1.4rem;letter-spacing:3px;background:linear-gradient(135deg,var(--green),var(--gold));-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
+.tn-menu{font-size:1.4rem;cursor:pointer;color:var(--txt);background:none;border:none;padding:6px;}
 
-.bg-mesh{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden;}
-.bg-mesh::before{
-  content:'';position:absolute;width:700px;height:700px;
-  background:conic-gradient(from 0deg at 25% 25%,
-    transparent 0deg,rgba(0,230,118,0.06) 60deg,
-    transparent 120deg,rgba(255,23,68,0.05) 200deg,
-    transparent 260deg,rgba(255,215,64,0.04) 320deg,transparent 360deg);
-  border-radius:50%;top:-200px;left:-150px;animation:mr 22s linear infinite;
-}
-.bg-mesh::after{
-  content:'';position:absolute;width:500px;height:500px;
-  background:conic-gradient(from 180deg at 75% 75%,
-    transparent 0deg,rgba(255,23,68,0.05) 80deg,
-    transparent 160deg,rgba(0,230,118,0.04) 250deg,transparent 360deg);
-  border-radius:50%;bottom:-120px;right:-120px;animation:mr 28s linear infinite reverse;
-}
-@keyframes mr{to{transform:rotate(360deg)}}
+/* ── BOTTOM NAV ── */
+.bnav{position:fixed;bottom:0;left:0;right:0;z-index:300;height:60px;background:rgba(13,13,13,.97);border-top:1px solid #222;display:flex;align-items:stretch;}
+.bn-btn{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;background:none;border:none;color:var(--muted);font-family:'Outfit',sans-serif;font-size:.6rem;font-weight:600;cursor:pointer;transition:color .2s;text-transform:uppercase;letter-spacing:.5px;}
+.bn-btn.active{color:var(--green);}
+.bn-btn svg{width:22px;height:22px;fill:currentColor;}
+.bn-btn.active svg{filter:drop-shadow(0 0 6px var(--green));}
 
-/* Japanese chars floating */
-.krain{position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden;opacity:0.018;}
-.krain span{position:absolute;top:-20px;font-family:'JetBrains Mono',monospace;font-size:13px;color:var(--green2);animation:kf linear infinite;writing-mode:vertical-rl;}
-@keyframes kf{to{transform:translateY(110vh)}}
-
-/* ═══════════════════════════════════
-   NAVBAR — MOBILE OPTIMIZED
-═══════════════════════════════════ */
-nav{
-  position:sticky;top:0;z-index:500;
-  height:56px;
-  background:rgba(0,0,0,0.97);
-  backdrop-filter:blur(24px);
-  -webkit-backdrop-filter:blur(24px);
-  border-bottom:1px solid rgba(255,255,255,0.08);
-  display:flex;align-items:center;justify-content:space-between;
-  padding:0 14px;gap:10px;
-}
-nav::before{
-  content:'';position:absolute;bottom:0;left:0;right:0;height:2px;
-  background:linear-gradient(90deg,transparent,var(--red) 30%,var(--gold) 50%,var(--green) 70%,transparent);
-  opacity:0.6;
-}
-
-.hbg{
-  display:flex;flex-direction:column;gap:5px;
-  padding:8px;border-radius:10px;flex-shrink:0;
-  transition:background .2s;
-  /* bigger tap target for mobile */
-  min-width:40px;min-height:40px;justify-content:center;align-items:center;
-}
-.hbg:active{background:rgba(0,230,118,0.1);}
-.hbg span{display:block;width:20px;height:2px;background:var(--txt);border-radius:4px;transition:all .3s cubic-bezier(.4,0,.2,1);}
-.hbg.open span:nth-child(1){transform:rotate(45deg) translate(5px,5px);}
-.hbg.open span:nth-child(2){opacity:0;transform:scaleX(0);}
-.hbg.open span:nth-child(3){transform:rotate(-45deg) translate(5px,-5px);}
-
-.nav-logo{
-  font-family:'Bebas Neue',sans-serif;
-  font-size:1.45rem;letter-spacing:4px;
-  text-align:right;
-  background:linear-gradient(130deg,var(--green) 0%,var(--gold) 50%,var(--red) 100%);
-  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
-  filter:drop-shadow(0 0 14px var(--glow));
-  white-space:nowrap;
-  flex:1;
-}
-
-.tg-pill{
-  display:flex;align-items:center;gap:5px;
-  background:linear-gradient(135deg,var(--tg2),var(--tg));
-  border:none;border-radius:50px;padding:8px 13px;
-  color:#fff;font-family:'Outfit',sans-serif;font-size:0.74rem;font-weight:700;
-  text-decoration:none;flex-shrink:0;
-  box-shadow:0 4px 16px rgba(29,155,209,0.4);
-  transition:all .2s;letter-spacing:.4px;
-  /* Mobile tap */
-  min-height:38px;
-}
-.tg-pill:active{transform:scale(0.96);}
-.tg-pill svg{width:13px;height:13px;fill:#fff;}
-
-/* ═══════════════════════════════════
-   DRAWER — SLIDE FROM LEFT
-═══════════════════════════════════ */
-.dov{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.82);backdrop-filter:blur(6px);z-index:600;}
-.dov.open{display:block;animation:fin .25s ease;}
-@keyframes fin{from{opacity:0}to{opacity:1}}
-.drw{
-  position:fixed;top:0;left:-295px;width:285px;height:100vh;
-  background:#0a0a0a;
-  border-right:1px solid rgba(255,255,255,0.1);z-index:700;
-  transition:left .35s cubic-bezier(.4,0,.2,1);overflow-y:auto;padding-bottom:40px;
-}
+/* ── DRAWER ── */
+.dov{display:none;position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:500;}
+.dov.open{display:block;}
+.drw{position:fixed;top:0;left:-300px;width:290px;height:100vh;background:#111;border-right:1px solid #222;z-index:600;transition:left .3s ease;overflow-y:auto;padding-bottom:40px;}
 .drw.open{left:0;}
 .drw::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--green),var(--gold),var(--red));}
-.drw-hd{padding:22px 18px 16px;border-bottom:1px solid var(--b2);position:relative;overflow:hidden;}
-.drw-hd::after{content:'';position:absolute;top:-50px;right:-50px;width:140px;height:140px;background:radial-gradient(circle,rgba(0,230,118,0.15),transparent 70%);border-radius:50%;}
-.drw-logo{font-family:'Bebas Neue',sans-serif;font-size:1.3rem;letter-spacing:3px;background:linear-gradient(135deg,var(--green),var(--gold));-webkit-background-clip:text;-webkit-text-fill-color:transparent;filter:drop-shadow(0 0 10px var(--glow));}
-.drw-sub{font-size:0.67rem;color:var(--muted);margin-top:4px;letter-spacing:1px;}
-.drw-sec{font-size:0.58rem;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:3px;padding:16px 18px 8px;}
-.drw-lnk{display:flex;align-items:center;gap:12px;padding:13px 18px;text-decoration:none;color:var(--txt2);font-size:0.86rem;font-weight:500;border-left:2px solid transparent;transition:all .2s;}
-.drw-lnk:active{background:rgba(0,230,118,0.08);border-left-color:var(--green);color:var(--txt);}
-.di{width:38px;height:38px;border-radius:11px;display:flex;align-items:center;justify-content:center;font-size:1.05rem;flex-shrink:0;}
-.dia{background:linear-gradient(135deg,rgba(0,230,118,.15),rgba(105,240,174,.1));border:1px solid rgba(0,230,118,.25);}
-.did{background:linear-gradient(135deg,rgba(255,109,0,.12),rgba(255,23,68,.08));border:1px solid rgba(255,109,0,.2);}
-.dih{background:linear-gradient(135deg,rgba(255,23,68,.12),rgba(255,0,100,.08));border:1px solid rgba(255,23,68,.2);}
-.dis{background:linear-gradient(135deg,rgba(24,255,255,.1),rgba(0,85,255,.07));border:1px solid rgba(24,255,255,.18);}
-.di-nm{font-size:0.83rem;font-weight:600;color:var(--txt);line-height:1.2;}
-.di-hn{font-size:0.67rem;color:var(--muted);margin-top:2px;}
-.hlp-b{background:linear-gradient(135deg,var(--tg2),var(--tg));color:#fff;font-size:0.55rem;font-weight:800;padding:3px 9px;border-radius:50px;}
-.drw-div{height:1px;background:linear-gradient(90deg,transparent,var(--b3),transparent);margin:8px 18px;}
+.drw-hd{padding:24px 18px 16px;border-bottom:1px solid #222;background:linear-gradient(135deg,rgba(0,230,118,.08),rgba(229,9,20,.05));}
+.drw-logo{font-family:'Bebas Neue',sans-serif;font-size:1.4rem;letter-spacing:3px;background:linear-gradient(135deg,var(--green),var(--gold));-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
+.drw-sub{font-size:.67rem;color:var(--muted);margin-top:3px;letter-spacing:1px;}
+.drw-sec{font-size:.58rem;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:3px;padding:16px 18px 8px;}
+.drw-lnk{display:flex;align-items:center;gap:12px;padding:13px 18px;text-decoration:none;color:#aaa;font-size:.86rem;font-weight:500;border-left:2px solid transparent;transition:all .2s;}
+.drw-lnk:active{background:rgba(0,230,118,.06);border-left-color:var(--green);color:#fff;}
+.di{width:38px;height:38px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:1rem;flex-shrink:0;}
+.dia{background:rgba(0,230,118,.15);border:1px solid rgba(0,230,118,.25);}
+.did{background:rgba(255,109,0,.12);border:1px solid rgba(255,109,0,.2);}
+.dih{background:rgba(229,9,20,.12);border:1px solid rgba(229,9,20,.2);}
+.dis{background:rgba(29,155,209,.12);border:1px solid rgba(29,155,209,.2);}
+.di-nm{font-size:.83rem;font-weight:600;color:#fff;line-height:1.2;}
+.di-hn{font-size:.67rem;color:var(--muted);margin-top:2px;}
+.hlpb{background:var(--tg);color:#fff;font-size:.56rem;font-weight:800;padding:2px 8px;border-radius:50px;}
+.drw-div{height:1px;background:#222;margin:8px 18px;}
 
-/* ═══════════════════════════════════
-   PAGES
-═══════════════════════════════════ */
-.pg{display:none;position:relative;z-index:1;}
-.pg.active{display:block;animation:pgi .35s ease;}
-@keyframes pgi{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+/* ── HERO SLIDER ── */
+.hero-wrap{position:relative;height:62vw;max-height:320px;overflow:hidden;background:#111;}
+.hero-slide{position:absolute;inset:0;opacity:0;transition:opacity .8s ease;}
+.hero-slide.active{opacity:1;}
+.hero-img{width:100%;height:100%;object-fit:cover;filter:brightness(.45);}
+.hero-grad{position:absolute;inset:0;background:linear-gradient(to bottom,transparent 30%,rgba(13,13,13,.7) 70%,var(--bg) 100%);}
+.hero-info{position:absolute;bottom:0;left:0;right:0;padding:16px;}
+.hero-title{font-family:'Bebas Neue',sans-serif;font-size:1.6rem;letter-spacing:2px;line-height:1.1;text-shadow:0 2px 8px rgba(0,0,0,.8);margin-bottom:8px;}
+.hero-meta{display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
+.hero-score{background:rgba(245,197,24,.2);border:1px solid rgba(245,197,24,.4);color:var(--gold);font-size:.7rem;font-weight:700;padding:2px 8px;border-radius:4px;}
+.hero-type{background:rgba(255,255,255,.15);color:#fff;font-size:.7rem;font-weight:700;padding:2px 8px;border-radius:4px;}
+.hero-btns{display:flex;gap:10px;margin-top:12px;}
+.hbtn-watch{display:flex;align-items:center;justify-content:center;gap:7px;background:#fff;color:#000;border:none;border-radius:6px;padding:9px 20px;font-family:'Outfit',sans-serif;font-weight:800;font-size:.84rem;flex:1;cursor:pointer;text-decoration:none;}
+.hbtn-info{display:flex;align-items:center;justify-content:center;gap:7px;background:rgba(255,255,255,.18);color:#fff;border:none;border-radius:6px;padding:9px 16px;font-family:'Outfit',sans-serif;font-weight:700;font-size:.84rem;cursor:pointer;backdrop-filter:blur(4px);}
+.hero-dots{position:absolute;bottom:6px;right:12px;display:flex;gap:4px;}
+.hdot{width:6px;height:6px;border-radius:50%;background:rgba(255,255,255,.3);transition:all .3s;}
+.hdot.active{background:var(--green);width:16px;border-radius:4px;}
 
-/* ═══════════════════════════════════
-   HERO — MOBILE FIRST
-═══════════════════════════════════ */
-.hero{
-  position:relative;
-  padding:28px 16px 28px;
-  text-align:center;overflow:hidden;
-}
-.hero::before{
-  content:'';position:absolute;inset:0;
-  background:
-    radial-gradient(ellipse 90% 60% at 50% -5%,rgba(0,230,118,0.1),transparent),
-    radial-gradient(ellipse 60% 40% at 80% 100%,rgba(255,23,68,0.07),transparent),
-    radial-gradient(ellipse 50% 30% at 10% 80%,rgba(255,215,64,0.05),transparent);
-  pointer-events:none;
-}
-/* Big "ANIME" text in background */
-.hero-bg-txt{
-  position:absolute;font-family:'Bebas Neue',sans-serif;
-  color:rgba(0,230,118,0.03);pointer-events:none;user-select:none;
-  font-size:22vw;top:50%;left:50%;
-  transform:translate(-50%,-50%);
-  white-space:nowrap;letter-spacing:8px;
-  animation:bgT 10s ease-in-out infinite;
-}
-@keyframes bgT{0%,100%{transform:translate(-50%,-50%)}50%{transform:translate(-50%,-53%)}}
+/* ── SECTIONS ── */
+.section{padding:16px 0 8px;}
+.sec-hd{display:flex;align-items:center;justify-content:space-between;padding:0 14px;margin-bottom:12px;}
+.sec-ttl{font-family:'Outfit',sans-serif;font-size:1.05rem;font-weight:700;display:flex;align-items:center;gap:8px;}
+.sec-ttl::before{content:'';display:block;width:3px;height:18px;background:var(--red);border-radius:2px;}
+.sec-view{color:var(--red);font-size:.78rem;font-weight:600;}
 
-.hero-chip{
-  display:inline-flex;align-items:center;gap:7px;
-  background:rgba(0,230,118,0.08);
-  border:1px solid rgba(0,230,118,0.22);
-  border-radius:50px;padding:5px 15px;
-  font-size:0.66rem;font-weight:700;color:var(--green);
-  text-transform:uppercase;letter-spacing:2px;
-  margin-bottom:16px;
-  box-shadow:0 0 18px rgba(0,230,118,0.08);
-}
-.hero-chip::before{
-  content:'';width:6px;height:6px;border-radius:50%;
-  background:var(--green);box-shadow:0 0 8px var(--green);
-  animation:blnk 2s infinite;
-}
-@keyframes blnk{0%,100%{opacity:1}50%{opacity:.1}}
+/* Horizontal scroll row */
+.hrow{display:flex;gap:10px;overflow-x:auto;padding:0 14px;scroll-snap-type:x mandatory;}
+.hrow::-webkit-scrollbar{display:none;}
 
-/* HERO TITLE — Only "WATCH ANIME" */
-.hero h1{
-  font-family:'Bebas Neue',sans-serif;
-  font-size:clamp(3rem,14vw,5rem);
-  line-height:0.95;letter-spacing:4px;
-  margin-bottom:12px;
-}
-.h1-watch{
-  display:block;color:var(--txt);
-  text-shadow:0 0 40px rgba(0,230,118,0.15);
-}
-.h1-anime{
-  display:block;
-  background:linear-gradient(120deg,var(--green) 0%,var(--gold) 45%,var(--red) 100%);
-  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
-  filter:drop-shadow(0 0 24px var(--glow));
-  animation:hueS 5s ease-in-out infinite;
-}
-@keyframes hueS{0%,100%{filter:drop-shadow(0 0 24px var(--glow))}50%{filter:drop-shadow(0 0 32px var(--rglow))}}
+/* ── ANIME CARD (horizontal row) ── */
+.acard{flex-shrink:0;width:120px;scroll-snap-align:start;cursor:pointer;}
+.acard-img{position:relative;width:120px;height:168px;border-radius:var(--r);overflow:hidden;background:#222;}
+.acard-img img{width:100%;height:100%;object-fit:cover;display:block;}
+.acard-badge{position:absolute;top:6px;left:6px;font-size:.58rem;font-weight:800;padding:2px 7px;border-radius:4px;text-transform:uppercase;letter-spacing:.5px;}
+.b-multi{background:#f5c518;color:#000;}
+.b-hindi{background:#ff6b35;color:#fff;}
+.b-dual{background:#6c63ff;color:#fff;}
+.b-sub{background:#00b4d8;color:#fff;}
+.b-fandub{background:#e50914;color:#fff;}
+.b-eng{background:#2ecc71;color:#000;}
+.acard-score{position:absolute;bottom:6px;right:6px;background:rgba(0,0,0,.75);color:var(--gold);font-size:.62rem;font-weight:700;padding:2px 6px;border-radius:4px;}
+.acard-name{margin-top:6px;font-size:.72rem;font-weight:600;line-height:1.3;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;color:var(--txt2);}
+.acard-year{font-size:.65rem;color:var(--muted);margin-top:2px;}
 
-.hero-sub{
-  color:var(--txt2);font-size:0.85rem;line-height:1.6;
-  margin-bottom:24px;letter-spacing:.2px;
-}
-.hero-sub span{font-weight:700;}
-.hero-sub .gr{color:var(--green2);}
-.hero-sub .rd{color:var(--red2);}
-.hero-sub .gd{color:var(--gold);}
+/* ── GRID (for movies/series pages) ── */
+.grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;padding:14px;}
+.gcard{cursor:pointer;}
+.gcard-img{position:relative;aspect-ratio:2/3;border-radius:var(--r);overflow:hidden;background:#222;}
+.gcard-img img{width:100%;height:100%;object-fit:cover;display:block;}
+.gcard-badge{position:absolute;top:6px;left:6px;font-size:.55rem;font-weight:800;padding:2px 6px;border-radius:4px;text-transform:uppercase;}
+.gcard-score{position:absolute;bottom:5px;right:5px;background:rgba(0,0,0,.75);color:var(--gold);font-size:.6rem;font-weight:700;padding:2px 5px;border-radius:4px;}
+.gcard-name{margin-top:5px;font-size:.72rem;font-weight:600;line-height:1.3;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;color:#ddd;}
+.gcard-year{font-size:.62rem;color:var(--muted);margin-top:1px;}
 
-/* SEARCH BAR — Mobile optimized */
-.sbar{
-  display:flex;align-items:center;
-  background:rgba(255,255,255,0.04);
-  border:1.5px solid var(--b3);border-radius:50px;
-  padding:5px 5px 5px 18px;
-  transition:border .25s,box-shadow .25s;
-  max-width:500px;margin:0 auto;
-}
-.sbar:focus-within{
-  border-color:rgba(0,230,118,0.5);
-  box-shadow:0 0 0 3px rgba(0,230,118,0.1),0 6px 30px rgba(0,230,118,0.12);
-}
-.sbar input{
-  flex:1;background:transparent;border:none;
-  color:var(--txt);font-family:'Outfit',sans-serif;
-  font-size:0.9rem;outline:none;min-width:0;
-  /* Bigger for mobile */
-  padding:6px 0;
-}
+/* ── OUR ANIME row (horizontal, special) ── */
+.our-card{flex-shrink:0;width:130px;scroll-snap-align:start;cursor:pointer;}
+.our-img{position:relative;width:130px;height:185px;border-radius:var(--r2);overflow:hidden;background:#222;}
+.our-img img{width:100%;height:100%;object-fit:cover;display:block;}
+.our-pp{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;background:linear-gradient(135deg,#1a1a1a,#0d0d0d);}
+.our-pp-i{font-size:2.2rem;}
+.our-pp-t{font-size:.6rem;font-weight:700;color:var(--green);text-align:center;padding:0 6px;line-height:1.3;}
+.our-badge{position:absolute;top:6px;left:6px;}
+.our-score{position:absolute;bottom:6px;right:6px;background:rgba(0,0,0,.75);color:var(--gold);font-size:.62rem;font-weight:700;padding:2px 6px;border-radius:4px;}
+.our-name{margin-top:6px;font-size:.74rem;font-weight:700;line-height:1.3;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;color:#fff;}
+
+/* ── SEARCH ── */
+.search-top{padding:12px 14px;background:var(--bg);position:sticky;top:56px;z-index:100;}
+.sbar{display:flex;align-items:center;background:#222;border-radius:8px;padding:0 14px;gap:10px;}
+.sbar input{flex:1;background:transparent;border:none;color:#fff;font-family:'Outfit',sans-serif;font-size:.9rem;padding:12px 0;outline:none;}
 .sbar input::placeholder{color:var(--muted);}
-.sbar button{
-  background:linear-gradient(135deg,var(--green3),var(--green));
-  border:none;border-radius:50px;padding:11px 22px;
-  color:#000;font-family:'Outfit',sans-serif;font-weight:800;
-  font-size:0.84rem;white-space:nowrap;flex-shrink:0;
-  box-shadow:0 4px 18px rgba(0,230,118,0.4);
-  transition:all .2s;letter-spacing:.3px;
-}
-.sbar button:active{transform:scale(0.96);}
+.sbar svg{width:18px;height:18px;fill:var(--muted);}
 
-/* Stats bar */
-.hero-stats{
-  display:flex;align-items:center;justify-content:center;
-  gap:18px;margin-top:26px;flex-wrap:wrap;
-}
-.hstat{text-align:center;}
-.hstat-num{
-  font-family:'Bebas Neue',sans-serif;font-size:1.8rem;
-  letter-spacing:2px;line-height:1;
-  background:linear-gradient(135deg,var(--green),var(--gold));
-  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
-}
-.hstat-lbl{font-size:0.6rem;color:var(--muted);text-transform:uppercase;letter-spacing:1.5px;margin-top:2px;}
-.hstat-div{width:1px;height:26px;background:linear-gradient(var(--green),var(--red));opacity:0.2;}
-
-/* QUOTE BOX */
-.qbox{
-  position:relative;margin:18px 14px;padding:14px 18px 14px 48px;
-  background:linear-gradient(135deg,rgba(0,230,118,0.05),rgba(255,23,68,0.03));
-  border:1px solid var(--b2);border-left:3px solid var(--green);
-  border-radius:var(--r);font-style:italic;color:var(--txt2);
-  font-size:0.83rem;line-height:1.7;overflow:hidden;
-}
-.qbox::before{
-  content:'"';position:absolute;left:10px;top:2px;
-  font-family:'Bebas Neue',sans-serif;font-size:3rem;
-  color:var(--green);opacity:.25;line-height:1;
-}
-.qbox span{display:block;font-style:normal;font-size:0.7rem;color:var(--green2);font-weight:700;margin-top:5px;letter-spacing:.5px;}
-
-/* ═══════════════════════════════════
-   SECTIONS
-═══════════════════════════════════ */
-section{padding:18px 12px;position:relative;z-index:1;}
-.sh{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;}
-.st{font-family:'Bebas Neue',sans-serif;font-size:1.2rem;letter-spacing:2px;display:flex;align-items:center;gap:9px;}
-.stbar{width:4px;height:20px;border-radius:4px;background:linear-gradient(var(--green),var(--red));box-shadow:0 0 10px var(--glow);flex-shrink:0;}
-.sc{font-size:0.68rem;color:var(--muted);background:var(--card);border:1px solid var(--b2);border-radius:50px;padding:3px 11px;font-weight:600;}
-
-/* ═══════════════════════════════════
-   3D COLLECTION CARDS — MOBILE
-═══════════════════════════════════ */
-.mg{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:12px;}
-
-.mc{
-  background:var(--card);border-radius:var(--r2);overflow:hidden;
-  border:1px solid var(--b2);position:relative;
-  transition:transform .25s,box-shadow .25s,border-color .25s;
-  animation:ci .5s ease backwards;
-  /* Mobile: active instead of hover */
-}
-.mc:active{transform:scale(0.97);}
-
-/* Shine on card */
-.mc::before{
-  content:'';position:absolute;inset:0;
-  background:linear-gradient(135deg,rgba(0,230,118,0.06),transparent 50%,rgba(255,23,68,0.04));
-  pointer-events:none;z-index:2;opacity:0;transition:opacity .3s;border-radius:var(--r2);
-}
-/* Glowing border on hover/active */
-.mc::after{
-  content:'';position:absolute;inset:-1px;
-  background:linear-gradient(135deg,var(--green),var(--gold),var(--red));
-  border-radius:var(--r2);opacity:0;transition:opacity .25s;z-index:-1;
-}
-
-@keyframes ci{from{opacity:0;transform:translateY(20px) scale(0.95)}to{opacity:1;transform:translateY(0) scale(1)}}
-
-.pw{position:relative;aspect-ratio:2/3;background:var(--surface);overflow:hidden;}
-.pw img{width:100%;height:100%;object-fit:cover;display:block;transition:transform .4s ease;}
-
-/* Holographic shimmer */
-.pw-holo{
-  position:absolute;inset:0;
-  background:linear-gradient(110deg,transparent 38%,rgba(0,230,118,0.06) 44%,rgba(255,215,64,0.07) 50%,rgba(255,23,68,0.05) 56%,transparent 62%);
-  background-size:200% 200%;animation:holo 4s ease-in-out infinite;
-  pointer-events:none;z-index:3;
-}
-@keyframes holo{0%{background-position:200% 0}100%{background-position:-200% 0}}
-
-.pp{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;background:linear-gradient(135deg,var(--card2),var(--surface));}
-.pp-i{font-size:2.8rem;}
-.pp-t{font-size:0.62rem;font-weight:700;color:var(--green);text-align:center;padding:0 8px;line-height:1.3;}
-.eov{position:absolute;bottom:0;left:0;right:0;background:linear-gradient(transparent,rgba(6,13,6,0.94));padding:26px 9px 8px;font-size:0.64rem;color:#ccc;font-weight:600;z-index:4;}
-.score-ov{position:absolute;top:8px;left:8px;background:rgba(0,0,0,0.75);backdrop-filter:blur(4px);border:1px solid rgba(255,215,64,0.4);color:var(--gold);font-size:0.65rem;font-weight:700;padding:3px 8px;border-radius:50px;z-index:5;}
-.new-badge{position:absolute;top:9px;right:9px;background:linear-gradient(135deg,var(--red3),var(--red));color:#fff;font-size:0.54rem;font-weight:800;padding:3px 8px;border-radius:50px;text-transform:uppercase;letter-spacing:.8px;z-index:5;box-shadow:0 2px 10px var(--rglow);}
-
-.mi{padding:10px 11px 12px;}
-.mt{font-size:0.8rem;font-weight:700;line-height:1.3;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;margin-bottom:6px;}
-.lb{display:inline-flex;align-items:center;font-size:0.57rem;font-weight:700;padding:2px 8px;border-radius:50px;text-transform:uppercase;letter-spacing:.3px;}
-.lh{background:rgba(255,107,107,.1);color:#ff7a7a;border:1px solid rgba(255,107,107,.22);}
-.lt{background:rgba(24,255,255,.07);color:#18ffff;border:1px solid rgba(24,255,255,.18);}
-.lm{background:rgba(0,230,118,.1);color:#00e676;border:1px solid rgba(0,230,118,.22);}
-.le{background:rgba(255,215,64,.08);color:#ffd740;border:1px solid rgba(255,215,64,.2);}
-
-/* ═══════════════════════════════════
-   API / SEARCH CARDS
-═══════════════════════════════════ */
-.ag{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:10px;}
-.ac{background:var(--card);border-radius:var(--r);overflow:hidden;border:1px solid var(--b2);transition:transform .2s,box-shadow .2s;}
-.ac:active{transform:scale(0.97);}
-.ac img{width:100%;aspect-ratio:2/3;object-fit:cover;display:block;}
-.ac-i{padding:8px 9px 10px;}
-.ac-t{font-size:0.75rem;font-weight:600;line-height:1.3;margin-bottom:5px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;}
-.ac-s{display:inline-flex;align-items:center;gap:3px;font-size:0.67rem;color:var(--gold);font-weight:700;background:rgba(255,215,64,.07);border:1px solid rgba(255,215,64,.18);border-radius:50px;padding:1px 7px;}
-
-/* SKELETON */
-.sk{background:linear-gradient(90deg,var(--card) 25%,var(--card2) 50%,var(--card) 75%);background-size:200% 100%;animation:shim 1.6s infinite;border-radius:var(--r);}
-.skh{height:200px;}
-@keyframes shim{0%{background-position:200% 0}100%{background-position:-200% 0}}
-.nores{grid-column:1/-1;text-align:center;color:var(--muted);padding:36px 0;font-size:0.85rem;}
-.ldr{display:inline-block;width:14px;height:14px;border:2px solid var(--b3);border-top-color:var(--green);border-radius:50%;animation:spin .7s linear infinite;vertical-align:middle;margin-left:6px;}
-@keyframes spin{to{transform:rotate(360deg)}}
-
-/* ═══════════════════════════════════
-   WATCH PAGE
-═══════════════════════════════════ */
-.wp{min-height:100vh;padding-bottom:50px;}
-.bbtn{
-  display:inline-flex;align-items:center;gap:7px;
-  background:rgba(255,255,255,0.04);border:1px solid var(--b3);
-  border-radius:50px;padding:10px 16px;color:var(--txt2);
-font-family:'Outfit',sans-serif;font-weight:600;font-size:0.83rem;
-  text-decoration:none;margin:12px 12px 10px;transition:all .2s;outline:none;
-  min-height:42px;/* Mobile tap size */
-}
-.bbtn:active{border-color:var(--green);color:var(--green);}
-.bbtn svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2.5;}
-
-.wbn{position:relative;margin:0 12px 14px;border-radius:var(--r3);overflow:hidden;border:1px solid var(--b3);}
-.wbn-img{width:100%;height:220px;object-fit:cover;display:block;filter:brightness(.25) saturate(1.4);}
-.wbn-ov{position:absolute;inset:0;display:flex;gap:13px;align-items:flex-end;padding:16px;background:linear-gradient(to top,rgba(6,13,6,.97) 0%,rgba(6,13,6,.45) 60%,transparent 100%);}
-.wpst{width:80px;height:108px;border-radius:12px;object-fit:cover;flex-shrink:0;border:2px solid rgba(0,230,118,.5);box-shadow:0 6px 24px rgba(0,0,0,.8),0 0 22px var(--glow);}
-.wi{flex:1;}
-.wtl{font-family:'Bebas Neue',sans-serif;font-size:1.35rem;letter-spacing:2px;line-height:1.1;margin-bottom:8px;text-shadow:0 2px 12px rgba(0,0,0,.9);}
-.wm{display:flex;flex-wrap:wrap;gap:5px;}
-.wbadge{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.1);border-radius:50px;padding:3px 10px;font-size:0.65rem;color:#ccc;font-weight:500;}
-.wbadge.hl{border-color:rgba(0,230,118,.4);color:var(--green);background:rgba(0,230,118,.08);}
-
-.ic{margin:0 12px 12px;background:var(--card);border:1px solid var(--b3);border-radius:var(--r2);overflow:hidden;}
-.ic-hd{padding:11px 15px 9px;border-bottom:1px solid var(--b2);background:linear-gradient(135deg,rgba(0,230,118,.06),rgba(255,23,68,.03));display:flex;align-items:center;gap:8px;}
-.ic-dot{width:7px;height:7px;border-radius:50%;background:var(--green);box-shadow:0 0 8px var(--green);animation:blnk 2s infinite;flex-shrink:0;}
-.ic-ttl{font-family:'Bebas Neue',sans-serif;font-size:1rem;letter-spacing:2px;}
-.ic-body{padding:11px 15px 13px;font-family:'JetBrains Mono',monospace;font-size:0.77rem;line-height:2;color:#a0c8a0;}
-.il{display:flex;gap:8px;align-items:baseline;}
-.ik{color:var(--muted);font-size:0.7rem;flex-shrink:0;}
-.iv{color:var(--txt);font-weight:500;font-size:0.78rem;}
-.idv{display:block;color:rgba(0,230,118,0.12);font-size:0.76rem;letter-spacing:1px;}
-.ip{color:var(--green);margin-right:4px;opacity:.7;}
-
-.va{margin:0 12px 12px;border-radius:var(--r2);overflow:hidden;border:1px solid var(--b3);background:var(--surface);}
-.va-top{padding:12px 15px;background:rgba(0,230,118,.04);border-bottom:1px solid var(--b2);}
-.va-lbl{font-family:'Bebas Neue',sans-serif;font-size:1.05rem;letter-spacing:2px;color:var(--green);}
-.va-sub{font-size:0.67rem;color:var(--muted);margin-top:2px;}
-.tgw{
-  display:flex;align-items:center;justify-content:center;gap:12px;
-  background:linear-gradient(135deg,var(--tg2),var(--tg),#36c9f5);
-  border:none;border-radius:0;padding:20px;width:100%;
-  color:#fff;font-family:'Outfit',sans-serif;font-weight:800;font-size:0.98rem;
-  text-decoration:none;transition:filter .2s;position:relative;overflow:hidden;letter-spacing:.4px;
-  min-height:60px;/* Bigger tap area */
-}
-.tgw::before{content:'';position:absolute;top:0;left:-100%;width:55%;height:100%;background:linear-gradient(90deg,transparent,rgba(255,255,255,.12),transparent);transition:left .5s;}
-.tgw:active::before{left:150%;}
-.tgw svg{width:22px;height:22px;fill:#fff;}
-.tg-note{padding:10px 15px;background:rgba(29,155,209,.05);border-top:1px solid rgba(29,155,209,.12);}
-.tg-note p{font-size:0.73rem;color:#7ab0cb;line-height:1.6;}
-.tg-note strong{color:var(--cyan);}
-
-.eps{padding:0 12px 12px;}
-.ep-ttl{font-family:'Bebas Neue',sans-serif;font-size:.95rem;letter-spacing:2px;margin-bottom:10px;color:var(--green2);display:flex;align-items:center;gap:7px;}
-.ep-ttl::before{content:'';display:block;width:3px;height:14px;background:var(--green2);border-radius:4px;box-shadow:0 0 8px var(--glow2);}
-.ep-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(58px,1fr));gap:7px;}
-.ep-btn{
-  background:var(--card);border:1px solid var(--b2);border-radius:var(--r);
-  padding:12px 4px;text-align:center;font-size:0.72rem;font-weight:700;
-  color:var(--muted);letter-spacing:.2px;transition:all .2s;
-  min-height:44px;display:flex;align-items:center;justify-content:center;
-}
-.ep-btn.active{background:linear-gradient(135deg,var(--green3),var(--green));border-color:transparent;color:#000;box-shadow:0 4px 18px var(--glow);}
-.ep-btn:active:not(.active){border-color:rgba(0,230,118,.4);color:var(--green);}
-
-.syn-box{background:var(--card);border:1px solid var(--b3);border-radius:var(--r2);padding:15px;}
-.syn-box h3{font-family:'Bebas Neue',sans-serif;font-size:.95rem;letter-spacing:2px;margin-bottom:8px;color:var(--green2);display:flex;align-items:center;gap:7px;}
-.syn-box h3::before{content:'';display:block;width:3px;height:14px;background:var(--green2);border-radius:4px;box-shadow:0 0 8px var(--glow2);}
-.syn-box p{font-size:0.82rem;line-height:1.78;color:var(--txt2);}
-
-/* ═══════════════════════════════════
-   DETAIL PAGE — ZORO STYLE
-═══════════════════════════════════ */
-.det-page{min-height:100vh;padding-bottom:50px;}
-.det-ban{position:relative;height:260px;overflow:hidden;}
-.det-ban img{width:100%;height:100%;object-fit:cover;display:block;filter:brightness(.25) saturate(1.4);}
-.det-ban-ov{position:absolute;inset:0;background:linear-gradient(to bottom,transparent 20%,rgba(6,13,6,.7) 60%,rgba(6,13,6,1) 100%);}
-.det-ban-ct{position:absolute;bottom:0;left:0;right:0;padding:16px;display:flex;gap:14px;align-items:flex-end;}
-.det-poster{width:88px;height:118px;border-radius:13px;object-fit:cover;flex-shrink:0;border:2px solid rgba(0,230,118,.5);box-shadow:0 8px 28px rgba(0,0,0,.8),0 0 24px var(--glow);}
+/* ── DETAIL MODAL ── */
+.det-modal{display:none;position:fixed;inset:0;background:var(--bg);z-index:400;overflow-y:auto;}
+.det-modal.active{display:block;animation:dtIn .3s ease;}
+@keyframes dtIn{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+.det-back{display:flex;align-items:center;gap:8px;padding:14px;background:rgba(13,13,13,.9);position:sticky;top:0;z-index:10;backdrop-filter:blur(8px);}
+.det-back button{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.15);border-radius:50%;width:36px;height:36px;color:#fff;font-size:1rem;cursor:pointer;display:flex;align-items:center;justify-content:center;}
+.det-back-title{font-family:'Bebas Neue',sans-serif;font-size:1rem;letter-spacing:1px;color:#fff;}
+.det-banner{position:relative;height:55vw;max-height:260px;overflow:hidden;}
+.det-banner img{width:100%;height:100%;object-fit:cover;filter:brightness(.3);}
+.det-banner-ov{position:absolute;inset:0;background:linear-gradient(to bottom,transparent 20%,var(--bg) 100%);}
+.det-banner-ct{position:absolute;bottom:0;left:0;right:0;padding:16px;display:flex;gap:14px;align-items:flex-end;}
+.det-poster{width:80px;height:110px;border-radius:var(--r2);object-fit:cover;flex-shrink:0;border:2px solid rgba(0,230,118,.4);box-shadow:0 6px 24px rgba(0,0,0,.8);}
 .det-info{flex:1;min-width:0;}
-.det-ttl{font-family:'Bebas Neue',sans-serif;font-size:1.4rem;letter-spacing:2px;line-height:1.15;text-shadow:0 2px 12px rgba(0,0,0,.9);margin-bottom:5px;}
-.det-alt{font-size:0.7rem;color:var(--muted);margin-bottom:7px;}
-
-/* Star rating */
-.det-rating{display:flex;align-items:center;gap:7px;margin-bottom:7px;flex-wrap:wrap;}
-.stars{display:flex;gap:1px;}
-.star{font-size:0.95rem;color:#2a3a2a;}
-.star.full{color:var(--gold);}
-.rating-num{font-size:0.8rem;font-weight:700;color:var(--gold);}
-.rating-votes{font-size:0.66rem;color:var(--muted);}
-
-.det-chips{display:flex;flex-wrap:wrap;gap:5px;}
-.d-chip{border-radius:50px;padding:3px 10px;font-size:0.66rem;font-weight:700;}
-.d-air{background:rgba(0,230,118,.1);border:1px solid rgba(0,230,118,.3);color:var(--green);display:flex;align-items:center;gap:4px;}
-.d-air::before{content:'';width:5px;height:5px;border-radius:50%;background:var(--green);box-shadow:0 0 5px var(--green);animation:blnk 1.5s infinite;}
-.d-fin{background:rgba(255,23,68,.1);border:1px solid rgba(255,23,68,.25);color:var(--red2);}
-.d-up{background:rgba(255,215,64,.1);border:1px solid rgba(255,215,64,.25);color:var(--gold);}
-.d-type{background:rgba(255,255,255,.06);border:1px solid var(--b3);color:var(--txt2);}
-
-/* Watch button */
-.watch-big-btn{
-  display:flex;align-items:center;justify-content:center;gap:11px;
-  margin:12px 12px 0;
-  background:linear-gradient(135deg,var(--tg2),var(--tg),#36c9f5);
-  border:none;border-radius:var(--r2);padding:17px;color:#fff;
-  font-family:'Outfit',sans-serif;font-weight:800;font-size:0.98rem;
-  text-decoration:none;box-shadow:0 6px 26px rgba(29,155,209,.45);
-  transition:all .2s;letter-spacing:.4px;position:relative;overflow:hidden;
-  min-height:56px;
-}
-.watch-big-btn::before{content:'';position:absolute;top:0;left:-100%;width:55%;height:100%;background:linear-gradient(90deg,transparent,rgba(255,255,255,.12),transparent);transition:left .5s;}
-.watch-big-btn:active::before{left:150%;}
-.watch-big-btn svg{width:20px;height:20px;fill:#fff;}
-
-/* Detail blocks */
-.det-block{margin:12px 12px 0;background:var(--card);border:1px solid var(--b3);border-radius:var(--r2);overflow:hidden;}
-.det-bh{padding:12px 15px 10px;border-bottom:1px solid var(--b2);background:linear-gradient(135deg,rgba(0,230,118,.05),rgba(255,23,68,.03));display:flex;align-items:center;gap:8px;}
-.det-bh-icon{font-size:1rem;}
-.det-bh-ttl{font-family:'Bebas Neue',sans-serif;font-size:0.95rem;letter-spacing:2px;}
-.det-bc{padding:13px 15px;}
-
-/* Info grid — Zoro style 2 column with bullets */
+.det-title{font-family:'Bebas Neue',sans-serif;font-size:1.3rem;letter-spacing:1.5px;line-height:1.15;text-shadow:0 2px 8px rgba(0,0,0,.9);margin-bottom:6px;}
+.det-meta-row{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:6px;}
+.det-chip{border-radius:4px;padding:3px 8px;font-size:.64rem;font-weight:700;}
+.ch-air{background:rgba(0,230,118,.15);border:1px solid rgba(0,230,118,.3);color:var(--green);}
+.ch-fin{background:rgba(29,155,209,.15);border:1px solid rgba(29,155,209,.25);color:#1d9bd1;}
+.ch-type{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.15);color:#ccc;}
+.det-score-row{display:flex;align-items:center;gap:6px;}
+.det-stars{display:flex;gap:2px;}
+.det-star{font-size:.85rem;color:#333;}
+.det-star.on{color:var(--gold);}
+.det-score-num{font-size:.78rem;font-weight:700;color:var(--gold);}
+.det-votes{font-size:.65rem;color:var(--muted);}
+.det-watch-btn{display:flex;align-items:center;justify-content:center;gap:10px;margin:14px;background:var(--tg);border:none;border-radius:8px;padding:16px;color:#fff;font-family:'Outfit',sans-serif;font-weight:800;font-size:.95rem;cursor:pointer;text-decoration:none;box-shadow:0 6px 20px rgba(29,155,209,.4);}
+.det-watch-btn svg{width:20px;height:20px;fill:#fff;}
+.det-block{margin:0 14px 14px;background:#181818;border-radius:var(--r2);overflow:hidden;}
+.det-bh{padding:12px 16px 10px;border-bottom:1px solid #222;background:rgba(255,255,255,.03);display:flex;align-items:center;gap:8px;}
+.det-bh-icon{font-size:.95rem;}
+.det-bh-ttl{font-family:'Bebas Neue',sans-serif;font-size:.95rem;letter-spacing:1.5px;}
+.det-bc{padding:14px 16px;}
+.det-syn{font-size:.82rem;line-height:1.8;color:#aaa;overflow:hidden;transition:max-height .4s;}
+.det-syn.coll{max-height:80px;}
+.det-syn-fade{position:relative;}
+.det-syn-fade::after{content:'';position:absolute;bottom:0;left:0;right:0;height:40px;background:linear-gradient(transparent,#181818);pointer-events:none;}
+.det-syn-fade.open::after{display:none;}
+.more-btn{font-size:.76rem;color:var(--green);font-weight:700;border:none;background:none;padding:6px 0;cursor:pointer;}
+.genre-row{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px;}
+.gtag{background:#222;border:1px solid #333;border-radius:6px;padding:4px 12px;font-size:.7rem;color:#aaa;}
 .info-grid{display:grid;grid-template-columns:1fr 1fr;gap:0;}
-.info-item{display:flex;align-items:flex-start;gap:6px;padding:7px 0;border-bottom:1px solid var(--b1);}
-.info-item:nth-child(odd){padding-right:10px;border-right:1px solid var(--b1);}
+.info-item{display:flex;align-items:flex-start;gap:6px;padding:7px 0;border-bottom:1px solid rgba(255,255,255,.04);}
+.info-item:nth-child(odd){padding-right:10px;border-right:1px solid rgba(255,255,255,.04);}
 .info-item:nth-child(even){padding-left:10px;}
 .info-item:nth-last-child(-n+2){border-bottom:none;}
-.info-bullet{width:7px;height:7px;border-radius:50%;background:var(--green2);box-shadow:0 0 5px var(--glow2);flex-shrink:0;margin-top:4px;}
-.info-k{font-size:0.72rem;font-weight:700;color:var(--txt);flex-shrink:0;}
-.info-v{font-size:0.72rem;color:var(--txt2);flex:1;line-height:1.4;}
+.info-dot{width:6px;height:6px;border-radius:50%;background:var(--green);flex-shrink:0;margin-top:4px;}
+.info-k{font-size:.7rem;font-weight:700;color:#fff;flex-shrink:0;}
+.info-v{font-size:.7rem;color:#888;flex:1;line-height:1.4;}
+.rec-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;}
+.rec-card{cursor:pointer;}
+.rec-img{aspect-ratio:2/3;border-radius:var(--r);overflow:hidden;position:relative;}
+.rec-img img{width:100%;height:100%;object-fit:cover;display:block;}
+.rec-name{font-size:.68rem;font-weight:600;margin-top:4px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;color:#ccc;}
+.lang-grid,.q-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+.lang-it{display:flex;align-items:center;gap:8px;background:#222;border:1px solid #333;border-radius:var(--r);padding:9px 11px;}
+.lang-it.yes{border-color:rgba(0,230,118,.25);background:rgba(0,230,118,.04);}
+.lang-it.no{opacity:.3;}
+.lang-flag{font-size:1.05rem;}
+.lang-name{font-size:.75rem;font-weight:600;flex:1;}
+.lang-chk{font-size:.85rem;}
+.ch-btn-row{display:flex;flex-direction:column;gap:8px;}
+.ch-row-btn{display:flex;align-items:center;gap:12px;padding:13px 14px;border-radius:var(--r);text-decoration:none;border:1px solid #333;background:rgba(255,255,255,.02);}
+.ch-row-btn.main{background:rgba(0,230,118,.07);border-color:rgba(0,230,118,.25);}
+.ch-row-icon{width:38px;height:38px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:1rem;background:rgba(0,230,118,.15);border:1px solid rgba(0,230,118,.25);}
+.ch-row-name{font-size:.82rem;font-weight:700;color:#fff;}
+.ch-row-handle{font-size:.66rem;color:var(--muted);margin-top:2px;}
 
-/* Genres */
-.genre-row{display:flex;flex-wrap:wrap;gap:7px;}
-.gtag{background:rgba(255,255,255,.04);border:1px solid var(--b3);border-radius:8px;padding:5px 13px;font-size:0.75rem;color:var(--txt2);transition:all .2s;}
-.gtag:active{border-color:var(--green);color:var(--green);background:rgba(0,230,118,.06);}
+/* ── PAGE HEADERS ── */
+.page-hd{padding:20px 14px 4px;}
+.page-hd h2{font-family:'Outfit',sans-serif;font-size:1.3rem;font-weight:800;}
+.page-hd h2 span{color:var(--red);}
+.page-hd p{font-size:.78rem;color:var(--muted);margin-top:3px;}
 
-/* Synopsis expand/collapse */
-.syn-wrap{position:relative;}
-.det-syn{font-size:0.83rem;line-height:1.82;color:var(--txt2);overflow:hidden;transition:max-height .4s ease;}
-.det-syn.collapsed{max-height:76px;}
-.syn-fade{position:absolute;bottom:24px;left:0;right:0;height:36px;background:linear-gradient(transparent,var(--card));pointer-events:none;}
-.syn-fade.hidden{display:none;}
-.more-btn{display:inline-block;margin-top:7px;font-size:0.77rem;color:var(--green2);font-weight:700;border:none;background:transparent;letter-spacing:.2px;padding:4px 0;}
+/* ── SKELETON ── */
+.sk{background:linear-gradient(90deg,#181818 25%,#252525 50%,#181818 75%);background-size:200% 100%;animation:shim 1.6s infinite;border-radius:var(--r);}
+.sk-card{width:120px;height:168px;flex-shrink:0;}
+.sk-gcard{aspect-ratio:2/3;border-radius:var(--r);}
+@keyframes shim{0%{background-position:200% 0}100%{background-position:-200% 0}}
+.ldr{display:inline-block;width:16px;height:16px;border:2px solid #333;border-top-color:var(--green);border-radius:50%;animation:spin .7s linear infinite;vertical-align:middle;}
+@keyframes spin{to{transform:rotate(360deg)}}
 
-/* Lang + Quality */
-.two-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
-.gi{display:flex;align-items:center;gap:8px;background:rgba(255,255,255,.03);border:1px solid var(--b2);border-radius:var(--r);padding:10px 12px;}
-.gi.yes{border-color:rgba(0,230,118,.25);background:rgba(0,230,118,.04);}
-.gi.no{opacity:.3;}
-.gi.qyes{border-color:rgba(255,215,64,.2);background:rgba(255,215,64,.03);}
-.gi-icon{font-size:1.05rem;flex-shrink:0;}
-.gi-name{font-size:0.76rem;font-weight:600;flex:1;}
-.gi-name.c{color:var(--gold);}
-.gi-chk{font-size:0.85rem;}
+/* ── NO RESULTS ── */
+.no-res{text-align:center;color:var(--muted);padding:40px 20px;font-size:.85rem;}
 
-/* Recommended Series */
-.rec-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:9px;}
-.rec-card{background:var(--card);border-radius:var(--r);overflow:hidden;border:1px solid var(--b2);position:relative;transition:transform .2s;}
-.rec-card:active{transform:scale(0.97);}
-.rec-poster{position:relative;aspect-ratio:2/3;overflow:hidden;}
-.rec-poster img{width:100%;height:100%;object-fit:cover;display:block;}
-.rec-type{position:absolute;top:6px;right:6px;background:var(--tg);color:#fff;font-size:0.52rem;font-weight:800;padding:2px 6px;border-radius:4px;letter-spacing:.5px;}
-.rec-status{position:absolute;bottom:0;left:0;right:0;background:linear-gradient(transparent,rgba(0,0,0,.9));padding:16px 6px 5px;}
-.rec-status span{font-size:0.57rem;font-weight:700;color:var(--green2);text-transform:uppercase;letter-spacing:.4px;}
-.rec-name{padding:6px 7px 8px;font-size:0.7rem;font-weight:600;line-height:1.3;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;}
-
-/* Channels */
-.ch-grid{display:flex;flex-direction:column;gap:9px;}
-.ch-btn{display:flex;align-items:center;gap:12px;padding:13px 14px;border-radius:var(--r);text-decoration:none;border:1px solid var(--b3);background:rgba(255,255,255,.02);transition:all .2s;position:relative;overflow:hidden;min-height:56px;}
-.ch-btn:active{border-color:rgba(29,155,209,.4);background:rgba(29,155,209,.05);}
-.ch-btn.main{background:linear-gradient(135deg,rgba(0,230,118,.08),rgba(0,230,118,.04));border-color:rgba(0,230,118,.25);}
-.ch-icon{width:40px;height:40px;border-radius:11px;display:flex;align-items:center;justify-content:center;font-size:1.1rem;flex-shrink:0;background:linear-gradient(135deg,rgba(0,230,118,.18),rgba(255,215,64,.12));border:1px solid rgba(0,230,118,.25);}
-.ch-name{font-size:0.83rem;font-weight:700;color:var(--txt);line-height:1.2;}
-.ch-handle{font-size:0.67rem;color:var(--muted);margin-top:2px;}
-.ch-arr{color:var(--muted);font-size:0.85rem;margin-left:auto;}
-
-/* TOAST */
-.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%) translateY(80px);background:var(--card2);border:1px solid rgba(0,230,118,.3);box-shadow:0 8px 30px rgba(0,0,0,.5),0 0 18px rgba(0,230,118,.1);color:var(--txt);padding:11px 22px;border-radius:50px;font-size:0.79rem;font-weight:600;z-index:9999;transition:transform .35s cubic-bezier(.34,1.56,.64,1);white-space:nowrap;}
+/* ── TOAST ── */
+.toast{position:fixed;bottom:72px;left:50%;transform:translateX(-50%) translateY(60px);background:#222;border:1px solid var(--green);color:#fff;padding:10px 22px;border-radius:50px;font-size:.78rem;font-weight:600;z-index:9999;transition:transform .3s;white-space:nowrap;}
 .toast.show{transform:translateX(-50%) translateY(0);}
-
-footer{text-align:center;padding:28px 14px;border-top:1px solid var(--b2);color:var(--muted);font-size:0.75rem;position:relative;z-index:1;}
-footer::before{content:'';position:absolute;top:0;left:50%;transform:translateX(-50%);width:100px;height:1.5px;background:linear-gradient(90deg,var(--green),var(--gold),var(--red));}
-footer a{color:var(--green2);text-decoration:none;}
-#searchSec{display:none;}
-
-/* ═══ INTRO SPLASH ═══ */
-#intro{position:fixed;inset:0;background:#000;z-index:999999;display:flex;align-items:center;justify-content:center;overflow:hidden;transition:opacity 1s ease;}
-#introBg{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;filter:brightness(0.35) saturate(1.4) contrast(1.2);z-index:0;}
-.intro-content{position:relative;z-index:1;text-align:center;animation:introZoom 3s ease forwards;}
-.intro-welcome{display:block;font-family:'Outfit',sans-serif;font-size:1rem;font-weight:300;letter-spacing:8px;text-transform:uppercase;color:rgba(255,255,255,0.7);margin-bottom:10px;}
-.intro-logo{display:block;font-family:'Bebas Neue',sans-serif;font-size:clamp(3rem,15vw,5.5rem);letter-spacing:6px;background:linear-gradient(135deg,#00e676,#ffd740,#ff1744);-webkit-background-clip:text;-webkit-text-fill-color:transparent;filter:drop-shadow(0 0 30px rgba(0,230,118,0.6)) drop-shadow(0 0 60px rgba(255,23,68,0.4));line-height:1;}
-.intro-tagline{display:block;font-family:'Outfit',sans-serif;font-size:0.75rem;font-weight:400;letter-spacing:4px;color:rgba(255,255,255,0.5);margin-top:14px;text-transform:uppercase;}
-.intro-bar{width:60px;height:2px;background:linear-gradient(90deg,#00e676,#ff1744);margin:14px auto 0;border-radius:4px;animation:introBar 3s ease forwards;box-shadow:0 0 10px #00e676;}
-@keyframes introZoom{0%{opacity:0;transform:scale(0.4);}50%{opacity:1;transform:scale(1.06);}75%{transform:scale(0.98);}100%{opacity:1;transform:scale(1);}}
-@keyframes introBar{0%{width:0;opacity:0;}60%{opacity:1;}100%{width:120px;opacity:1;}}
-.intro-particle{position:absolute;border-radius:50%;animation:pFloat linear infinite;pointer-events:none;}
-@keyframes pFloat{0%{transform:translateY(100vh) scale(0);opacity:0;}10%{opacity:1;}90%{opacity:1;}100%{transform:translateY(-100px) scale(1.2);opacity:0;}}
 </style>
 </head>
 <body>
 
-<!-- ═══════ INTRO SPLASH ═══════ -->
+<!-- INTRO -->
 <div id="intro">
   <video autoplay muted playsinline loop id="introBg">
     <source src="https://cdn.pixabay.com/vimeo/328940142/abstract-21503.mp4" type="video/mp4"/>
   </video>
-  <div class="intro-content">
-    <span class="intro-welcome">Welcome to</span>
-    <span class="intro-logo">iNFiNiTE TV</span>
-    <span class="intro-tagline">Free • HD • Multi Language</span>
-    <div class="intro-bar"></div>
+  <div class="ic">
+    <span class="ic-w">Welcome to</span>
+    <span class="ic-l">iNFiNiTE TV</span>
+    <span class="ic-t">Free • HD • Multi Language</span>
+    <div class="ic-bar"></div>
   </div>
 </div>
-
-<!-- Background effects -->
-<div class="bg-mesh"></div>
-<div class="orb o1"></div><div class="orb o2"></div><div class="orb o3"></div>
-<div class="krain" id="krain"></div>
 
 <!-- DRAWER -->
 <div class="dov" id="dov" onclick="closeDrawer()"></div>
 <div class="drw" id="drw">
   <div class="drw-hd">
-    <div class="drw-logo">iNFiNiTE ANiMES</div>
+    <div class="drw-logo">iNFiNiTE TV</div>
     <div class="drw-sub">ALL COMMUNITIES • ONE PLACE 🌐</div>
   </div>
   <div class="drw-sec">Our Channels</div>
@@ -654,171 +266,228 @@ footer a{color:var(--green2);text-decoration:none;}
   <a href="https://t.me/iNFiNiTES_Support" target="_blank" class="drw-lnk" onclick="closeDrawer()">
     <div class="di dis">🛠️</div>
     <div style="flex:1"><div class="di-nm">iNFiNiTE Support</div><div class="di-hn">@iNFiNiTES_Support</div></div>
-    <span class="hlp-b">HELP</span>
+    <span class="hlpb">HELP</span>
   </a>
-</div>
-
-<!-- NAVBAR -->
-<nav>
-  <div class="hbg" id="hbg" onclick="toggleDrawer()"><span></span><span></span><span></span></div>
-  <div class="nav-logo">iNFiNiTE TV</div>
-</nav>
-
-<!-- ═══════ HOME PAGE ═══════ -->
-<div class="pg active" id="homePage">
-  <div class="hero">
-    <div class="hero-bg-txt">ANIME</div>
-    <div class="hero-chip">Free Streaming • Updated Daily</div>
-    <p class="hero-sub">
-      <span class="gr">Hindi</span> • <span class="rd">Telugu</span> • <span class="gd">Tamil</span> • Malayalam • English • Japanese
-    </p>
-    <div class="sbar">
-      <input type="text" id="srchIn" placeholder="Search any anime..."/>
-      <button onclick="doSearch()">SEARCH</button>
-    </div>
-    <div class="hero-stats">
-      <div class="hstat"><div class="hstat-num" id="statA">0</div><div class="hstat-lbl">Anime</div></div>
-      <div class="hstat-div"></div>
-      <div class="hstat"><div class="hstat-num" id="statE">0</div><div class="hstat-lbl">Episodes</div></div>
-      <div class="hstat-div"></div>
-      <div class="hstat"><div class="hstat-num">6</div><div class="hstat-lbl">Languages</div></div>
-      <div class="hstat-div"></div>
-      <div class="hstat"><div class="hstat-num">FREE</div><div class="hstat-lbl">Always</div></div>
-    </div>
-  </div>
-
-  <div class="qbox" id="qbox"><span>Loading...</span></div>
-
-  <section>
-    <div class="sh">
-      <div class="st"><div class="stbar"></div>🎌 OUR COLLECTION</div>
-      <div class="sc" id="colCnt">—</div>
-    </div>
-    <div class="mg" id="colGrid">
-      <div class="sk skh"></div><div class="sk skh"></div><div class="sk skh"></div>
-    </div>
-  </section>
-
-  <section id="searchSec">
-    <div class="sh"><div class="st" id="srchTtl"><div class="stbar"></div>RESULTS</div></div>
-    <div class="ag" id="srchGrid"></div>
-  </section>
-
-  <section>
-    <div class="sh"><div class="st"><div class="stbar"></div>🔥 TRENDING NOW</div></div>
-    <div class="ag" id="trendGrid">
-      <div class="sk skh"></div><div class="sk skh"></div><div class="sk skh"></div>
-      <div class="sk skh"></div><div class="sk skh"></div><div class="sk skh"></div>
-    </div>
-  </section>
-
-  <section>
-    <div class="sh"><div class="st"><div class="stbar"></div>⭐ TOP RATED</div></div>
-    <div class="ag" id="topGrid">
-      <div class="sk skh"></div><div class="sk skh"></div>
-      <div class="sk skh"></div><div class="sk skh"></div>
-      <div class="sk skh"></div><div class="sk skh"></div>
-    </div>
-  </section>
-
-  <section>
-    <div class="sh"><div class="st"><div class="stbar"></div>🎬 MOVIES</div></div>
-    <div class="ag" id="moviesGrid">
-      <div class="sk skh"></div><div class="sk skh"></div>
-      <div class="sk skh"></div><div class="sk skh"></div>
-    </div>
-  </section>
-
-  <footer>Made with 🔥 by <a href="https://t.me/infinite_animes" target="_blank">iNFiNiTE ANiMES</a></footer>
-</div>
-
-<!-- ═══════ WATCH PAGE ═══════ -->
-<div class="pg" id="watchPage">
-  <div class="wp">
-    <button class="bbtn" onclick="goHome()"><svg viewBox="0 0 24 24"><polyline points="15,18 9,12 15,6"/></svg>BACK</button>
-    <div class="wbn">
-      <img class="wbn-img" id="bnImg" src="" alt=""/>
-      <div class="wbn-ov">
-        <img class="wpst" id="pstSm" src="" alt=""/>
-        <div class="wi"><div class="wtl" id="wTtl"></div><div class="wm" id="wMeta"></div></div>
-      </div>
-    </div>
-    <div class="ic">
-      <div class="ic-hd"><div class="ic-dot"></div><div class="ic-ttl" id="icTtl"></div></div>
-      <div class="ic-body" id="icBody"></div>
-    </div>
-    <div class="va">
-      <div class="va-top"><div class="va-lbl" id="vaLbl">SELECT EPISODE</div><div class="va-sub" id="vaSub">Choose an episode below</div></div>
-      <a id="tgBtn" href="#" target="_blank" class="tgw">
-        <svg viewBox="0 0 24 24"><path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.562 8.248-1.97 9.289c-.145.658-.537.818-1.084.508l-3-2.21-1.447 1.394c-.16.16-.295.295-.605.295l.213-3.053 5.56-5.023c.242-.213-.054-.333-.373-.12L7.19 14.447l-2.95-.924c-.64-.204-.657-.64.136-.95l11.57-4.461c.537-.194 1.006.131.616.136z"/></svg>
-        ▶ WATCH ON TELEGRAM
-      </a>
-      <div class="tg-note"><p>Opens <strong>Telegram</strong> — Free, fast, zero ads. Join <strong>@infinite_animes</strong></p></div>
-    </div>
-    <div class="eps" id="epsSec"></div>
-    <div style="padding:0 12px 12px" id="synSec"></div>
+  <div class="drw-div"></div>
+  <div class="drw-sec">Streaming Partners</div>
+  <div style="display:flex;flex-wrap:wrap;gap:8px;padding:8px 18px;">
+    <div style="background:#f5753a;color:#fff;border-radius:6px;padding:6px 14px;font-size:.72rem;font-weight:700;">Crunchyroll</div>
+    <div style="background:#e50914;color:#fff;border-radius:6px;padding:6px 14px;font-size:.72rem;font-weight:700;">Netflix</div>
+    <div style="background:#00a8e0;color:#fff;border-radius:6px;padding:6px 14px;font-size:.72rem;font-weight:700;">Prime Video</div>
+    <div style="background:#1b74e4;color:#fff;border-radius:6px;padding:6px 14px;font-size:.72rem;font-weight:700;">Hotstar</div>
   </div>
 </div>
 
-<!-- ═══════ DETAIL PAGE ═══════ -->
-<div class="pg" id="detailPage">
-  <div class="det-page">
-    <button class="bbtn" onclick="goHome()"><svg viewBox="0 0 24 24"><polyline points="15,18 9,12 15,6"/></svg>BACK</button>
-    <div class="det-ban">
-      <img id="detBanImg" src="" alt=""/>
-      <div class="det-ban-ov"></div>
-      <div class="det-ban-ct">
-        <img id="detPoster" src="" alt="" class="det-poster"/>
-        <div class="det-info">
-          <div class="det-ttl" id="detTtl">Loading...</div>
-          <div class="det-alt" id="detAlt"></div>
-          <div class="det-rating" id="detRating"></div>
-          <div class="det-chips" id="detChips"></div>
+<!-- TOP NAV (shared) -->
+<div class="topnav" id="topnav" style="display:flex;">
+  <button class="tn-menu" onclick="toggleDrawer()">☰</button>
+  <div class="tn-logo">iNFiNiTE TV</div>
+  <div style="width:36px;"></div>
+</div>
+
+<!-- ═══ HOME PAGE ═══ -->
+<div class="page active" id="pgHome">
+  <!-- Hero Slider -->
+  <div class="hero-wrap" id="heroWrap">
+    <div class="hero-slide active" id="heroSlide0">
+      <img src="" alt="" class="hero-img" id="heroImg0"/>
+      <div class="hero-grad"></div>
+      <div class="hero-info">
+        <div class="hero-title" id="heroTitle0">Loading...</div>
+        <div class="hero-meta" id="heroMeta0"></div>
+        <div class="hero-btns">
+          <a href="#" target="_blank" class="hbtn-watch" id="heroWatch0">
+            <svg viewBox="0 0 24 24" fill="#000" width="16" height="16"><polygon points="5,3 19,12 5,21"/></svg>
+            WATCH NOW
+          </a>
+          <button class="hbtn-info" onclick="openDetailById('heroMalId0')">
+            <svg viewBox="0 0 24 24" fill="white" width="14" height="14"><circle cx="12" cy="12" r="10" stroke="white" stroke-width="2" fill="none"/><line x1="12" y1="8" x2="12" y2="12" stroke="white" stroke-width="2"/><line x1="12" y1="16" x2="12.01" y2="16" stroke="white" stroke-width="2"/></svg>
+            Info
+          </button>
         </div>
       </div>
     </div>
-    <a id="detWatchBtn" href="https://t.me/+xMpwvvBc2bEzOTk1" target="_blank" class="watch-big-btn">
-      <svg viewBox="0 0 24 24"><path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.562 8.248-1.97 9.289c-.145.658-.537.818-1.084.508l-3-2.21-1.447 1.394c-.16.16-.295.295-.605.295l.213-3.053 5.56-5.023c.242-.213-.054-.333-.373-.12L7.19 14.447l-2.95-.924c-.64-.204-.657-.64.136-.95l11.57-4.461c.537-.194 1.006.131.616.136z"/></svg>
-      ▶ WATCH ON TELEGRAM
-    </a>
-    <div class="det-block"><div class="det-bh"><span class="det-bh-icon">📋</span><span class="det-bh-ttl">INFORMATION</span></div><div class="det-bc"><div class="info-grid" id="detInfoGrid"></div></div></div>
-    <div class="det-block"><div class="det-bh"><span class="det-bh-icon">🏷️</span><span class="det-bh-ttl">GENRES</span></div><div class="det-bc"><div class="genre-row" id="detGenres"></div></div></div>
-    <div class="det-block">
-      <div class="det-bh"><span class="det-bh-icon">📖</span><span class="det-bh-ttl">STORY</span></div>
-      <div class="det-bc">
-        <div class="syn-wrap"><div class="det-syn collapsed" id="detSyn">Loading...</div><div class="syn-fade" id="synFade"></div></div>
-        <button class="more-btn" id="moreBtn" onclick="toggleSyn()">more ▼</button>
-      </div>
+    <div class="hero-dots" id="heroDots"></div>
+  </div>
+
+  <!-- Our Collection -->
+  <div class="section">
+    <div class="sec-hd">
+      <div class="sec-ttl">🎌 Our Collection</div>
+      <span id="ourCount" style="font-size:.72rem;color:var(--muted);"></span>
     </div>
-    <div class="det-block"><div class="det-bh"><span class="det-bh-icon">🌐</span><span class="det-bh-ttl">LANGUAGES AVAILABLE</span></div><div class="det-bc"><div class="two-grid" id="detLangs"></div></div></div>
-    <div class="det-block"><div class="det-bh"><span class="det-bh-icon">🎞️</span><span class="det-bh-ttl">QUALITY AVAILABLE</span></div><div class="det-bc"><div class="two-grid" id="detQuality"></div></div></div>
-    <div class="det-block"><div class="det-bh"><span class="det-bh-icon">🎯</span><span class="det-bh-ttl">RECOMMENDED SERIES</span></div><div class="det-bc"><div class="rec-grid" id="detRec"></div></div></div>
-    <div class="det-block" style="margin-bottom:12px;"><div class="det-bh"><span class="det-bh-icon">📡</span><span class="det-bh-ttl">WATCH ON OUR CHANNELS</span></div><div class="det-bc"><div class="ch-grid" id="detChannels"></div></div></div>
+    <div class="hrow" id="ourRow">
+      <div class="sk sk-card"></div><div class="sk sk-card"></div><div class="sk sk-card"></div>
+    </div>
+  </div>
+
+  <!-- Trending -->
+  <div class="section">
+    <div class="sec-hd"><div class="sec-ttl">🔥 Trending Now</div></div>
+    <div class="hrow" id="trendRow">
+      <div class="sk sk-card"></div><div class="sk sk-card"></div><div class="sk sk-card"></div><div class="sk sk-card"></div>
+    </div>
+  </div>
+
+  <!-- Top Rated -->
+  <div class="section">
+    <div class="sec-hd"><div class="sec-ttl">⭐ Top Rated</div></div>
+    <div class="hrow" id="topRow">
+      <div class="sk sk-card"></div><div class="sk sk-card"></div><div class="sk sk-card"></div><div class="sk sk-card"></div>
+    </div>
+  </div>
+
+  <!-- Popular Movies row -->
+  <div class="section">
+    <div class="sec-hd">
+      <div class="sec-ttl">🎬 Popular Movies</div>
+      <span class="sec-view" onclick="goTab('pgMovies')">View All ›</span>
+    </div>
+    <div class="hrow" id="movRow">
+      <div class="sk sk-card"></div><div class="sk sk-card"></div><div class="sk sk-card"></div><div class="sk sk-card"></div>
+    </div>
   </div>
 </div>
+
+<!-- ═══ SEARCH PAGE ═══ -->
+<div class="page" id="pgSearch">
+  <div class="search-top">
+    <div class="sbar">
+      <svg viewBox="0 0 24 24"><path d="M21 21l-4.35-4.35M17 11A6 6 0 1 1 5 11a6 6 0 0 1 12 0z" stroke="currentColor" stroke-width="2" fill="none"/></svg>
+      <input type="text" id="srchIn" placeholder="Search anime, movies, series..."/>
+    </div>
+  </div>
+  <div id="srchResult" style="padding:8px 0;">
+    <div class="no-res">Search for your favourite anime 🔍</div>
+  </div>
+</div>
+
+<!-- ═══ MOVIES PAGE ═══ -->
+<div class="page" id="pgMovies">
+  <div class="page-hd"><h2>All <span>Movies</span></h2><p>Watch Your Favourite Movies</p></div>
+  <div class="grid-3" id="movGrid">
+    <div class="sk sk-gcard"></div><div class="sk sk-gcard"></div><div class="sk sk-gcard"></div>
+    <div class="sk sk-gcard"></div><div class="sk sk-gcard"></div><div class="sk sk-gcard"></div>
+  </div>
+</div>
+
+<!-- ═══ SERIES PAGE ═══ -->
+<div class="page" id="pgSeries">
+  <div class="page-hd"><h2>All <span>Series</span></h2><p>Watch Your Favourite Anime Series</p></div>
+  <div class="grid-3" id="serGrid">
+    <div class="sk sk-gcard"></div><div class="sk sk-gcard"></div><div class="sk sk-gcard"></div>
+    <div class="sk sk-gcard"></div><div class="sk sk-gcard"></div><div class="sk sk-gcard"></div>
+  </div>
+</div>
+
+<!-- ═══ DETAIL MODAL ═══ -->
+<div class="det-modal" id="detModal">
+  <div class="det-back">
+    <button onclick="closeDetail()">‹</button>
+    <span class="det-back-title" id="detBackTitle"></span>
+  </div>
+  <div class="det-banner">
+    <img id="detBanImg" src="" alt=""/>
+    <div class="det-banner-ov"></div>
+    <div class="det-banner-ct">
+      <img id="detPoster" src="" alt="" class="det-poster"/>
+      <div class="det-info">
+        <div class="det-title" id="detTitle">Loading...</div>
+        <div class="det-meta-row" id="detMeta"></div>
+        <div class="det-score-row" id="detScore"></div>
+      </div>
+    </div>
+  </div>
+  <a id="detWatchBtn" href="#" target="_blank" class="det-watch-btn">
+    <svg viewBox="0 0 24 24"><path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.562 8.248-1.97 9.289c-.145.658-.537.818-1.084.508l-3-2.21-1.447 1.394c-.16.16-.295.295-.605.295l.213-3.053 5.56-5.023c.242-.213-.054-.333-.373-.12L7.19 14.447l-2.95-.924c-.64-.204-.657-.64.136-.95l11.57-4.461c.537-.194 1.006.131.616.136z"/></svg>
+    ▶ WATCH ON TELEGRAM
+  </a>
+  <!-- Info -->
+  <div class="det-block">
+    <div class="det-bh"><span class="det-bh-icon">📋</span><span class="det-bh-ttl">INFORMATION</span></div>
+    <div class="det-bc"><div class="info-grid" id="detInfoGrid"></div></div>
+  </div>
+  <!-- Genres -->
+  <div class="det-block">
+    <div class="det-bh"><span class="det-bh-icon">🏷️</span><span class="det-bh-ttl">GENRES</span></div>
+    <div class="det-bc"><div class="genre-row" id="detGenres"></div></div>
+  </div>
+  <!-- Story -->
+  <div class="det-block">
+    <div class="det-bh"><span class="det-bh-icon">📖</span><span class="det-bh-ttl">STORY</span></div>
+    <div class="det-bc">
+      <div class="det-syn-fade" id="detSynFade">
+        <div class="det-syn coll" id="detSyn"></div>
+      </div>
+      <button class="more-btn" id="moreBtn" onclick="toggleSyn()">more ▼</button>
+    </div>
+  </div>
+  <!-- Languages -->
+  <div class="det-block">
+    <div class="det-bh"><span class="det-bh-icon">🌐</span><span class="det-bh-ttl">LANGUAGES AVAILABLE</span></div>
+    <div class="det-bc"><div class="lang-grid" id="detLangs"></div></div>
+  </div>
+  <!-- Quality -->
+  <div class="det-block">
+    <div class="det-bh"><span class="det-bh-icon">🎞️</span><span class="det-bh-ttl">QUALITY AVAILABLE</span></div>
+    <div class="det-bc"><div class="q-grid" id="detQuality"></div></div>
+  </div>
+  <!-- Recommended -->
+  <div class="det-block">
+    <div class="det-bh"><span class="det-bh-icon">🎯</span><span class="det-bh-ttl">RECOMMENDED</span></div>
+    <div class="det-bc"><div class="rec-grid" id="detRec"></div></div>
+  </div>
+  <!-- Channels -->
+  <div class="det-block" style="margin-bottom:20px;">
+    <div class="det-bh"><span class="det-bh-icon">📡</span><span class="det-bh-ttl">WATCH ON OUR CHANNELS</span></div>
+    <div class="det-bc"><div class="ch-btn-row" id="detChannels"></div></div>
+  </div>
+</div>
+
+<!-- BOTTOM NAV -->
+<nav class="bnav">
+  <button class="bn-btn active" id="bn0" onclick="goTab('pgHome')">
+    <svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9,22 9,12 15,12 15,22"/></svg>
+    Home
+  </button>
+  <button class="bn-btn" id="bn1" onclick="goTab('pgSearch')">
+    <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+    Search
+  </button>
+  <button class="bn-btn" id="bn2" onclick="goTab('pgMovies')">
+    <svg viewBox="0 0 24 24"><rect x="2" y="2" width="20" height="20" rx="2.18" ry="2.18"/><line x1="7" y1="2" x2="7" y2="22"/><line x1="17" y1="2" x2="17" y2="22"/><line x1="2" y1="12" x2="22" y2="12"/><line x1="2" y1="7" x2="7" y2="7"/><line x1="2" y1="17" x2="7" y2="17"/><line x1="17" y1="17" x2="22" y2="17"/><line x1="17" y1="7" x2="22" y2="7"/></svg>
+    Movies
+  </button>
+  <button class="bn-btn" id="bn3" onclick="goTab('pgSeries')">
+    <svg viewBox="0 0 24 24"><rect x="2" y="7" width="20" height="15" rx="2"/><polyline points="17,2 12,7 7,2"/></svg>
+    Series
+  </button>
+  <button class="bn-btn" id="bn4" onclick="toggleDrawer()">
+    <svg viewBox="0 0 24 24"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+    More
+  </button>
+</nav>
 
 <div class="toast" id="toast"></div>
 
 <script>
-// ════════════════════════════════════════════════════════
-// ★ ANIME DATABASE ★
-// malId = MyAnimeList ID (thumbnail fetch ke liye)
-// tgLink = Direct Telegram channel link
-// ════════════════════════════════════════════════════════
+// ══════════════════════════════════════════════
+// ★ ANIME DATABASE — Your channels
+// ══════════════════════════════════════════════
 const ANIME_DB = [
   {id:1,  title:"HUNTER X HUNTER",                     malId:11061, tgLink:"https://t.me/+kDVlwkOcACA4Y2U1",                               lang:"multi"},
   {id:2,  title:"ATTACK ON TITAN",                      malId:16498, tgLink:"https://t.me/+GoGJ4FMVhVllNTY1",                               lang:"multi"},
   {id:3,  title:"DRAGON BALL Z",                        malId:813,   tgLink:"https://t.me/+ePBYZOdBWZs5N2Y1",                               lang:"multi"},
   {id:4,  title:"NARUTO CLASSIC",                       malId:20,    tgLink:"https://t.me/+_dXiOxJqKWdjNGU1",                               lang:"multi"},
   {id:5,  title:"NARUTO SHIPPUDEN",                     malId:1735,  tgLink:"https://t.me/+nrNly9PR2vBmOGNl",                               lang:"multi"},
-  {id:6,  title:"THAT TIME I GOT REINCARNATED AS A SLIME", malId:37430, tgLink:"https://t.me/+TwO7z1euGCkzNjJl",                          lang:"multi"},
+  {id:6,  title:"THAT TIME I GOT REINCARNATED AS A SLIME",malId:37430,tgLink:"https://t.me/+TwO7z1euGCkzNjJl",                            lang:"multi"},
   {id:7,  title:"MUSHOKU TENSEI",                       malId:39535, tgLink:"https://t.me/+4zl992Z0Mf4xNjBl",                               lang:"multi"},
   {id:8,  title:"DEATH NOTE",                           malId:1535,  tgLink:"https://t.me/+vVQQEJNTigtmMWJl",                               lang:"multi"},
-  {id:9,  title:"BLACK CLOVER",                         malId:34572, tgLink:"https://t.me/+I8YHOptRcw0wZmJl",                               lang:"multi"},
+  {id:9,  title:"BLACK CLOVER",                         malId:34572, tgLink:"https://t.me/Black_Clover_Hindi_Dub_53",                        lang:"multi"},
   {id:10, title:"THE ANGEL NEXT DOOR",                  malId:51105, tgLink:"https://t.me/the_angle_next_door_hindidubbed",                  lang:"hindi"},
   {id:11, title:"FRIEREN: BEYOND JOURNEY'S END",        malId:52991, tgLink:"https://t.me/Infinite_Link_Bot?start=req_LTEwMDIzNDU0NTI5Nzg", lang:"multi"},
   {id:12, title:"LOOKISM",                              malId:50251, tgLink:"https://t.me/lookisminhindiseason2",                             lang:"hindi"},
-  {id:13, title:"DAILY LIFE OF IMMORTAL KING",          malId:40357, tgLink:"https://t.me/Infinite_Link_Bot?start=req_LTEwMDI1MDg5MDIyNDk", lang:"hindi"},
+  {id:13, title:"DAILY LIFE OF IMMORTAL KING",          malId:40357, tgLink:"https://t.me/+KOdfKTB6MXRlZjRl",                               lang:"hindi"},
   {id:14, title:"FIRE FORCE",                           malId:38671, tgLink:"https://t.me/Infinite_Link_Bot?start=req_LTEwMDI0Mzc2OTkxMDQ", lang:"multi"},
   {id:15, title:"JUJUTSU KAISEN",                       malId:40748, tgLink:"https://t.me/Jujutsu_Kaisen_Hindi_Dub_3",                       lang:"multi"},
   {id:16, title:"CLASSROOM OF THE ELITE",               malId:35507, tgLink:"https://t.me/Classroom_of_Elite_Hindi_Dubb",                    lang:"multi"},
@@ -836,361 +505,385 @@ const ANIME_DB = [
   {id:28, title:"DR. STONE",                            malId:38691, tgLink:"https://t.me/+utvCm1i1pHljZmRl",                               lang:"multi"},
   {id:29, title:"CHAINSAW MAN",                         malId:44511, tgLink:"https://t.me/+87A_zQN7hTVkOWI1",                               lang:"multi"},
   {id:30, title:"HAIKYUU!!",                            malId:20583, tgLink:"https://t.me/+dy5By_WDX4A0Yjhl",                               lang:"multi"},
-  {id:31, title:"ONE PIECE HINDI",                      malId:21,    tgLink:"https://t.me/+B4A_ez7B1cw3ZGRl",                               lang:"hindi"},
-  {id:32, title:"ONE PIECE MOVIES",                     malId:1569,  tgLink:"https://t.me/+OFimTqrJ23Q3YWE1",                               lang:"multi"},
-  {id:33, title:"TOKYO REVENGERS",                      malId:48569, tgLink:"https://t.me/Tokyo_Revenger_official_hindi",                    lang:"hindi"},
-  {id:34, title:"MOB PSYCHO 100",                       malId:32182, tgLink:"https://t.me/+nMhSJHY-ER43NWJl",                               lang:"multi"},
-  {id:35, title:"KAGUYA-SAMA: LOVE IS WAR",             malId:37999, tgLink:"https://t.me/+qrb-uu8QuVBiNzc9",                               lang:"multi"},
-  {id:36, title:"THE APOTHECARY DIARIES",               malId:54112, tgLink:"https://t.me/The_Apothecary_Diaries_Hindidubx",                 lang:"hindi"},
-  {id:37, title:"GOBLIN SLAYER",                        malId:37349, tgLink:"https://t.me/+sKwqa0smAAdkZWI9",                               lang:"multi"},
-  {id:38, title:"DEMON SLAYER",                         malId:38000, tgLink:"https://t.me/Demon_slayer_official_hindiX",                     lang:"multi"},
-  {id:39, title:"THE GOD OF HIGH SCHOOL",               malId:42476, tgLink:"https://t.me/the_god_of_hschool/26",                           lang:"multi"},
-  {id:40, title:"SAKAMOTO DAYS",                        malId:57756, tgLink:"https://t.me/+FtR1UaQSp-tmMTdl",                               lang:"multi"},
-  {id:41, title:"WIND BREAKER",                         malId:55898, tgLink:"https://t.me/+XUDY3TBZ7phkN2Nl",                               lang:"multi"},
-  {id:42, title:"TOKYO GHOUL",                          malId:22319, tgLink:"https://t.me/+SNxzPZvMOdplYTBl",                               lang:"multi"},
-  {id:43, title:"BLACK CLOVER (OFFICIAL)",              malId:34572, tgLink:"https://t.me/Black_Clover_Hindi_Dub_53",                        lang:"multi"},
-  {id:44, title:"DRAGON BALL Z (OFFICIAL)",             malId:813,   tgLink:"https://t.me/+T9UBJyX3eHkwNmJl",                               lang:"multi"},
-  {id:45, title:"ATTACK ON TITAN (OFFICIAL)",           malId:16498, tgLink:"https://t.me/Attack_On_Titan_Hindi_X",                         lang:"multi"},
-  {id:46, title:"HUNTER X HUNTER (OFFICIAL)",           malId:11061, tgLink:"https://t.me/HunterxHunter_In_Hindi",                          lang:"multi"},
-  {id:47, title:"NARUTO MOVIES",                        malId:11970, tgLink:"https://t.me/+tLMZFux6Woo5MjVl",                               lang:"multi"},
-  {id:48, title:"I PARRY EVERYTHING",                   malId:58590, tgLink:"https://t.me/+CCKg-WsHZgY2ODk1",                               lang:"hindi"},
-  {id:49, title:"CATCH ME AT THE BALL PARK",            malId:57498, tgLink:"https://t.me/Catch_me_at_ball_park_hindi_dubb",                 lang:"hindi"},
-  {id:50, title:"TOILET-BOUND HANAKO-KUN",              malId:41025, tgLink:"https://t.me/+OXl4SsEE0JxiY2Q1",                               lang:"multi"},
-  {id:51, title:"ONCE UPON A WITCH'S DEATH",            malId:57596, tgLink:"https://t.me/+7xuDH7gRrK5mMTNl",                               lang:"multi"},
-  {id:52, title:"PARADOX LIVE THE ANIMATION",           malId:57858, tgLink:"https://t.me/+BpCwsrluJnZhNzc1",                               lang:"multi"},
-  {id:53, title:"TEOGONIA",                             malId:58442, tgLink:"https://t.me/+3TBukrrklSE4NTg1",                               lang:"multi"},
-  {id:54, title:"MOBILE SUIT GUNDAM",                   malId:80,    tgLink:"https://t.me/+2KDC2YB6Y3wzNjU1",                               lang:"multi"},
-  {id:55, title:"GHOST IN THE SHELL",                   malId:43,    tgLink:"https://t.me/+3cx9LvQanXg5MDZl",                               lang:"multi"},
+  {id:31, title:"ONE PIECE",                            malId:21,    tgLink:"https://t.me/+B4A_ez7B1cw3ZGRl",                               lang:"hindi"},
+  {id:32, title:"TOKYO REVENGERS",                      malId:48569, tgLink:"https://t.me/Tokyo_Revenger_official_hindi",                    lang:"hindi"},
+  {id:33, title:"MOB PSYCHO 100",                       malId:32182, tgLink:"https://t.me/+nMhSJHY-ER43NWJl",                               lang:"multi"},
+  {id:34, title:"KAGUYA-SAMA: LOVE IS WAR",             malId:37999, tgLink:"https://t.me/+qrb-uu8QuVBiNzc9",                               lang:"multi"},
+  {id:35, title:"THE APOTHECARY DIARIES",               malId:54112, tgLink:"https://t.me/The_Apothecary_Diaries_Hindidubx",                 lang:"hindi"},
+  {id:36, title:"GOBLIN SLAYER",                        malId:37349, tgLink:"https://t.me/+sKwqa0smAAdkZWI9",                               lang:"multi"},
+  {id:37, title:"DEMON SLAYER",                         malId:38000, tgLink:"https://t.me/Demon_slayer_official_hindiX",                     lang:"multi"},
+  {id:38, title:"THE GOD OF HIGH SCHOOL",               malId:42476, tgLink:"https://t.me/the_god_of_hschool/26",                           lang:"multi"},
+  {id:39, title:"SAKAMOTO DAYS",                        malId:57756, tgLink:"https://t.me/+FtR1UaQSp-tmMTdl",                               lang:"multi"},
+  {id:40, title:"WIND BREAKER",                         malId:55898, tgLink:"https://t.me/+XUDY3TBZ7phkN2Nl",                               lang:"multi"},
+  {id:41, title:"TOKYO GHOUL",                          malId:22319, tgLink:"https://t.me/+SNxzPZvMOdplYTBl",                               lang:"multi"},
+  {id:42, title:"DRAGON BALL Z (DUB)",                  malId:813,   tgLink:"https://t.me/+T9UBJyX3eHkwNmJl",                               lang:"multi"},
+  {id:43, title:"ATTACK ON TITAN (OFFICIAL)",           malId:16498, tgLink:"https://t.me/Attack_On_Titan_Hindi_X",                         lang:"multi"},
+  {id:44, title:"HUNTER X HUNTER (OFFICIAL)",           malId:11061, tgLink:"https://t.me/HunterxHunter_In_Hindi",                          lang:"multi"},
+  {id:45, title:"I PARRY EVERYTHING",                   malId:58590, tgLink:"https://t.me/+CCKg-WsHZgY2ODk1",                               lang:"hindi"},
+  {id:46, title:"CATCH ME AT THE BALL PARK",            malId:57498, tgLink:"https://t.me/Catch_me_at_ball_park_hindi_dubb",                 lang:"hindi"},
+  {id:47, title:"TOILET-BOUND HANAKO-KUN",              malId:41025, tgLink:"https://t.me/+OXl4SsEE0JxiY2Q1",                               lang:"multi"},
+  {id:48, title:"ONCE UPON A WITCH'S DEATH",            malId:57596, tgLink:"https://t.me/+7xuDH7gRrK5mMTNl",                               lang:"multi"},
+  {id:49, title:"SAKAMOTO DAYS 2",                      malId:57756, tgLink:"https://t.me/+FtR1UaQSp-tmMTdl",                               lang:"multi"},
+  {id:50, title:"TEOGONIA",                             malId:58442, tgLink:"https://t.me/+3TBukrrklSE4NTg1",                               lang:"multi"},
+  {id:51, title:"GHOST IN THE SHELL",                   malId:43,    tgLink:"https://t.me/+3cx9LvQanXg5MDZl",                               lang:"multi"},
+  {id:52, title:"KAGUYA-SAMA (S2)",                     malId:43608, tgLink:"https://t.me/+qrb-uu8QuVBiNzc9",                               lang:"multi"},
+  {id:53, title:"HAIKYUU!! TO THE TOP",                 malId:40456, tgLink:"https://t.me/+dy5By_WDX4A0Yjhl",                               lang:"multi"},
+  {id:54, title:"MOB PSYCHO 100 II",                    malId:36471, tgLink:"https://t.me/+nMhSJHY-ER43NWJl",                               lang:"multi"},
+  {id:55, title:"NARUTO MOVIES",                        malId:11970, tgLink:"https://t.me/+tLMZFux6Woo5MjVl",                               lang:"multi"},
 ];
 
-// Default — koi bhi API anime pe click kare
 const DEFAULT_LINK = "https://t.me/infinite_animes";
+const TG = {};
+ANIME_DB.forEach(a => TG[a.malId] = a.tgLink);
 
-const ALL_LANGS=[{key:'hindi',flag:'🇮🇳',name:'Hindi'},{key:'english',flag:'🇬🇧',name:'English'},{key:'japanese',flag:'🇯🇵',name:'Japanese'},{key:'tamil',flag:'🇮🇳',name:'Tamil'},{key:'telugu',flag:'🇮🇳',name:'Telugu'},{key:'malayalam',flag:'🇮🇳',name:'Malayalam'}];
-const ALL_Q=[{icon:'📱',name:'480p'},{icon:'📺',name:'720p'},{icon:'🖥️',name:'1080p'},{icon:'💎',name:'4K'},{icon:'📝',name:'Eng Sub'},{icon:'🎙️',name:'Dubbed'}];
+const ALL_LANGS = [
+  {key:'hindi',flag:'🇮🇳',name:'Hindi'},
+  {key:'english',flag:'🇬🇧',name:'English'},
+  {key:'japanese',flag:'🇯🇵',name:'Japanese'},
+  {key:'tamil',flag:'🇮🇳',name:'Tamil'},
+  {key:'telugu',flag:'🇮🇳',name:'Telugu'},
+  {key:'malayalam',flag:'🇮🇳',name:'Malayalam'},
+];
+const ALL_Q = [{icon:'📱',name:'480p'},{icon:'📺',name:'720p'},{icon:'🖥️',name:'1080p'},{icon:'💎',name:'4K'},{icon:'📝',name:'Eng Sub'},{icon:'🎙️',name:'Dubbed'}];
 
-// ── Katakana rain ──
-(()=>{
-  const chars='アイウエオカキクケコサシスセソナニヌネノラリルレロアニメ012345';
-  const r=document.getElementById('krain');
-  for(let i=0;i<18;i++){
-    const s=document.createElement('span');
-    let t='';for(let j=0;j<Math.floor(Math.random()*14+7);j++)t+=chars[Math.floor(Math.random()*chars.length)];
-    s.textContent=t;s.style.left=(Math.random()*100)+'%';
-    s.style.animationDuration=(Math.random()*14+8)+'s';s.style.animationDelay=(Math.random()*14)+'s';
-    r.appendChild(s);
-  }
-})();
-
-// tgLink map — malId → tgLink
-const TG_LINKS = {};
-ANIME_DB.forEach(a=>{ TG_LINKS[a.malId]=a.tgLink; });
-
-// ── Lang badge ──
+// Badge helper
+function badge(lang){
+  if(!lang)return'';
+  const l=lang.toLowerCase();
+  if(l.includes('hindi'))return`<div class="acard-badge b-hindi">HINDI</div>`;
+  if(l.includes('dual'))return`<div class="acard-badge b-dual">DUAL</div>`;
+  if(l.includes('english'))return`<div class="acard-badge b-eng">ENG</div>`;
+  if(l.includes('sub'))return`<div class="acard-badge b-sub">SUB</div>`;
+  return`<div class="acard-badge b-multi">MULTI</div>`;
+}
 function langBadge(lang){
-  const m={hindi:{c:'lh',l:'🇮🇳 Hindi'},telugu:{c:'lt',l:'🇮🇳 Telugu'},multi:{c:'lm',l:'🌐 Multi'},english:{c:'le',l:'🌏 English'}};
-  const x=m[lang]||m.multi;return `<span class="lb ${x.c}">${x.l}</span>`;
+  if(lang==='hindi')return`<div class="acard-badge b-hindi">HINDI</div>`;
+  if(lang==='english')return`<div class="acard-badge b-eng">ENG</div>`;
+  return`<div class="acard-badge b-multi">MULTI</div>`;
 }
 
-// ── Animate numbers ──
-function animNum(id,target){
-  const el=document.getElementById(id);if(!el||!target)return;
-  let c=0;const step=Math.ceil(target/40);
-  const t=setInterval(()=>{c=Math.min(c+step,target);el.textContent=c;if(c>=target)clearInterval(t);},35);
+// API helpers
+async function apiGet(url){
+  try{const r=await fetch(url);const d=await r.json();return d.data||[];}catch{return[];}
+}
+async function apiGetOne(url){
+  try{const r=await fetch(url);const d=await r.json();return d.data||null;}catch{return null;}
 }
 
-// ── Render collection — click goes to openDetail ──
-function renderCol(){
-  const g=document.getElementById('colGrid'),cnt=document.getElementById('colCnt');
-  cnt.textContent=ANIME_DB.length+' Anime';
-  animNum('statA',ANIME_DB.length);
-  animNum('statE',ANIME_DB.length*12);
-  g.innerHTML=ANIME_DB.map((a,i)=>`
-    <div class="mc" onclick="openDetail(${a.malId})" style="animation-delay:${i*.04}s">
-      <div class="pw">
-        <img id="img_${a.id}" src=""
-          style="width:100%;height:100%;object-fit:cover;display:none;position:absolute;inset:0;"
-          onload="this.style.display='block';document.getElementById('pp_${a.id}').style.display='none';"
+// ── BOTTOM NAV ──
+function goTab(pgId){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.getElementById(pgId).classList.add('active');
+  document.querySelectorAll('.bn-btn').forEach(b=>b.classList.remove('active'));
+  const map={'pgHome':0,'pgSearch':1,'pgMovies':2,'pgSeries':3};
+  const idx=map[pgId];
+  if(idx!==undefined) document.getElementById('bn'+idx).classList.add('active');
+  window.scrollTo(0,0);
+}
+
+// ── DRAWER ──
+function toggleDrawer(){['drw','dov'].forEach(id=>document.getElementById(id).classList.toggle('open'));}
+function closeDrawer(){['drw','dov'].forEach(id=>document.getElementById(id).classList.remove('open'));}
+
+// ── HERO SLIDER ──
+let heroData = [];
+let heroIdx = 0;
+let heroTimer = null;
+
+async function loadHero(){
+  const d = await apiGet('https://api.jikan.moe/v4/top/anime?filter=bypopularity&limit=8');
+  if(!d.length) return;
+  heroData = d;
+  const wrap = document.getElementById('heroWrap');
+  const dotsEl = document.getElementById('heroDots');
+
+  // Build slides
+  wrap.innerHTML = '';
+  dotsEl.innerHTML = '';
+
+  d.forEach((a,i)=>{
+    const img = a.images?.jpg?.large_image_url || a.images?.jpg?.image_url || '';
+    const slide = document.createElement('div');
+    slide.className = 'hero-slide' + (i===0?' active':'');
+    slide.innerHTML = `
+      <img src="${img}" class="hero-img" alt="${a.title||''}"/>
+      <div class="hero-grad"></div>
+      <div class="hero-info">
+        <div class="hero-title">${a.title||''}</div>
+        <div class="hero-meta">
+          ${a.score?`<span class="hero-score">⭐ ${a.score}</span>`:''}
+          ${a.type?`<span class="hero-type">${a.type}</span>`:''}
+          ${a.year?`<span class="hero-type">${a.year}</span>`:''}
+        </div>
+        <div class="hero-btns">
+          <a href="${TG[a.mal_id]||DEFAULT_LINK}" target="_blank" class="hbtn-watch">
+            <svg viewBox="0 0 24 24" fill="#000" width="16" height="16"><polygon points="5,3 19,12 5,21"/></svg>
+            WATCH NOW
+          </a>
+          <button class="hbtn-info" onclick="openDetail(${a.mal_id})">
+            <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" width="14" height="14"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+            Info
+          </button>
+        </div>
+      </div>`;
+    wrap.appendChild(slide);
+
+    const dot = document.createElement('div');
+    dot.className = 'hdot' + (i===0?' active':'');
+    dot.onclick = () => setHeroSlide(i);
+    dotsEl.appendChild(dot);
+  });
+  wrap.appendChild(dotsEl);
+
+  heroTimer = setInterval(()=>{
+    heroIdx = (heroIdx+1) % heroData.length;
+    setHeroSlide(heroIdx);
+  }, 4000);
+}
+
+function setHeroSlide(i){
+  heroIdx = i;
+  document.querySelectorAll('.hero-slide').forEach((s,j)=>s.classList.toggle('active',j===i));
+  document.querySelectorAll('.hdot').forEach((d,j)=>d.classList.toggle('active',j===i));
+}
+
+// ── OUR COLLECTION ──
+function renderOur(){
+  const row = document.getElementById('ourRow');
+  document.getElementById('ourCount').textContent = ANIME_DB.length + ' anime';
+  row.innerHTML = ANIME_DB.map(a=>`
+    <div class="our-card" onclick="openDetail(${a.malId})">
+      <div class="our-img">
+        <img id="oimg_${a.id}" src="" alt="${a.title}"
+          style="display:none"
+          onload="this.style.display='block';document.getElementById('opp_${a.id}').style.display='none';"
           onerror="this.style.display='none';"
         />
-        <div class="pp" id="pp_${a.id}">
-          <div class="pp-i">🎌</div>
-          <div class="pp-t">${a.title}</div>
+        <div class="our-pp" id="opp_${a.id}">
+          <div class="our-pp-i">🎌</div>
+          <div class="our-pp-t">${a.title}</div>
         </div>
-        <div class="pw-holo"></div>
-        <div class="score-ov" id="scr_${a.id}"></div>
+        <div class="our-badge">${langBadge(a.lang)}</div>
+        <div class="our-score" id="oscr_${a.id}"></div>
       </div>
-      <div class="mi"><div class="mt">${a.title}</div>${langBadge(a.lang)}</div>
+      <div class="our-name">${a.title}</div>
     </div>`).join('');
-  loadImagesLazy();
+  loadOurImages();
 }
 
-// Load images 1 at a time — 500ms gap to avoid rate limit
-async function loadImagesLazy(){
+async function loadOurImages(){
   for(let i=0;i<ANIME_DB.length;i++){
     const a=ANIME_DB[i];
     try{
-      const d=await apiFetchOne(`https://api.jikan.moe/v4/anime/${a.malId}`);
+      const d=await apiGetOne(`https://api.jikan.moe/v4/anime/${a.malId}`);
       if(d){
-        const imgEl=document.getElementById(`img_${a.id}`);
-        const scrEl=document.getElementById(`scr_${a.id}`);
-        if(imgEl && d.images?.jpg?.large_image_url){
-          imgEl.src = d.images.jpg.large_image_url;
-        }
-        if(scrEl && d.score){
-          scrEl.textContent='⭐ '+d.score;
-        }
+        const img=document.getElementById(`oimg_${a.id}`);
+        const scr=document.getElementById(`oscr_${a.id}`);
+        if(img&&d.images?.jpg?.large_image_url) img.src=d.images.jpg.large_image_url;
+        if(scr&&d.score) scr.textContent='⭐'+d.score;
       }
-    }catch(e){}
+    }catch{}
     await new Promise(r=>setTimeout(r,500));
   }
 }
 
-// ── Watch page — Our Anime ──
-async function openWatch(id){
-  const a=ANIME_DB.find(x=>x.id===id);if(!a)return;
-  showPg('watchPage');window.scrollTo(0,0);
-
-  // Set Watch button to direct channel
-  document.getElementById('tgBtn').href=a.tgLink;
-  document.getElementById('vaLbl').textContent='READY TO WATCH!';
-  document.getElementById('vaSub').textContent='Tap below to open Telegram channel ▶';
-
-  // Load info from API
-  document.getElementById('wTtl').textContent=a.title;
-  document.getElementById('wMeta').innerHTML=`<span class="wbadge hl">🌐 Multi-Language</span><span class="wbadge">📺 Full Series</span>`;
-  document.getElementById('icTtl').textContent=a.title;
-  document.getElementById('icBody').innerHTML=`<span class="idv">Loading info...</span>`;
-  document.getElementById('epsSec').innerHTML='';
-  document.getElementById('synSec').innerHTML='';
-
-  // Fetch from Jikan
-  const data=await apiFetchOne(`https://api.jikan.moe/v4/anime/${a.malId}`);
-  if(data){
-    const img=data.images?.jpg?.large_image_url||data.images?.jpg?.image_url||'';
-    document.getElementById('bnImg').src=img;
-    document.getElementById('pstSm').src=img;
-    document.getElementById('wMeta').innerHTML=`
-      <span class="wbadge hl">${data.type||'TV'}</span>
-      <span class="wbadge">📺 ${data.episodes||'?'} eps</span>
-      <span class="wbadge">⭐ ${data.score||'?'}</span>`;
-    document.getElementById('icTtl').textContent=data.title||a.title;
-    const aired=data.aired?.from?new Date(data.aired.from).getFullYear():'?';
-    const studio=(data.studios||[])[0]?.name||'?';
-    document.getElementById('icBody').innerHTML=`
-      <span class="idv">╭────────────────────</span>
-      <div class="il"><span class="ip">┣</span><span class="ik">STATUS&nbsp;&nbsp;&nbsp;:</span><span class="iv">&nbsp;${data.status||'?'}</span></div>
-      <div class="il"><span class="ip">┣</span><span class="ik">EPISODES :</span><span class="iv">&nbsp;${data.episodes||'?'}</span></div>
-      <div class="il"><span class="ip">┣</span><span class="ik">YEAR&nbsp;&nbsp;&nbsp;&nbsp; :</span><span class="iv">&nbsp;${aired}</span></div>
-      <div class="il"><span class="ip">┣</span><span class="ik">STUDIO&nbsp;&nbsp; :</span><span class="iv">&nbsp;${studio}</span></div>
-      <div class="il"><span class="ip">┣</span><span class="ik">SCORE&nbsp;&nbsp;&nbsp; :</span><span class="iv">&nbsp;${data.score?data.score+'/10':'?'}</span></div>
-      <span class="idv">╰───────────────────</span>`;
-    if(data.synopsis){
-      document.getElementById('synSec').innerHTML=`
-        <div class="syn-box"><h3>📖 SYNOPSIS</h3><p>${data.synopsis.substring(0,400)}${data.synopsis.length>400?'...':''}</p></div>`;
-    }
-  } else {
-    document.getElementById('bnImg').src='';
-    document.getElementById('pstSm').src='';
-    document.getElementById('icBody').innerHTML=`<span class="idv">Info unavailable</span>`;
-  }
+// ── API CARD (horizontal row) ──
+function mkAcard(a, watchUrl){
+  const img=a.images?.jpg?.large_image_url||a.images?.jpg?.image_url||'';
+  const score=a.score?`<div class="acard-score">⭐${a.score}</div>`:'';
+  const url = watchUrl || TG[a.mal_id] || DEFAULT_LINK;
+  return `<div class="acard" onclick="openDetail(${a.mal_id})">
+    <div class="acard-img">
+      <img src="${img}" alt="${a.title||''}" loading="lazy" onerror="this.src=''"/>
+      ${badge(a.title_english||'')}
+      ${score}
+    </div>
+    <div class="acard-name">${a.title||''}</div>
+    <div class="acard-year">${a.year||''}</div>
+  </div>`;
 }
 
-// ── API helpers ──
-async function apiFetch(url){try{const r=await fetch(url);const d=await r.json();return d.data||[];}catch{return[];}}
-async function apiFetchOne(url){try{const r=await fetch(url);const d=await r.json();return d.data||null;}catch{return null;}}
-
-// ── API Cards (Trending/Top Rated/Movies) → go to main channel ──
-function makeCard(a){
-  const title=a.title||'Unknown';
+// ── API GRID CARD ──
+function mkGcard(a){
   const img=a.images?.jpg?.large_image_url||a.images?.jpg?.image_url||'';
-  const score=a.score?`⭐ ${a.score}`:'';
-  return `<div class="ac" onclick="openDetail(${a.mal_id})">
-    <img src="${img}" alt="${title}" loading="lazy" onerror="this.src=''"/>
-    <div class="ac-i">
-      <div class="ac-t">${title}</div>
-      ${score?`<div class="ac-s">${score}</div>`:''}
-    </div></div>`;
+  const score=a.score?`<div class="gcard-score">⭐${a.score}</div>`:'';
+  return `<div class="gcard" onclick="openDetail(${a.mal_id})">
+    <div class="gcard-img">
+      <img src="${img}" alt="${a.title||''}" loading="lazy" onerror="this.src=''"/>
+      ${badge('')}
+      ${score}
+    </div>
+    <div class="gcard-name">${a.title||''}</div>
+    <div class="gcard-year">${a.year||''}</div>
+  </div>`;
 }
 
 async function loadTrending(){
-  try{
-    const d=await apiFetch('https://api.jikan.moe/v4/top/anime?filter=airing&limit=12');
-    document.getElementById('trendGrid').innerHTML=d.length?d.map(makeCard).join(''):'<div class="nores">Refresh karo 🔄</div>';
-  }catch{document.getElementById('trendGrid').innerHTML='<div class="nores">Reload karo 🔄</div>';}
+  await new Promise(r=>setTimeout(r,800));
+  const d=await apiGet('https://api.jikan.moe/v4/top/anime?filter=airing&limit=16');
+  document.getElementById('trendRow').innerHTML=d.length?d.map(a=>mkAcard(a)).join(''):'<div class="no-res">Reload karo 🔄</div>';
 }
 async function loadTop(){
-  await new Promise(r=>setTimeout(r,1500));
-  try{
-    const d=await apiFetch('https://api.jikan.moe/v4/top/anime?limit=12');
-    document.getElementById('topGrid').innerHTML=d.length?d.map(makeCard).join(''):'<div class="nores">Could not load.</div>';
-  }catch{document.getElementById('topGrid').innerHTML='<div class="nores">Reload karo 🔄</div>';}
+  await new Promise(r=>setTimeout(r,1600));
+  const d=await apiGet('https://api.jikan.moe/v4/top/anime?limit=16');
+  document.getElementById('topRow').innerHTML=d.length?d.map(a=>mkAcard(a)).join(''):'<div class="no-res">Could not load.</div>';
 }
-async function loadMovies(){
-  await new Promise(r=>setTimeout(r,3000));
-  try{
-    const d=await apiFetch('https://api.jikan.moe/v4/top/anime?type=movie&limit=8');
-    document.getElementById('moviesGrid').innerHTML=d.length?d.map(makeCard).join(''):'<div class="nores">Could not load.</div>';
-  }catch{document.getElementById('moviesGrid').innerHTML='<div class="nores">Reload karo 🔄</div>';}
+async function loadMovRow(){
+  await new Promise(r=>setTimeout(r,2400));
+  const d=await apiGet('https://api.jikan.moe/v4/top/anime?type=movie&limit=12');
+  document.getElementById('movRow').innerHTML=d.length?d.map(a=>mkAcard(a)).join(''):'<div class="no-res">Could not load.</div>';
+}
+async function loadMoviesPage(){
+  const d=await apiGet('https://api.jikan.moe/v4/top/anime?type=movie&limit=24');
+  document.getElementById('movGrid').innerHTML=d.length?d.map(mkGcard).join(''):'<div class="no-res">Could not load.</div>';
+}
+async function loadSeriesPage(){
+  const d=await apiGet('https://api.jikan.moe/v4/top/anime?type=tv&limit=24');
+  document.getElementById('serGrid').innerHTML=d.length?d.map(mkGcard).join(''):'<div class="no-res">Could not load.</div>';
 }
 
-async function doSearch(){
-  const q=document.getElementById('srchIn').value.trim();
-  if(!q){showToast('⚠️ Type something first!');return;}
-  const sec=document.getElementById('searchSec'),grid=document.getElementById('srchGrid'),ttl=document.getElementById('srchTtl');
-  sec.style.display='block';
-  ttl.innerHTML=`<div class="stbar"></div>🔍 "${q}" <span class="ldr"></span>`;
-  grid.innerHTML='<div class="sk skh"></div>'.repeat(4);
-  const d=await apiFetch(`https://api.jikan.moe/v4/anime?q=${encodeURIComponent(q)}&limit=12`);
-  ttl.innerHTML=`<div class="stbar"></div>RESULTS: "${q.toUpperCase()}"`;
-  grid.innerHTML=d.length?d.map(makeCard).join(''):'<div class="nores">No anime found 😢</div>';
-  sec.scrollIntoView({behavior:'smooth'});
-}
-document.getElementById('srchIn').addEventListener('keydown',e=>{if(e.key==='Enter')doSearch();});
+// ── SEARCH ──
+document.getElementById('srchIn').addEventListener('input', async function(){
+  const q=this.value.trim();
+  if(!q){document.getElementById('srchResult').innerHTML='<div class="no-res">Search for your favourite anime 🔍</div>';return;}
+  document.getElementById('srchResult').innerHTML='<div style="text-align:center;padding:30px"><div class="ldr"></div></div>';
+  const d=await apiGet(`https://api.jikan.moe/v4/anime?q=${encodeURIComponent(q)}&limit=18`);
+  document.getElementById('srchResult').innerHTML=d.length?`<div class="grid-3">${d.map(mkGcard).join('')}</div>`:'<div class="no-res">No results found 😢</div>';
+});
 
-// Stars
+// ── DETAIL MODAL ──
+let synOpen=false;
+function toggleSyn(){
+  synOpen=!synOpen;
+  const s=document.getElementById('detSyn'),f=document.getElementById('detSynFade'),b=document.getElementById('moreBtn');
+  s.classList.toggle('coll',!synOpen);
+  f.classList.toggle('open',synOpen);
+  b.textContent=synOpen?'less ▲':'more ▼';
+}
+
 function renderStars(score){
   if(!score)return'';
-  const s=parseFloat(score),stars=Math.round((s/10)*5*2)/2;
-  let h='<div class="stars">';
-  for(let i=1;i<=5;i++){
-    if(i<=stars)h+='<span class="star full">★</span>';
-    else h+='<span class="star">★</span>';
-  }
-  return h+`</div><span class="rating-num">${score}/10</span>`;
+  const stars=Math.round((parseFloat(score)/10)*5*2)/2;
+  let h='<div class="det-stars">';
+  for(let i=1;i<=5;i++) h+=`<span class="det-star${i<=stars?' on':''}">★</span>`;
+  return h+`</div><span class="det-score-num">${score}/10</span>`;
 }
 
-// Synopsis toggle
-let synX=false;
-function toggleSyn(){
-  synX=!synX;
-  const s=document.getElementById('detSyn'),f=document.getElementById('synFade'),b=document.getElementById('moreBtn');
-  s.classList.toggle('collapsed',!synX);f.classList.toggle('hidden',synX);
-  b.textContent=synX?'less ▲':'more ▼';
-}
-
-// Detail page — API anime → main channel
 async function openDetail(malId){
-  showPg('detailPage');window.scrollTo(0,0);
-  synX=false;
-  document.getElementById('detSyn').classList.add('collapsed');
-  document.getElementById('synFade').classList.remove('hidden');
+  const modal=document.getElementById('detModal');
+  modal.classList.add('active');
+  modal.scrollTop=0;
+  synOpen=false;
+  // Reset
+  document.getElementById('detSyn').classList.add('coll');
+  document.getElementById('detSynFade').classList.remove('open');
   document.getElementById('moreBtn').textContent='more ▼';
-  document.getElementById('detTtl').textContent='Loading...';
-  ['detChips','detInfoGrid','detGenres','detLangs','detQuality','detRec','detChannels','detRating','detAlt','detSyn'].forEach(id=>document.getElementById(id).innerHTML='');
-  document.getElementById('detBanImg').src='';document.getElementById('detPoster').src='';
+  document.getElementById('detTitle').textContent='Loading...';
+  document.getElementById('detBackTitle').textContent='';
+  ['detMeta','detScore','detInfoGrid','detGenres','detSyn','detLangs','detQuality','detRec','detChannels'].forEach(id=>document.getElementById(id).innerHTML='');
+  document.getElementById('detBanImg').src='';
+  document.getElementById('detPoster').src='';
 
-  // Check if this anime is in our DB — use specific tgLink
-  const dbMatch=ANIME_DB.find(x=>x.malId===malId);
-  const watchUrl = TG_LINKS[malId] || DEFAULT_LINK;
+  // Set watch button
+  const watchUrl = TG[malId] || DEFAULT_LINK;
   document.getElementById('detWatchBtn').href = watchUrl;
 
-  const a=await apiFetchOne(`https://api.jikan.moe/v4/anime/${malId}`);
-  if(!a){document.getElementById('detTtl').textContent='Error loading.';return;}
+  const a = await apiGetOne(`https://api.jikan.moe/v4/anime/${malId}`);
+  if(!a){document.getElementById('detTitle').textContent='Error loading.';return;}
 
-  const img=a.images?.jpg?.large_image_url||a.images?.jpg?.image_url||'';
-  document.getElementById('detBanImg').src=img;
-  document.getElementById('detPoster').src=img;
-  document.getElementById('detTtl').textContent=a.title||'Unknown';
-  document.getElementById('detAlt').textContent=a.title_japanese||'';
-  document.getElementById('detRating').innerHTML=renderStars(a.score)+(a.scored_by?`<span class="rating-votes">(${a.scored_by.toLocaleString()})</span>`:'');
+  const img = a.images?.jpg?.large_image_url || a.images?.jpg?.image_url || '';
+  document.getElementById('detBanImg').src = img;
+  document.getElementById('detPoster').src = img;
+  document.getElementById('detTitle').textContent = a.title||'Unknown';
+  document.getElementById('detBackTitle').textContent = a.title||'';
 
-  const sCls=a.status==='Currently Airing'?'d-air':a.status==='Finished Airing'?'d-fin':'d-up';
-  const sLbl=a.status==='Currently Airing'?'Ongoing':a.status==='Finished Airing'?'Finished':'Upcoming';
-  let chips='';
-  if(a.status)chips+=`<span class="d-chip ${sCls}">${sLbl}</span>`;
-  if(a.type)chips+=`<span class="d-chip d-type">${a.type}</span>`;
-  document.getElementById('detChips').innerHTML=chips;
+  // Meta chips
+  const sCls = a.status==='Currently Airing'?'ch-air':'ch-fin';
+  const sLbl = a.status==='Currently Airing'?'Ongoing':'Finished';
+  document.getElementById('detMeta').innerHTML=`
+    ${a.status?`<span class="det-chip ${sCls}">${sLbl}</span>`:''}
+    ${a.type?`<span class="det-chip ch-type">${a.type}</span>`:''}
+    ${a.year?`<span class="det-chip ch-type">${a.year}</span>`:''}`;
 
-  document.getElementById('detSyn').textContent=a.synopsis||'No synopsis available.';
-  document.getElementById('detGenres').innerHTML=(a.genres||[]).map(g=>`<span class="gtag">${g.name}</span>`).join('');
+  // Score
+  document.getElementById('detScore').innerHTML = renderStars(a.score) + (a.scored_by?`<span class="det-votes">(${a.scored_by.toLocaleString()})</span>`:'');
 
-  const aired=a.aired?.from?new Date(a.aired.from).toLocaleDateString('en-US',{year:'numeric',month:'short',day:'numeric'}):'?';
-  const ended=a.aired?.to?new Date(a.aired.to).toLocaleDateString('en-US',{year:'numeric',month:'short',day:'numeric'}):'?';
-  const studios=(a.studios||[]).map(s=>s.name).join(', ')||'?';
-  const season=a.season?a.season.charAt(0).toUpperCase()+a.season.slice(1)+(a.year?' '+a.year:''):(a.year||'?');
-  document.getElementById('detInfoGrid').innerHTML=[
-    ['Status',a.status||'?'],['Studio',studios],
-    ['Released',aired],['Ended',a.aired?.to?ended:'Ongoing'],
-    ['Season',season],['Country','Japan'],
-    ['Type',a.type||'?'],['Episodes',a.episodes||'?'],
-    ['Score',a.score?`${a.score}/10`:'?'],['Members',a.members?a.members.toLocaleString():'?'],
-  ].map(([k,v])=>`<div class="info-item"><div class="info-bullet"></div><span class="info-k">${k}:</span><span class="info-v">${v}</span></div>`).join('');
+  // Synopsis
+  document.getElementById('detSyn').textContent = a.synopsis||'No synopsis available.';
 
-  document.getElementById('detLangs').innerHTML=ALL_LANGS.map(l=>`
-    <div class="gi yes">
-      <span class="gi-icon">${l.flag}</span>
-      <span class="gi-name">${l.name}</span>
-      <span class="gi-chk">✅</span>
+  // Genres
+  document.getElementById('detGenres').innerHTML = (a.genres||[]).map(g=>`<span class="gtag">${g.name}</span>`).join('');
+
+  // Info grid
+  const aired = a.aired?.from ? new Date(a.aired.from).toLocaleDateString('en-US',{year:'numeric',month:'short',day:'numeric'}) : '?';
+  const ended = a.aired?.to ? new Date(a.aired.to).toLocaleDateString('en-US',{year:'numeric',month:'short',day:'numeric'}) : 'Ongoing';
+  const studio = (a.studios||[]).map(s=>s.name).join(', ')||'?';
+  document.getElementById('detInfoGrid').innerHTML = [
+    ['Status', a.status||'?'], ['Studio', studio],
+    ['Released', aired], ['Ended', ended],
+    ['Episodes', a.episodes||'?'], ['Duration', a.duration||'?'],
+    ['Type', a.type||'?'], ['Score', a.score?`${a.score}/10`:'?'],
+    ['Ranked', a.rank?`#${a.rank}`:'?'], ['Members', a.members?a.members.toLocaleString():'?'],
+  ].map(([k,v])=>`<div class="info-item"><div class="info-dot"></div><span class="info-k">${k}:</span><span class="info-v">${v}</span></div>`).join('');
+
+  // Languages
+  document.getElementById('detLangs').innerHTML = ALL_LANGS.map(l=>`
+    <div class="lang-it yes">
+      <span class="lang-flag">${l.flag}</span>
+      <span class="lang-name">${l.name}</span>
+      <span class="lang-chk">✅</span>
     </div>`).join('');
-  document.getElementById('detQuality').innerHTML=ALL_Q.map(q=>`
-    <div class="gi qyes">
-      <span class="gi-icon">${q.icon}</span>
-      <span class="gi-name c">${q.name}</span>
-      <span class="gi-chk">✅</span>
+
+  // Quality
+  document.getElementById('detQuality').innerHTML = ALL_Q.map(q=>`
+    <div class="lang-it yes">
+      <span class="lang-flag">${q.icon}</span>
+      <span class="lang-name" style="color:#18ffff">${q.name}</span>
+      <span class="lang-chk">✅</span>
     </div>`).join('');
 
   // Recommendations
-  const recData=await apiFetch(`https://api.jikan.moe/v4/anime/${malId}/recommendations`);
-  document.getElementById('detRec').innerHTML=recData.slice(0,6).map(r=>{
-    const ra=r.entry,ri=ra.images?.jpg?.large_image_url||ra.images?.jpg?.image_url||'';
+  const rec = await apiGet(`https://api.jikan.moe/v4/anime/${malId}/recommendations`);
+  document.getElementById('detRec').innerHTML = rec.slice(0,6).map(r=>{
+    const ra=r.entry, ri=ra.images?.jpg?.large_image_url||ra.images?.jpg?.image_url||'';
     return `<div class="rec-card" onclick="openDetail(${ra.mal_id})">
-      <div class="rec-poster"><img src="${ri}" alt="${ra.title}" loading="lazy" onerror="this.src=''"/>
-      <div class="rec-type">TV</div><div class="rec-status"><span>Ongoing</span></div></div>
-      <div class="rec-name">${ra.title}</div></div>`;
-  }).join('')||'<p style="color:var(--muted);font-size:.8rem">No recommendations.</p>';
+      <div class="rec-img"><img src="${ri}" alt="${ra.title}" loading="lazy" onerror="this.src=''"/></div>
+      <div class="rec-name">${ra.title}</div>
+    </div>`;
+  }).join('')||'<p style="color:#555;font-size:.8rem">No recommendations.</p>';
 
-  // Channel button — specific or main
-  document.getElementById('detChannels').innerHTML=`
-    <a href="${watchUrl}" target="_blank" class="ch-btn main">
-      <div class="ch-icon">🎌</div>
-      <div style="flex:1">
-        <div class="ch-name">Watch on Telegram</div>
-        <div class="ch-handle">Free • HD • No Ads</div>
-      </div>
-      <span class="ch-arr">›</span>
+  // Channels
+  document.getElementById('detChannels').innerHTML = `
+    <a href="${watchUrl}" target="_blank" class="ch-row-btn main">
+      <div class="ch-row-icon">🎌</div>
+      <div><div class="ch-row-name">Watch on Telegram</div><div class="ch-row-handle">Free • HD • No Ads</div></div>
     </a>
-    <a href="https://t.me/infinite_animes" target="_blank" class="ch-btn">
-      <div class="ch-icon">📺</div>
-      <div style="flex:1">
-        <div class="ch-name">iNFiNiTE ANiMES</div>
-        <div class="ch-handle">@infinite_animes</div>
-      </div>
-      <span class="ch-arr">›</span>
+    <a href="https://t.me/infinite_animes" target="_blank" class="ch-row-btn">
+      <div class="ch-row-icon">📺</div>
+      <div><div class="ch-row-name">iNFiNiTE ANiMES</div><div class="ch-row-handle">@infinite_animes</div></div>
     </a>`;
 }
 
-// Nav
-function toggleDrawer(){['drw','dov','hbg'].forEach(id=>document.getElementById(id).classList.toggle('open'));}
-function closeDrawer(){['drw','dov','hbg'].forEach(id=>document.getElementById(id).classList.remove('open'));}
-function showPg(id){document.querySelectorAll('.pg').forEach(p=>p.classList.remove('active'));document.getElementById(id).classList.add('active');}
-function goHome(){showPg('homePage');window.scrollTo(0,0);}
+function closeDetail(){
+  document.getElementById('detModal').classList.remove('active');
+}
 
-// Quotes
-const QUOTES=[
-  {text:"It's not the face that makes someone a monster, it's the choices they make.",anime:"Naruto"},
-  {text:"Whatever you lose, you'll find it again. But what you throw away you'll never get back.",anime:"Fullmetal Alchemist"},
-  {text:"If you don't take risks, you can't create a future.",anime:"One Piece"},
-  {text:"The only ones who should kill are those who are prepared to be killed.",anime:"Code Geass"},
-  {text:"Power comes in response to a need, not a desire.",anime:"Dragon Ball Z"},
-  {text:"You should enjoy the little detours. That's where you'll find things more important.",anime:"Hunter x Hunter"},
-  {text:"Those who cannot acknowledge themselves will eventually fail.",anime:"Naruto Shippuden"},
-  {text:"A place where someone still thinks about you is a place you can call home.",anime:"Fruits Basket"},
-];
-const qq=QUOTES[Math.floor(Math.random()*QUOTES.length)];
-document.getElementById('qbox').innerHTML=`"${qq.text}" <span>— ${qq.anime}</span>`;
+// ── TOAST ──
+function showToast(msg){
+  const t=document.getElementById('toast');
+  t.textContent=msg;t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),3000);
+}
 
-function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),3200);}
-
-// ── INTRO SPLASH ──
+// ── INTRO ──
 (function(){
   const intro=document.getElementById('intro');
-  const colors=['#00e676','#ff1744','#ffd740','#18ffff','#ffffff'];
-  for(let i=0;i<18;i++){
+  const colors=['#00e676','#e50914','#f5c518','#18ffff','#ffffff'];
+  for(let i=0;i<16;i++){
     const p=document.createElement('div');
-    p.className='intro-particle';
-    const size=Math.random()*5+2;
-    p.style.cssText=`width:${size}px;height:${size}px;background:${colors[Math.floor(Math.random()*colors.length)]};left:${Math.random()*100}%;animation-duration:${Math.random()*4+3}s;animation-delay:${Math.random()*2}s;opacity:0.6;`;
+    p.className='ip';
+    const sz=Math.random()*4+2;
+    p.style.cssText=`width:${sz}px;height:${sz}px;background:${colors[Math.floor(Math.random()*colors.length)]};left:${Math.random()*100}%;animation-duration:${Math.random()*5+4}s;animation-delay:${Math.random()*3}s;opacity:.5;`;
     intro.appendChild(p);
   }
   window.addEventListener('load',()=>{
@@ -1202,10 +895,13 @@ function showToast(msg){const t=document.getElementById('toast');t.textContent=m
 })();
 
 // ── INIT ──
-renderCol();
+renderOur();
+loadHero();
 loadTrending();
 loadTop();
-loadMovies();
+loadMovRow();
+loadMoviesPage();
+loadSeriesPage();
 </script>
 </body>
 </html>
