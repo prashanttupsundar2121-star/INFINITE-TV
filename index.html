@@ -68,11 +68,11 @@ html,body{background:var(--bg);color:var(--txt);font-family:'Outfit',sans-serif;
 .hlpb{background:var(--tg);color:#fff;font-size:.56rem;font-weight:800;padding:2px 8px;border-radius:50px;}
 .drw-div{height:1px;background:#222;margin:8px 18px;}
 
-/* ── HERO SLIDER ── */
-.hero-wrap{position:relative;height:62vw;max-height:320px;overflow:hidden;background:#111;}
-.hero-slide{position:absolute;inset:0;opacity:0;transition:opacity .8s ease;}
-.hero-slide.active{opacity:1;}
-.hero-img{width:100%;height:100%;object-fit:cover;filter:brightness(.45);}
+/* ── HERO SLIDER — SLIDING ── */
+.hero-wrap{position:relative;height:62vw;max-height:320px;overflow:hidden;background:#111;touch-action:pan-y;}
+.hero-track{display:flex;height:100%;transition:transform .45s cubic-bezier(.25,.46,.45,.94);}
+.hero-slide{flex-shrink:0;width:100%;height:100%;position:relative;}
+.hero-img{width:100%;height:100%;object-fit:cover;filter:brightness(.45);display:block;}
 .hero-grad{position:absolute;inset:0;background:linear-gradient(to bottom,transparent 30%,rgba(13,13,13,.7) 70%,var(--bg) 100%);}
 .hero-info{position:absolute;bottom:0;left:0;right:0;padding:16px;}
 .hero-title{font-family:'Bebas Neue',sans-serif;font-size:1.6rem;letter-spacing:2px;line-height:1.1;text-shadow:0 2px 8px rgba(0,0,0,.8);margin-bottom:8px;}
@@ -82,9 +82,9 @@ html,body{background:var(--bg);color:var(--txt);font-family:'Outfit',sans-serif;
 .hero-btns{display:flex;gap:10px;margin-top:12px;}
 .hbtn-watch{display:flex;align-items:center;justify-content:center;gap:7px;background:#fff;color:#000;border:none;border-radius:6px;padding:9px 20px;font-family:'Outfit',sans-serif;font-weight:800;font-size:.84rem;flex:1;cursor:pointer;text-decoration:none;}
 .hbtn-info{display:flex;align-items:center;justify-content:center;gap:7px;background:rgba(255,255,255,.18);color:#fff;border:none;border-radius:6px;padding:9px 16px;font-family:'Outfit',sans-serif;font-weight:700;font-size:.84rem;cursor:pointer;backdrop-filter:blur(4px);}
-.hero-dots{position:absolute;bottom:6px;right:12px;display:flex;gap:4px;}
-.hdot{width:6px;height:6px;border-radius:50%;background:rgba(255,255,255,.3);transition:all .3s;}
-.hdot.active{background:var(--green);width:16px;border-radius:4px;}
+.hero-dots{position:absolute;bottom:8px;left:50%;transform:translateX(-50%);display:flex;gap:5px;z-index:10;}
+.hdot{width:6px;height:6px;border-radius:50%;background:rgba(255,255,255,.35);transition:all .3s;cursor:pointer;}
+.hdot.active{background:var(--green);width:18px;border-radius:4px;}
 
 /* ── SECTIONS ── */
 .section{padding:16px 0 8px;}
@@ -221,7 +221,20 @@ html,body{background:var(--bg);color:var(--txt);font-family:'Outfit',sans-serif;
 .ldr{display:inline-block;width:16px;height:16px;border:2px solid #333;border-top-color:var(--green);border-radius:50%;animation:spin .7s linear infinite;vertical-align:middle;}
 @keyframes spin{to{transform:rotate(360deg)}}
 
-/* ── NO RESULTS ── */
+/* ── COMMUNITY CARDS ── */
+.comm-card{display:flex;align-items:flex-start;gap:12px;padding:14px 16px;border-bottom:1px solid #1a1a1a;cursor:pointer;transition:background .2s;}
+.comm-card:active{background:rgba(255,255,255,.04);}
+.comm-icon{width:46px;height:46px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:1.2rem;flex-shrink:0;}
+.comm-info{flex:1;min-width:0;}
+.comm-name{font-size:.86rem;font-weight:700;color:#fff;margin-bottom:2px;}
+.comm-handle{font-size:.65rem;color:var(--green);margin-bottom:5px;font-weight:600;}
+.comm-desc{font-size:.7rem;color:#777;line-height:1.6;}
+.comm-arr{color:#444;font-size:1.1rem;margin-top:4px;flex-shrink:0;}
+/* Platform logos */
+.platform-row{display:flex;gap:12px;padding:8px 16px 12px;overflow-x:auto;}
+.pf-item{display:flex;flex-direction:column;align-items:center;gap:5px;flex-shrink:0;}
+.pf-logo{width:52px;height:52px;border-radius:12px;display:flex;align-items:center;justify-content:center;overflow:hidden;}
+.pf-name{font-size:.62rem;color:#777;font-weight:600;text-align:center;}
 .no-res{text-align:center;color:var(--muted);padding:40px 20px;font-size:.85rem;}
 
 /* ── TOAST ── */
@@ -244,37 +257,97 @@ html,body{background:var(--bg);color:var(--txt);font-family:'Outfit',sans-serif;
   </div>
 </div>
 
-<!-- DRAWER -->
+<!-- DRAWER → Community Page -->
 <div class="dov" id="dov" onclick="closeDrawer()"></div>
 <div class="drw" id="drw">
   <div class="drw-hd">
     <div class="drw-logo">iNFiNiTE TV</div>
-    <div class="drw-sub">ALL COMMUNITIES • ONE PLACE 🌐</div>
+    <div class="drw-sub">YOUR FREE ANIME DESTINATION 🌐</div>
   </div>
-  <div class="drw-sec">Our Channels</div>
-  <a href="https://t.me/infinite_animes" target="_blank" class="drw-lnk" onclick="closeDrawer()">
-    <div class="di dia">🎌</div><div><div class="di-nm">iNFiNiTE ANiMES</div><div class="di-hn">@infinite_animes</div></div>
-  </a>
-  <a href="https://t.me/infinite_dramas" target="_blank" class="drw-lnk" onclick="closeDrawer()">
-    <div class="di did">🎬</div><div><div class="di-nm">iNFiNiTE DRAMAs</div><div class="di-hn">@infinite_dramas</div></div>
-  </a>
-  <a href="https://t.me/iNFiNiTE_HENTAii" target="_blank" class="drw-lnk" onclick="closeDrawer()">
-    <div class="di dih">🔞</div><div><div class="di-nm">iNFiNiTE HENTAii</div><div class="di-hn">@iNFiNiTE_HENTAii</div></div>
-  </a>
+
+  <!-- iNFiNiTE ANiMES -->
+  <div class="comm-card" onclick="window.open('https://t.me/infinite_animes','_blank')">
+    <div class="comm-icon" style="background:linear-gradient(135deg,#00e676,#00b4d8);">🎌</div>
+    <div class="comm-info">
+      <div class="comm-name">iNFiNiTE ANiMES</div>
+      <div class="comm-handle">@infinite_animes</div>
+      <div class="comm-desc">Watch all your favourite anime here — Hindi, Tamil, Telugu, English & Japanese dubs. Hundreds of anime available completely FREE. No subscriptions, no ads. New episodes added daily!</div>
+    </div>
+    <div class="comm-arr">›</div>
+  </div>
+
+  <!-- iNFiNiTE DRAMAs -->
+  <div class="comm-card" onclick="window.open('https://t.me/infinite_dramas','_blank')">
+    <div class="comm-icon" style="background:linear-gradient(135deg,#ff6d00,#e50914);">🎬</div>
+    <div class="comm-info">
+      <div class="comm-name">iNFiNiTE DRAMAs</div>
+      <div class="comm-handle">@infinite_dramas</div>
+      <div class="comm-desc">Your ultimate destination for K-Dramas, C-Dramas, J-Dramas and Web Series — all in one place. Hindi & multi-language subtitles available. Watch for FREE anytime, anywhere!</div>
+    </div>
+    <div class="comm-arr">›</div>
+  </div>
+
+  <!-- iNFiNiTE HENTAii -->
+  <div class="comm-card" onclick="window.open('https://t.me/iNFiNiTE_HENTAii','_blank')">
+    <div class="comm-icon" style="background:linear-gradient(135deg,#e50914,#c900aa);">🔞</div>
+    <div class="comm-info">
+      <div class="comm-name">iNFiNiTE HENTAii</div>
+      <div class="comm-handle">@iNFiNiTE_HENTAii</div>
+      <div class="comm-desc">18+ adults only content. Exclusive anime collection available for free. Must be 18 years or older to join. Content is for mature audiences only.</div>
+    </div>
+    <div class="comm-arr">›</div>
+  </div>
+
   <div class="drw-div"></div>
+
+  <!-- Streaming Partners -->
+  <div class="drw-sec">Popular Content Networks</div>
+  <div class="platform-row">
+    <div class="pf-item">
+      <div class="pf-logo" style="background:#f5753a;overflow:hidden;">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/2/29/Crunchyroll_Logo.png/320px-Crunchyroll_Logo.png" style="width:100%;height:100%;object-fit:contain;padding:6px;" alt="Crunchyroll" onerror="this.parentElement.innerHTML='<span style=font-size:1.1rem>🟠</span>'"/>
+      </div>
+      <div class="pf-name">Crunchyroll</div>
+    </div>
+    <div class="pf-item">
+      <div class="pf-logo" style="background:#000;overflow:hidden;">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/0/08/Netflix_2015_logo.svg/320px-Netflix_2015_logo.svg.png" style="width:100%;height:100%;object-fit:contain;padding:4px;" alt="Netflix" onerror="this.parentElement.innerHTML='<span style=color:#e50914;font-family:Georgia;font-weight:900;font-size:1.2rem>N</span>'"/>
+      </div>
+      <div class="pf-name">Netflix</div>
+    </div>
+    <div class="pf-item">
+      <div class="pf-logo" style="background:#00a8e0;overflow:hidden;">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/1/11/Amazon_Prime_Video_logo.svg/320px-Amazon_Prime_Video_logo.svg.png" style="width:100%;height:100%;object-fit:contain;padding:5px;" alt="Prime Video" onerror="this.parentElement.innerHTML='<span style=color:#fff;font-size:.7rem;font-weight:800>prime</span>'"/>
+      </div>
+      <div class="pf-name">Prime Video</div>
+    </div>
+    <div class="pf-item">
+      <div class="pf-logo" style="background:#1b74e4;overflow:hidden;">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/0/0e/Hotstar_logo_%28Nov_2023%29.svg/320px-Hotstar_logo_%28Nov_2023%29.svg.png" style="width:100%;height:100%;object-fit:contain;padding:6px;" alt="Hotstar" onerror="this.parentElement.innerHTML='<span style=color:#fff;font-size:.8rem;font-weight:800>H+</span>'"/>
+      </div>
+      <div class="pf-name">Hotstar</div>
+    </div>
+  </div>
+
+  <div class="drw-div"></div>
+
+  <!-- Support -->
   <div class="drw-sec">Help & Support</div>
-  <a href="https://t.me/iNFiNiTES_Support" target="_blank" class="drw-lnk" onclick="closeDrawer()">
-    <div class="di dis">🛠️</div>
-    <div style="flex:1"><div class="di-nm">iNFiNiTE Support</div><div class="di-hn">@iNFiNiTES_Support</div></div>
-    <span class="hlpb">HELP</span>
-  </a>
-  <div class="drw-div"></div>
-  <div class="drw-sec">Streaming Partners</div>
-  <div style="display:flex;flex-wrap:wrap;gap:8px;padding:8px 18px;">
-    <div style="background:#f5753a;color:#fff;border-radius:6px;padding:6px 14px;font-size:.72rem;font-weight:700;">Crunchyroll</div>
-    <div style="background:#e50914;color:#fff;border-radius:6px;padding:6px 14px;font-size:.72rem;font-weight:700;">Netflix</div>
-    <div style="background:#00a8e0;color:#fff;border-radius:6px;padding:6px 14px;font-size:.72rem;font-weight:700;">Prime Video</div>
-    <div style="background:#1b74e4;color:#fff;border-radius:6px;padding:6px 14px;font-size:.72rem;font-weight:700;">Hotstar</div>
+  <div class="comm-card" onclick="window.open('https://t.me/iNFiNiTES_Support','_blank')">
+    <div class="comm-icon" style="background:linear-gradient(135deg,#1d9bd1,#0055ff);">🛠️</div>
+    <div class="comm-info">
+      <div class="comm-name">iNFiNiTE Support</div>
+      <div class="comm-handle">@iNFiNiTES_Support</div>
+      <div class="comm-desc">Facing any issue? Link not working? Anime not found? Or any other problem — come to our Support Group and we will help you as soon as possible. We are always here for you! 💬</div>
+    </div>
+    <div class="comm-arr">›</div>
+  </div>
+
+  <div style="padding:16px 18px 8px;">
+    <div style="background:#111;border:1px solid #222;border-radius:12px;padding:14px;">
+      <div style="font-size:.72rem;font-weight:700;color:var(--green);margin-bottom:6px;">ℹ️ About iNFiNiTE TV</div>
+      <div style="font-size:.72rem;color:#888;line-height:1.7;">iNFiNiTE TV is your free streaming destination for anime in Hindi, Tamil, Telugu, Malayalam, English & Japanese. All content is delivered via Telegram channels — completely free, no login required, no ads.</div>
+    </div>
   </div>
 </div>
 
@@ -289,25 +362,7 @@ html,body{background:var(--bg);color:var(--txt);font-family:'Outfit',sans-serif;
 <div class="page active" id="pgHome">
   <!-- Hero Slider -->
   <div class="hero-wrap" id="heroWrap">
-    <div class="hero-slide active" id="heroSlide0">
-      <img src="" alt="" class="hero-img" id="heroImg0"/>
-      <div class="hero-grad"></div>
-      <div class="hero-info">
-        <div class="hero-title" id="heroTitle0">Loading...</div>
-        <div class="hero-meta" id="heroMeta0"></div>
-        <div class="hero-btns">
-          <a href="#" target="_blank" class="hbtn-watch" id="heroWatch0">
-            <svg viewBox="0 0 24 24" fill="#000" width="16" height="16"><polygon points="5,3 19,12 5,21"/></svg>
-            WATCH NOW
-          </a>
-          <button class="hbtn-info" onclick="openDetailById('heroMalId0')">
-            <svg viewBox="0 0 24 24" fill="white" width="14" height="14"><circle cx="12" cy="12" r="10" stroke="white" stroke-width="2" fill="none"/><line x1="12" y1="8" x2="12" y2="12" stroke="white" stroke-width="2"/><line x1="12" y1="16" x2="12.01" y2="16" stroke="white" stroke-width="2"/></svg>
-            Info
-          </button>
-        </div>
-      </div>
-    </div>
-    <div class="hero-dots" id="heroDots"></div>
+    <!-- Built dynamically by JS -->
   </div>
 
   <!-- Our Collection -->
@@ -546,31 +601,37 @@ const ALL_LANGS = [
 ];
 const ALL_Q = [{icon:'📱',name:'480p'},{icon:'📺',name:'720p'},{icon:'🖥️',name:'1080p'},{icon:'💎',name:'4K'},{icon:'📝',name:'Eng Sub'},{icon:'🎙️',name:'Dubbed'}];
 
-// Badge helper
-function badge(lang){
-  if(!lang)return'';
-  const l=lang.toLowerCase();
-  if(l.includes('hindi'))return`<div class="acard-badge b-hindi">HINDI</div>`;
-  if(l.includes('dual'))return`<div class="acard-badge b-dual">DUAL</div>`;
-  if(l.includes('english'))return`<div class="acard-badge b-eng">ENG</div>`;
-  if(l.includes('sub'))return`<div class="acard-badge b-sub">SUB</div>`;
+// Global API cache
+const CACHE = {};
+
+// Badge
+function langBadge(lang){
+  if(lang==='hindi') return`<div class="acard-badge b-hindi">HINDI</div>`;
+  if(lang==='english') return`<div class="acard-badge b-eng">ENG</div>`;
   return`<div class="acard-badge b-multi">MULTI</div>`;
 }
-function langBadge(lang){
-  if(lang==='hindi')return`<div class="acard-badge b-hindi">HINDI</div>`;
-  if(lang==='english')return`<div class="acard-badge b-eng">ENG</div>`;
-  return`<div class="acard-badge b-multi">MULTI</div>`;
+function apiBadge(a){
+  // Use MAL data to determine badge
+  const lang = a.title_english ? 'DUAL' : 'SUB';
+  if(TG[a.mal_id]) return`<div class="acard-badge b-multi">MULTI</div>`;
+  return`<div class="acard-badge b-sub">${lang}</div>`;
 }
 
 // API helpers
 async function apiGet(url){
   try{const r=await fetch(url);const d=await r.json();return d.data||[];}catch{return[];}
 }
-async function apiGetOne(url){
-  try{const r=await fetch(url);const d=await r.json();return d.data||null;}catch{return null;}
+async function apiGetOne(malId){
+  if(CACHE[malId]) return CACHE[malId];
+  try{
+    const r=await fetch(`https://api.jikan.moe/v4/anime/${malId}`);
+    const d=await r.json();
+    if(d.data) CACHE[malId]=d.data;
+    return d.data||null;
+  }catch{return null;}
 }
 
-// ── BOTTOM NAV ──
+// Nav
 function goTab(pgId){
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
   document.getElementById(pgId).classList.add('active');
@@ -580,74 +641,107 @@ function goTab(pgId){
   if(idx!==undefined) document.getElementById('bn'+idx).classList.add('active');
   window.scrollTo(0,0);
 }
-
-// ── DRAWER ──
 function toggleDrawer(){['drw','dov'].forEach(id=>document.getElementById(id).classList.toggle('open'));}
 function closeDrawer(){['drw','dov'].forEach(id=>document.getElementById(id).classList.remove('open'));}
 
-// ── HERO SLIDER ──
-let heroData = [];
-let heroIdx = 0;
-let heroTimer = null;
+// ═══════════════════════════════════
+// HERO SLIDER — ANIME_DB, SLIDING, TOUCH
+// ═══════════════════════════════════
+const HERO_LIST = ANIME_DB.slice(0, 10); // First 10 anime
+let hIdx = 0;
+let hTimer = null;
+let hTrack = null;
+let hTouchX = 0;
 
 async function loadHero(){
-  const d = await apiGet('https://api.jikan.moe/v4/top/anime?filter=bypopularity&limit=8');
-  if(!d.length) return;
-  heroData = d;
   const wrap = document.getElementById('heroWrap');
-  const dotsEl = document.getElementById('heroDots');
-
-  // Build slides
   wrap.innerHTML = '';
-  dotsEl.innerHTML = '';
 
-  d.forEach((a,i)=>{
-    const img = a.images?.jpg?.large_image_url || a.images?.jpg?.image_url || '';
+  // Build track
+  const track = document.createElement('div');
+  track.className = 'hero-track';
+  track.id = 'heroTrack';
+
+  // Build dots
+  const dotsEl = document.createElement('div');
+  dotsEl.className = 'hero-dots';
+  dotsEl.id = 'heroDots';
+
+  // Build slides with placeholder
+  HERO_LIST.forEach((a, i) => {
     const slide = document.createElement('div');
-    slide.className = 'hero-slide' + (i===0?' active':'');
+    slide.className = 'hero-slide';
     slide.innerHTML = `
-      <img src="${img}" class="hero-img" alt="${a.title||''}"/>
+      <img src="" class="hero-img" id="himg_${i}" alt="${a.title}"/>
       <div class="hero-grad"></div>
       <div class="hero-info">
-        <div class="hero-title">${a.title||''}</div>
-        <div class="hero-meta">
-          ${a.score?`<span class="hero-score">⭐ ${a.score}</span>`:''}
-          ${a.type?`<span class="hero-type">${a.type}</span>`:''}
-          ${a.year?`<span class="hero-type">${a.year}</span>`:''}
-        </div>
+        <div class="hero-title" id="htitle_${i}">${a.title}</div>
+        <div class="hero-meta" id="hmeta_${i}"></div>
         <div class="hero-btns">
-          <a href="${TG[a.mal_id]||DEFAULT_LINK}" target="_blank" class="hbtn-watch">
+          <a href="${a.tgLink}" target="_blank" class="hbtn-watch">
             <svg viewBox="0 0 24 24" fill="#000" width="16" height="16"><polygon points="5,3 19,12 5,21"/></svg>
             WATCH NOW
           </a>
-          <button class="hbtn-info" onclick="openDetail(${a.mal_id})">
+          <button class="hbtn-info" onclick="openDetail(${a.malId})">
             <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" width="14" height="14"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
             Info
           </button>
         </div>
       </div>`;
-    wrap.appendChild(slide);
+    track.appendChild(slide);
 
     const dot = document.createElement('div');
     dot.className = 'hdot' + (i===0?' active':'');
-    dot.onclick = () => setHeroSlide(i);
+    dot.onclick = () => goHero(i);
     dotsEl.appendChild(dot);
   });
-  wrap.appendChild(dotsEl);
 
-  heroTimer = setInterval(()=>{
-    heroIdx = (heroIdx+1) % heroData.length;
-    setHeroSlide(heroIdx);
-  }, 4000);
+  wrap.appendChild(track);
+  wrap.appendChild(dotsEl);
+  hTrack = track;
+
+  // Touch swipe
+  wrap.addEventListener('touchstart', e=>{ hTouchX = e.touches[0].clientX; }, {passive:true});
+  wrap.addEventListener('touchend', e=>{
+    const diff = hTouchX - e.changedTouches[0].clientX;
+    if(Math.abs(diff) > 40){
+      if(diff > 0) goHero((hIdx+1) % HERO_LIST.length);
+      else goHero((hIdx-1+HERO_LIST.length) % HERO_LIST.length);
+    }
+  }, {passive:true});
+
+  goHero(0);
+  hTimer = setInterval(() => goHero((hIdx+1) % HERO_LIST.length), 4500);
+
+  // Load API data for each slide (500ms gap)
+  for(let i=0; i<HERO_LIST.length; i++){
+    const a = HERO_LIST[i];
+    const d = await apiGetOne(a.malId);
+    if(d){
+      const imgEl = document.getElementById(`himg_${i}`);
+      const titleEl = document.getElementById(`htitle_${i}`);
+      const metaEl = document.getElementById(`hmeta_${i}`);
+      // Use API title (real name)
+      if(titleEl) titleEl.textContent = d.title || a.title;
+      if(imgEl && d.images?.jpg?.large_image_url) imgEl.src = d.images.jpg.large_image_url;
+      if(metaEl) metaEl.innerHTML =
+        (d.score ? `<span class="hero-score">⭐ ${d.score}</span>` : '') +
+        (d.type ? `<span class="hero-type">${d.type}</span>` : '') +
+        (d.year ? `<span class="hero-type">${d.year}</span>` : '');
+    }
+    if(i < HERO_LIST.length-1) await new Promise(r=>setTimeout(r,500));
+  }
 }
 
-function setHeroSlide(i){
-  heroIdx = i;
-  document.querySelectorAll('.hero-slide').forEach((s,j)=>s.classList.toggle('active',j===i));
+function goHero(i){
+  hIdx = i;
+  if(hTrack) hTrack.style.transform = `translateX(-${i*100}%)`;
   document.querySelectorAll('.hdot').forEach((d,j)=>d.classList.toggle('active',j===i));
 }
 
-// ── OUR COLLECTION ──
+// ═══════════════════════════════════
+// OUR COLLECTION
+// ═══════════════════════════════════
 function renderOur(){
   const row = document.getElementById('ourRow');
   document.getElementById('ourCount').textContent = ANIME_DB.length + ' anime';
@@ -665,52 +759,52 @@ function renderOur(){
         </div>
         <div class="our-badge">${langBadge(a.lang)}</div>
         <div class="our-score" id="oscr_${a.id}"></div>
+        <div class="our-apiname" id="oname_${a.id}"></div>
       </div>
-      <div class="our-name">${a.title}</div>
+      <div class="our-name" id="onamefull_${a.id}">${a.title}</div>
     </div>`).join('');
   loadOurImages();
 }
 
 async function loadOurImages(){
-  for(let i=0;i<ANIME_DB.length;i++){
-    const a=ANIME_DB[i];
-    try{
-      const d=await apiGetOne(`https://api.jikan.moe/v4/anime/${a.malId}`);
-      if(d){
-        const img=document.getElementById(`oimg_${a.id}`);
-        const scr=document.getElementById(`oscr_${a.id}`);
-        if(img&&d.images?.jpg?.large_image_url) img.src=d.images.jpg.large_image_url;
-        if(scr&&d.score) scr.textContent='⭐'+d.score;
-      }
-    }catch{}
-    await new Promise(r=>setTimeout(r,500));
+  for(let i=0; i<ANIME_DB.length; i++){
+    const a = ANIME_DB[i];
+    const d = await apiGetOne(a.malId);
+    if(d){
+      const img = document.getElementById(`oimg_${a.id}`);
+      const scr = document.getElementById(`oscr_${a.id}`);
+      const nm = document.getElementById(`onamefull_${a.id}`);
+      if(img && d.images?.jpg?.large_image_url) img.src = d.images.jpg.large_image_url;
+      if(scr && d.score) scr.textContent = '⭐' + d.score;
+      if(nm && d.title) nm.textContent = d.title; // API name
+    }
+    if(i < ANIME_DB.length-1) await new Promise(r=>setTimeout(r,500));
   }
 }
 
-// ── API CARD (horizontal row) ──
-function mkAcard(a, watchUrl){
-  const img=a.images?.jpg?.large_image_url||a.images?.jpg?.image_url||'';
-  const score=a.score?`<div class="acard-score">⭐${a.score}</div>`:'';
-  const url = watchUrl || TG[a.mal_id] || DEFAULT_LINK;
+// ═══════════════════════════════════
+// API CARDS
+// ═══════════════════════════════════
+function mkAcard(a){
+  const img = a.images?.jpg?.large_image_url || a.images?.jpg?.image_url || '';
+  const score = a.score ? `<div class="acard-score">⭐${a.score}</div>` : '';
   return `<div class="acard" onclick="openDetail(${a.mal_id})">
     <div class="acard-img">
       <img src="${img}" alt="${a.title||''}" loading="lazy" onerror="this.src=''"/>
-      ${badge(a.title_english||'')}
+      ${TG[a.mal_id] ? '<div class="acard-badge b-multi">MULTI</div>' : '<div class="acard-badge b-sub">SUB</div>'}
       ${score}
     </div>
     <div class="acard-name">${a.title||''}</div>
     <div class="acard-year">${a.year||''}</div>
   </div>`;
 }
-
-// ── API GRID CARD ──
 function mkGcard(a){
-  const img=a.images?.jpg?.large_image_url||a.images?.jpg?.image_url||'';
-  const score=a.score?`<div class="gcard-score">⭐${a.score}</div>`:'';
+  const img = a.images?.jpg?.large_image_url || a.images?.jpg?.image_url || '';
+  const score = a.score ? `<div class="gcard-score">⭐${a.score}</div>` : '';
   return `<div class="gcard" onclick="openDetail(${a.mal_id})">
     <div class="gcard-img">
       <img src="${img}" alt="${a.title||''}" loading="lazy" onerror="this.src=''"/>
-      ${badge('')}
+      ${TG[a.mal_id] ? '<div class="gcard-badge b-multi">MULTI</div>' : '<div class="gcard-badge b-sub">SUB</div>'}
       ${score}
     </div>
     <div class="gcard-name">${a.title||''}</div>
@@ -718,141 +812,168 @@ function mkGcard(a){
   </div>`;
 }
 
+// ═══════════════════════════════════
+// LOAD SECTIONS (staggered)
+// ═══════════════════════════════════
 async function loadTrending(){
-  await new Promise(r=>setTimeout(r,800));
-  const d=await apiGet('https://api.jikan.moe/v4/top/anime?filter=airing&limit=16');
-  document.getElementById('trendRow').innerHTML=d.length?d.map(a=>mkAcard(a)).join(''):'<div class="no-res">Reload karo 🔄</div>';
+  await new Promise(r=>setTimeout(r,600));
+  const d = await apiGet('https://api.jikan.moe/v4/top/anime?filter=airing&limit=20');
+  document.getElementById('trendRow').innerHTML = d.length ? d.map(mkAcard).join('') : '<div class="no-res">Reload 🔄</div>';
 }
 async function loadTop(){
-  await new Promise(r=>setTimeout(r,1600));
-  const d=await apiGet('https://api.jikan.moe/v4/top/anime?limit=16');
-  document.getElementById('topRow').innerHTML=d.length?d.map(a=>mkAcard(a)).join(''):'<div class="no-res">Could not load.</div>';
+  await new Promise(r=>setTimeout(r,1200));
+  const d = await apiGet('https://api.jikan.moe/v4/top/anime?limit=20');
+  document.getElementById('topRow').innerHTML = d.length ? d.map(mkAcard).join('') : '<div class="no-res">Could not load.</div>';
 }
 async function loadMovRow(){
-  await new Promise(r=>setTimeout(r,2400));
-  const d=await apiGet('https://api.jikan.moe/v4/top/anime?type=movie&limit=12');
-  document.getElementById('movRow').innerHTML=d.length?d.map(a=>mkAcard(a)).join(''):'<div class="no-res">Could not load.</div>';
-}
-async function loadMoviesPage(){
-  const d=await apiGet('https://api.jikan.moe/v4/top/anime?type=movie&limit=24');
-  document.getElementById('movGrid').innerHTML=d.length?d.map(mkGcard).join(''):'<div class="no-res">Could not load.</div>';
-}
-async function loadSeriesPage(){
-  const d=await apiGet('https://api.jikan.moe/v4/top/anime?type=tv&limit=24');
-  document.getElementById('serGrid').innerHTML=d.length?d.map(mkGcard).join(''):'<div class="no-res">Could not load.</div>';
+  await new Promise(r=>setTimeout(r,1800));
+  const d = await apiGet('https://api.jikan.moe/v4/top/anime?type=movie&limit=16');
+  document.getElementById('movRow').innerHTML = d.length ? d.map(mkAcard).join('') : '<div class="no-res">Could not load.</div>';
 }
 
-// ── SEARCH ──
-document.getElementById('srchIn').addEventListener('input', async function(){
-  const q=this.value.trim();
-  if(!q){document.getElementById('srchResult').innerHTML='<div class="no-res">Search for your favourite anime 🔍</div>';return;}
-  document.getElementById('srchResult').innerHTML='<div style="text-align:center;padding:30px"><div class="ldr"></div></div>';
-  const d=await apiGet(`https://api.jikan.moe/v4/anime?q=${encodeURIComponent(q)}&limit=18`);
-  document.getElementById('srchResult').innerHTML=d.length?`<div class="grid-3">${d.map(mkGcard).join('')}</div>`:'<div class="no-res">No results found 😢</div>';
+// ═══════════════════════════════════
+// MOVIES PAGE — Infinite scroll
+// ═══════════════════════════════════
+let movPage = 1, movLoading = false, movDone = false;
+async function loadMoviesPage(reset){
+  if(reset){ movPage=1; movLoading=false; movDone=false; document.getElementById('movGrid').innerHTML=''; }
+  if(movLoading || movDone) return;
+  movLoading = true;
+  const d = await apiGet(`https://api.jikan.moe/v4/top/anime?type=movie&limit=24&page=${movPage}`);
+  if(d.length < 24) movDone = true;
+  const grid = document.getElementById('movGrid');
+  grid.insertAdjacentHTML('beforeend', d.map(mkGcard).join(''));
+  movPage++;
+  movLoading = false;
+}
+
+// ═══════════════════════════════════
+// SERIES PAGE — Infinite scroll
+// ═══════════════════════════════════
+let serPage = 1, serLoading = false, serDone = false;
+async function loadSeriesPage(reset){
+  if(reset){ serPage=1; serLoading=false; serDone=false; document.getElementById('serGrid').innerHTML=''; }
+  if(serLoading || serDone) return;
+  serLoading = true;
+  const d = await apiGet(`https://api.jikan.moe/v4/top/anime?type=tv&limit=24&page=${serPage}`);
+  if(d.length < 24) serDone = true;
+  const grid = document.getElementById('serGrid');
+  grid.insertAdjacentHTML('beforeend', d.map(mkGcard).join(''));
+  serPage++;
+  serLoading = false;
+}
+
+// Infinite scroll observer
+const scrollObs = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if(!e.isIntersecting) return;
+    if(document.getElementById('pgMovies').classList.contains('active')) loadMoviesPage();
+    if(document.getElementById('pgSeries').classList.contains('active')) loadSeriesPage();
+  });
+}, {threshold:0.1});
+
+// Sentinel divs for infinite scroll
+['movGrid','serGrid'].forEach(id => {
+  const sent = document.createElement('div');
+  sent.style.height = '20px';
+  document.getElementById(id).after(sent);
+  scrollObs.observe(sent);
 });
 
-// ── DETAIL MODAL ──
-let synOpen=false;
-function toggleSyn(){
-  synOpen=!synOpen;
-  const s=document.getElementById('detSyn'),f=document.getElementById('detSynFade'),b=document.getElementById('moreBtn');
-  s.classList.toggle('coll',!synOpen);
-  f.classList.toggle('open',synOpen);
-  b.textContent=synOpen?'less ▲':'more ▼';
-}
+// ═══════════════════════════════════
+// SEARCH
+// ═══════════════════════════════════
+let srchTimer = null;
+document.getElementById('srchIn').addEventListener('input', function(){
+  clearTimeout(srchTimer);
+  const q = this.value.trim();
+  if(!q){ document.getElementById('srchResult').innerHTML='<div class="no-res">Search for your favourite anime 🔍</div>'; return; }
+  document.getElementById('srchResult').innerHTML='<div style="text-align:center;padding:30px"><div class="ldr"></div></div>';
+  srchTimer = setTimeout(async()=>{
+    const d = await apiGet(`https://api.jikan.moe/v4/anime?q=${encodeURIComponent(q)}&limit=18`);
+    document.getElementById('srchResult').innerHTML = d.length ? `<div class="grid-3">${d.map(mkGcard).join('')}</div>` : '<div class="no-res">No results found 😢</div>';
+  }, 600);
+});
 
+// ═══════════════════════════════════
+// DETAIL MODAL
+// ═══════════════════════════════════
+let synOpen = false;
+function toggleSyn(){
+  synOpen = !synOpen;
+  document.getElementById('detSyn').classList.toggle('coll', !synOpen);
+  document.getElementById('detSynFade').classList.toggle('open', synOpen);
+  document.getElementById('moreBtn').textContent = synOpen ? 'less ▲' : 'more ▼';
+}
 function renderStars(score){
-  if(!score)return'';
-  const stars=Math.round((parseFloat(score)/10)*5*2)/2;
-  let h='<div class="det-stars">';
-  for(let i=1;i<=5;i++) h+=`<span class="det-star${i<=stars?' on':''}">★</span>`;
-  return h+`</div><span class="det-score-num">${score}/10</span>`;
+  if(!score) return '';
+  const stars = Math.round((parseFloat(score)/10)*5*2)/2;
+  let h = '<div class="det-stars">';
+  for(let i=1;i<=5;i++) h += `<span class="det-star${i<=stars?' on':''}">★</span>`;
+  return h + `</div><span class="det-score-num">${score}/10</span>`;
 }
 
 async function openDetail(malId){
-  const modal=document.getElementById('detModal');
+  const modal = document.getElementById('detModal');
   modal.classList.add('active');
-  modal.scrollTop=0;
-  synOpen=false;
-  // Reset
+  modal.scrollTop = 0;
+  synOpen = false;
   document.getElementById('detSyn').classList.add('coll');
   document.getElementById('detSynFade').classList.remove('open');
-  document.getElementById('moreBtn').textContent='more ▼';
-  document.getElementById('detTitle').textContent='Loading...';
-  document.getElementById('detBackTitle').textContent='';
+  document.getElementById('moreBtn').textContent = 'more ▼';
+  document.getElementById('detTitle').textContent = 'Loading...';
+  document.getElementById('detBackTitle').textContent = '';
   ['detMeta','detScore','detInfoGrid','detGenres','detSyn','detLangs','detQuality','detRec','detChannels'].forEach(id=>document.getElementById(id).innerHTML='');
-  document.getElementById('detBanImg').src='';
-  document.getElementById('detPoster').src='';
+  document.getElementById('detBanImg').src = '';
+  document.getElementById('detPoster').src = '';
 
-  // Set watch button
   const watchUrl = TG[malId] || DEFAULT_LINK;
   document.getElementById('detWatchBtn').href = watchUrl;
 
-  const a = await apiGetOne(`https://api.jikan.moe/v4/anime/${malId}`);
-  if(!a){document.getElementById('detTitle').textContent='Error loading.';return;}
+  const a = await apiGetOne(malId);
+  if(!a){ document.getElementById('detTitle').textContent='Error loading.'; return; }
 
   const img = a.images?.jpg?.large_image_url || a.images?.jpg?.image_url || '';
   document.getElementById('detBanImg').src = img;
   document.getElementById('detPoster').src = img;
-  document.getElementById('detTitle').textContent = a.title||'Unknown';
-  document.getElementById('detBackTitle').textContent = a.title||'';
+  document.getElementById('detTitle').textContent = a.title || 'Unknown';
+  document.getElementById('detBackTitle').textContent = a.title || '';
 
-  // Meta chips
-  const sCls = a.status==='Currently Airing'?'ch-air':'ch-fin';
-  const sLbl = a.status==='Currently Airing'?'Ongoing':'Finished';
-  document.getElementById('detMeta').innerHTML=`
-    ${a.status?`<span class="det-chip ${sCls}">${sLbl}</span>`:''}
-    ${a.type?`<span class="det-chip ch-type">${a.type}</span>`:''}
-    ${a.year?`<span class="det-chip ch-type">${a.year}</span>`:''}`;
+  const sCls = a.status==='Currently Airing' ? 'ch-air' : 'ch-fin';
+  const sLbl = a.status==='Currently Airing' ? 'Ongoing' : 'Finished';
+  document.getElementById('detMeta').innerHTML =
+    (a.status ? `<span class="det-chip ${sCls}">${sLbl}</span>` : '') +
+    (a.type ? `<span class="det-chip ch-type">${a.type}</span>` : '') +
+    (a.year ? `<span class="det-chip ch-type">${a.year}</span>` : '');
 
-  // Score
-  document.getElementById('detScore').innerHTML = renderStars(a.score) + (a.scored_by?`<span class="det-votes">(${a.scored_by.toLocaleString()})</span>`:'');
-
-  // Synopsis
-  document.getElementById('detSyn').textContent = a.synopsis||'No synopsis available.';
-
-  // Genres
+  document.getElementById('detScore').innerHTML = renderStars(a.score) + (a.scored_by ? `<span class="det-votes">(${a.scored_by.toLocaleString()})</span>` : '');
+  document.getElementById('detSyn').textContent = a.synopsis || 'No synopsis available.';
   document.getElementById('detGenres').innerHTML = (a.genres||[]).map(g=>`<span class="gtag">${g.name}</span>`).join('');
 
-  // Info grid
   const aired = a.aired?.from ? new Date(a.aired.from).toLocaleDateString('en-US',{year:'numeric',month:'short',day:'numeric'}) : '?';
   const ended = a.aired?.to ? new Date(a.aired.to).toLocaleDateString('en-US',{year:'numeric',month:'short',day:'numeric'}) : 'Ongoing';
-  const studio = (a.studios||[]).map(s=>s.name).join(', ')||'?';
+  const studio = (a.studios||[]).map(s=>s.name).join(', ') || '?';
   document.getElementById('detInfoGrid').innerHTML = [
-    ['Status', a.status||'?'], ['Studio', studio],
-    ['Released', aired], ['Ended', ended],
-    ['Episodes', a.episodes||'?'], ['Duration', a.duration||'?'],
-    ['Type', a.type||'?'], ['Score', a.score?`${a.score}/10`:'?'],
-    ['Ranked', a.rank?`#${a.rank}`:'?'], ['Members', a.members?a.members.toLocaleString():'?'],
+    ['Status',a.status||'?'], ['Studio',studio],
+    ['Released',aired], ['Ended',ended],
+    ['Episodes',a.episodes||'?'], ['Duration',a.duration||'?'],
+    ['Type',a.type||'?'], ['Score',a.score?`${a.score}/10`:'?'],
+    ['Ranked',a.rank?`#${a.rank}`:'?'], ['Members',a.members?a.members.toLocaleString():'?'],
   ].map(([k,v])=>`<div class="info-item"><div class="info-dot"></div><span class="info-k">${k}:</span><span class="info-v">${v}</span></div>`).join('');
 
-  // Languages
   document.getElementById('detLangs').innerHTML = ALL_LANGS.map(l=>`
-    <div class="lang-it yes">
-      <span class="lang-flag">${l.flag}</span>
-      <span class="lang-name">${l.name}</span>
-      <span class="lang-chk">✅</span>
-    </div>`).join('');
-
-  // Quality
+    <div class="lang-it yes"><span class="lang-flag">${l.flag}</span><span class="lang-name">${l.name}</span><span class="lang-chk">✅</span></div>`).join('');
   document.getElementById('detQuality').innerHTML = ALL_Q.map(q=>`
-    <div class="lang-it yes">
-      <span class="lang-flag">${q.icon}</span>
-      <span class="lang-name" style="color:#18ffff">${q.name}</span>
-      <span class="lang-chk">✅</span>
-    </div>`).join('');
+    <div class="lang-it yes"><span class="lang-flag">${q.icon}</span><span class="lang-name" style="color:#18ffff">${q.name}</span><span class="lang-chk">✅</span></div>`).join('');
 
-  // Recommendations
   const rec = await apiGet(`https://api.jikan.moe/v4/anime/${malId}/recommendations`);
   document.getElementById('detRec').innerHTML = rec.slice(0,6).map(r=>{
     const ra=r.entry, ri=ra.images?.jpg?.large_image_url||ra.images?.jpg?.image_url||'';
     return `<div class="rec-card" onclick="openDetail(${ra.mal_id})">
       <div class="rec-img"><img src="${ri}" alt="${ra.title}" loading="lazy" onerror="this.src=''"/></div>
-      <div class="rec-name">${ra.title}</div>
-    </div>`;
-  }).join('')||'<p style="color:#555;font-size:.8rem">No recommendations.</p>';
+      <div class="rec-name">${ra.title}</div></div>`;
+  }).join('') || '<p style="color:#555;font-size:.8rem">No recommendations.</p>';
 
-  // Channels
   document.getElementById('detChannels').innerHTML = `
     <a href="${watchUrl}" target="_blank" class="ch-row-btn main">
       <div class="ch-row-icon">🎌</div>
@@ -863,34 +984,21 @@ async function openDetail(malId){
       <div><div class="ch-row-name">iNFiNiTE ANiMES</div><div class="ch-row-handle">@infinite_animes</div></div>
     </a>`;
 }
-
-function closeDetail(){
-  document.getElementById('detModal').classList.remove('active');
-}
-
-// ── TOAST ──
-function showToast(msg){
-  const t=document.getElementById('toast');
-  t.textContent=msg;t.classList.add('show');
-  setTimeout(()=>t.classList.remove('show'),3000);
-}
+function closeDetail(){ document.getElementById('detModal').classList.remove('active'); }
 
 // ── INTRO ──
 (function(){
-  const intro=document.getElementById('intro');
-  const colors=['#00e676','#e50914','#f5c518','#18ffff','#ffffff'];
+  const intro = document.getElementById('intro');
+  const colors = ['#00e676','#e50914','#f5c518','#18ffff','#ffffff'];
   for(let i=0;i<16;i++){
-    const p=document.createElement('div');
-    p.className='ip';
-    const sz=Math.random()*4+2;
-    p.style.cssText=`width:${sz}px;height:${sz}px;background:${colors[Math.floor(Math.random()*colors.length)]};left:${Math.random()*100}%;animation-duration:${Math.random()*5+4}s;animation-delay:${Math.random()*3}s;opacity:.5;`;
+    const p = document.createElement('div');
+    p.className = 'ip';
+    const sz = Math.random()*4+2;
+    p.style.cssText = `width:${sz}px;height:${sz}px;background:${colors[Math.floor(Math.random()*colors.length)]};left:${Math.random()*100}%;animation-duration:${Math.random()*5+4}s;animation-delay:${Math.random()*3}s;opacity:.5;`;
     intro.appendChild(p);
   }
-  window.addEventListener('load',()=>{
-    setTimeout(()=>{
-      intro.style.opacity='0';
-      setTimeout(()=>{intro.style.display='none';},1000);
-    },3500);
+  window.addEventListener('load', ()=>{
+    setTimeout(()=>{ intro.style.opacity='0'; setTimeout(()=>{ intro.style.display='none'; }, 1000); }, 3500);
   });
 })();
 
@@ -900,8 +1008,8 @@ loadHero();
 loadTrending();
 loadTop();
 loadMovRow();
-loadMoviesPage();
-loadSeriesPage();
+loadMoviesPage(true);
+loadSeriesPage(true);
 </script>
 </body>
 </html>
