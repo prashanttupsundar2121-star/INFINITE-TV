@@ -365,7 +365,41 @@ html,body{background:var(--bg);color:var(--txt);font-family:'Outfit',sans-serif;
     <!-- Built dynamically by JS -->
   </div>
 
-  <!-- Our Collection -->
+  <!-- Popular Content Networks -->
+  <div style="padding:14px 14px 6px;">
+    <div style="display:flex;align-items:center;gap:12px;">
+      <div style="flex:0 0 auto;">
+        <div style="font-size:.72rem;font-weight:800;color:#fff;text-transform:uppercase;letter-spacing:1px;">POPULAR</div>
+        <div style="font-size:.66rem;color:var(--muted);margin-top:1px;">Content Networks</div>
+      </div>
+      <div style="display:flex;gap:10px;align-items:center;overflow-x:auto;flex:1;">
+        <div style="display:flex;flex-direction:column;align-items:center;gap:4px;flex-shrink:0;">
+          <div style="width:60px;height:60px;border-radius:14px;overflow:hidden;background:#f5753a;">
+            <img src="https://i.ibb.co/GQkGNhxV/x.jpg" style="width:100%;height:100%;object-fit:cover;" alt="Crunchyroll"/>
+          </div>
+          <span style="font-size:.58rem;color:#888;font-weight:600;">Crunchyroll</span>
+        </div>
+        <div style="display:flex;flex-direction:column;align-items:center;gap:4px;flex-shrink:0;">
+          <div style="width:60px;height:60px;border-radius:14px;overflow:hidden;background:#000;">
+            <img src="https://i.ibb.co/VWq2M3C4/x.jpg" style="width:100%;height:100%;object-fit:cover;" alt="Netflix"/>
+          </div>
+          <span style="font-size:.58rem;color:#888;font-weight:600;">Netflix</span>
+        </div>
+        <div style="display:flex;flex-direction:column;align-items:center;gap:4px;flex-shrink:0;">
+          <div style="width:60px;height:60px;border-radius:14px;overflow:hidden;background:#00a8e0;">
+            <img src="https://i.ibb.co/MkGkgY16/x.jpg" style="width:100%;height:100%;object-fit:cover;" alt="Prime Video"/>
+          </div>
+          <span style="font-size:.58rem;color:#888;font-weight:600;">Prime Video</span>
+        </div>
+        <div style="display:flex;flex-direction:column;align-items:center;gap:4px;flex-shrink:0;">
+          <div style="width:60px;height:60px;border-radius:14px;overflow:hidden;background:#1b74e4;">
+            <img src="https://i.ibb.co/NnTNvRMg/x.jpg" style="width:100%;height:100%;object-fit:cover;" alt="Hotstar"/>
+          </div>
+          <span style="font-size:.58rem;color:#888;font-weight:600;">Disney+ Hotstar</span>
+        </div>
+      </div>
+    </div>
+  </div>
   <div class="section">
     <div class="sec-hd">
       <div class="sec-ttl">🎌 Our Collection</div>
@@ -739,6 +773,11 @@ function goHero(i){
   document.querySelectorAll('.hdot').forEach((d,j)=>d.classList.toggle('active',j===i));
 }
 
+// MAL CDN direct URL — instant load, no API needed!
+function malImg(malId){
+  return `https://cdn.myanimelist.net/images/anime/${malId}l.jpg`;
+}
+
 // ═══════════════════════════════════
 // OUR COLLECTION
 // ═══════════════════════════════════
@@ -748,35 +787,41 @@ function renderOur(){
   row.innerHTML = ANIME_DB.map(a=>`
     <div class="our-card" onclick="openDetail(${a.malId})">
       <div class="our-img">
-        <img id="oimg_${a.id}" src="" alt="${a.title}"
-          style="display:none"
-          onload="this.style.display='block';document.getElementById('opp_${a.id}').style.display='none';"
-          onerror="this.style.display='none';"
+        <img id="oimg_${a.id}"
+          src="${malImg(a.malId)}"
+          alt="${a.title}"
+          style="width:100%;height:100%;object-fit:cover;display:block;"
+          onerror="this.style.display='none';document.getElementById('opp_${a.id}').style.display='flex';"
         />
-        <div class="our-pp" id="opp_${a.id}">
+        <div class="our-pp" id="opp_${a.id}" style="display:none;">
           <div class="our-pp-i">🎌</div>
           <div class="our-pp-t">${a.title}</div>
         </div>
         <div class="our-badge">${langBadge(a.lang)}</div>
         <div class="our-score" id="oscr_${a.id}"></div>
-        <div class="our-apiname" id="oname_${a.id}"></div>
       </div>
       <div class="our-name" id="onamefull_${a.id}">${a.title}</div>
     </div>`).join('');
-  loadOurImages();
+  // Load scores + API names in background (no rush, images already showing)
+  loadOurScores();
 }
 
-async function loadOurImages(){
+async function loadOurScores(){
   for(let i=0; i<ANIME_DB.length; i++){
     const a = ANIME_DB[i];
     const d = await apiGetOne(a.malId);
     if(d){
-      const img = document.getElementById(`oimg_${a.id}`);
       const scr = document.getElementById(`oscr_${a.id}`);
       const nm = document.getElementById(`onamefull_${a.id}`);
-      if(img && d.images?.jpg?.large_image_url) img.src = d.images.jpg.large_image_url;
       if(scr && d.score) scr.textContent = '⭐' + d.score;
-      if(nm && d.title) nm.textContent = d.title; // API name
+      if(nm && d.title) nm.textContent = d.title;
+      // Update image with high-res if CDN failed
+      const imgEl = document.getElementById(`oimg_${a.id}`);
+      if(imgEl && d.images?.jpg?.large_image_url && imgEl.style.display==='none'){
+        imgEl.src = d.images.jpg.large_image_url;
+        imgEl.style.display = 'block';
+        document.getElementById(`opp_${a.id}`).style.display = 'none';
+      }
     }
     if(i < ANIME_DB.length-1) await new Promise(r=>setTimeout(r,500));
   }
