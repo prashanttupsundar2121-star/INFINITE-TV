@@ -14,10 +14,11 @@
   --txt:#ffffff;--txt2:#aaaaaa;--muted:#555;
   --tg:#1d9bd1;--r:8px;--r2:12px;
 }
-html,body{background:var(--bg);color:var(--txt);font-family:'Outfit',sans-serif;min-height:100vh;overflow-x:hidden;}
+html{scroll-behavior:smooth;}
+html,body{background:var(--bg);color:var(--txt);font-family:'Outfit',sans-serif;min-height:100vh;overflow-x:hidden;-webkit-font-smoothing:antialiased;}
 ::-webkit-scrollbar{display:none;}
 
-/* ── INTRO ── */
+/* ── PAGES — smooth fade ── */
 #intro{position:fixed;inset:0;background:#000;z-index:99999;display:flex;align-items:center;justify-content:center;overflow:hidden;transition:opacity 1s;}
 #introBg{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;filter:brightness(.3) saturate(1.4);}
 .ic{position:relative;z-index:1;text-align:center;animation:izoom 3s ease forwards;}
@@ -32,19 +33,24 @@ html,body{background:var(--bg);color:var(--txt);font-family:'Outfit',sans-serif;
 
 /* ── PAGES ── */
 .page{display:none;padding-bottom:70px;}
-.page.active{display:block;}
+.page.active{display:block;animation:pgIn .3s ease;}
+@keyframes pgIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
 
 /* ── TOP NAV ── */
-.topnav{position:sticky;top:0;z-index:200;height:56px;background:linear-gradient(to bottom,rgba(0,0,0,.95),rgba(0,0,0,.7));display:flex;align-items:center;justify-content:space-between;padding:0 16px;}
-.tn-logo{font-family:'Bebas Neue',sans-serif;font-size:1.4rem;letter-spacing:3px;background:linear-gradient(135deg,var(--green),var(--gold));-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
-.tn-menu{font-size:1.4rem;cursor:pointer;color:var(--txt);background:none;border:none;padding:6px;}
+.topnav{position:sticky;top:0;z-index:200;height:56px;background:rgba(13,13,13,.95);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-bottom:1px solid rgba(255,255,255,.06);display:flex;align-items:center;justify-content:space-between;padding:0 16px;}
+.tn-logo{font-family:'Bebas Neue',sans-serif;font-size:1.45rem;letter-spacing:3px;background:linear-gradient(135deg,var(--green),var(--gold));-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
+.tn-menu{font-size:1.4rem;cursor:pointer;color:var(--txt);background:none;border:none;padding:8px;border-radius:8px;transition:background .2s;}
+.tn-menu:active{background:rgba(255,255,255,.1);}
 
 /* ── BOTTOM NAV ── */
-.bnav{position:fixed;bottom:0;left:0;right:0;z-index:300;height:60px;background:rgba(13,13,13,.97);border-top:1px solid #222;display:flex;align-items:stretch;}
-.bn-btn{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;background:none;border:none;color:var(--muted);font-family:'Outfit',sans-serif;font-size:.6rem;font-weight:600;cursor:pointer;transition:color .2s;text-transform:uppercase;letter-spacing:.5px;}
-.bn-btn.active{color:var(--green);}
-.bn-btn svg{width:22px;height:22px;fill:currentColor;}
-.bn-btn.active svg{filter:drop-shadow(0 0 6px var(--green));}
+.bnav{position:fixed;bottom:0;left:0;right:0;z-index:300;height:62px;background:rgba(10,10,10,.97);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-top:1px solid rgba(255,255,255,.07);display:flex;align-items:stretch;}
+.bn-btn{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;background:none;border:none;color:#555;font-family:'Outfit',sans-serif;font-size:.58rem;font-weight:600;cursor:pointer;transition:color .2s;text-transform:uppercase;letter-spacing:.3px;padding:6px 0;position:relative;}
+.bn-btn.active{color:#fff;}
+.bn-btn::after{content:'';position:absolute;top:0;left:20%;right:20%;height:2px;background:var(--green);border-radius:0 0 3px 3px;opacity:0;transition:opacity .2s;}
+.bn-btn.active::after{opacity:1;}
+.bn-btn svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;transition:stroke .2s;}
+.bn-btn.active svg{stroke:var(--green);filter:drop-shadow(0 0 5px var(--green));}
+.bn-btn.active span{color:var(--green);}
 
 /* ── DRAWER ── */
 .dov{display:none;position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:500;}
@@ -81,64 +87,73 @@ html,body{background:var(--bg);color:var(--txt);font-family:'Outfit',sans-serif;
 .hero-type{background:rgba(255,255,255,.15);color:#fff;font-size:.7rem;font-weight:700;padding:2px 8px;border-radius:4px;}
 .hero-btns{display:flex;gap:10px;margin-top:12px;}
 .hbtn-watch{display:flex;align-items:center;justify-content:center;gap:7px;background:#fff;color:#000;border:none;border-radius:6px;padding:9px 20px;font-family:'Outfit',sans-serif;font-weight:800;font-size:.84rem;flex:1;cursor:pointer;text-decoration:none;}
-.hbtn-info{display:flex;align-items:center;justify-content:center;gap:7px;background:rgba(255,255,255,.18);color:#fff;border:none;border-radius:6px;padding:9px 16px;font-family:'Outfit',sans-serif;font-weight:700;font-size:.84rem;cursor:pointer;backdrop-filter:blur(4px);}
-.hero-dots{position:absolute;bottom:8px;left:50%;transform:translateX(-50%);display:flex;gap:5px;z-index:10;}
-.hdot{width:6px;height:6px;border-radius:50%;background:rgba(255,255,255,.35);transition:all .3s;cursor:pointer;}
-.hdot.active{background:var(--green);width:18px;border-radius:4px;}
+.hbtn-watch{display:flex;align-items:center;justify-content:center;gap:7px;background:#fff;color:#000;border:none;border-radius:8px;padding:10px 20px;font-family:'Outfit',sans-serif;font-weight:800;font-size:.84rem;flex:1;cursor:pointer;text-decoration:none;transition:transform .15s,opacity .15s;-webkit-tap-highlight-color:transparent;}
+.hbtn-watch:active{transform:scale(.96);opacity:.9;}
+.hbtn-info{display:flex;align-items:center;justify-content:center;gap:7px;background:rgba(255,255,255,.15);color:#fff;border:1px solid rgba(255,255,255,.2);border-radius:8px;padding:10px 16px;font-family:'Outfit',sans-serif;font-weight:700;font-size:.84rem;cursor:pointer;backdrop-filter:blur(8px);transition:transform .15s;}
+.hbtn-info:active{transform:scale(.96);}
+.hero-dots{position:absolute;bottom:10px;left:50%;transform:translateX(-50%);display:flex;gap:5px;z-index:10;}
+.hdot{width:6px;height:6px;border-radius:50%;background:rgba(255,255,255,.3);transition:all .35s ease;cursor:pointer;}
+.hdot.active{background:var(--green);width:20px;border-radius:4px;box-shadow:0 0 6px var(--green);}
 
 /* ── SECTIONS ── */
-.section{padding:16px 0 8px;}
-.sec-hd{display:flex;align-items:center;justify-content:space-between;padding:0 14px;margin-bottom:12px;}
-.sec-ttl{font-family:'Outfit',sans-serif;font-size:1.05rem;font-weight:700;display:flex;align-items:center;gap:8px;}
-.sec-ttl::before{content:'';display:block;width:3px;height:18px;background:var(--red);border-radius:2px;}
-.sec-view{color:var(--red);font-size:.78rem;font-weight:600;}
+.section{padding:18px 0 8px;}
+.sec-hd{display:flex;align-items:center;justify-content:space-between;padding:0 14px;margin-bottom:14px;}
+.sec-ttl{font-family:'Outfit',sans-serif;font-size:1.05rem;font-weight:800;display:flex;align-items:center;gap:8px;color:#fff;}
+.sec-ttl::before{content:'';display:block;width:3px;height:18px;background:linear-gradient(var(--red),var(--gold));border-radius:2px;flex-shrink:0;}
+.sec-view{color:var(--red);font-size:.78rem;font-weight:700;}
 
 /* Horizontal scroll row */
-.hrow{display:flex;gap:10px;overflow-x:auto;padding:0 14px;scroll-snap-type:x mandatory;}
+.hrow{display:flex;gap:12px;overflow-x:auto;padding:0 14px 4px;scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch;}
 .hrow::-webkit-scrollbar{display:none;}
 
-/* ── ANIME CARD (horizontal row) ── */
-.acard{flex-shrink:0;width:120px;scroll-snap-align:start;cursor:pointer;}
-.acard-img{position:relative;width:120px;height:168px;border-radius:var(--r);overflow:hidden;background:#222;}
+/* ── ANIME CARD ── */
+.acard{flex-shrink:0;width:120px;scroll-snap-align:start;cursor:pointer;transition:transform .18s;}
+.acard:active{transform:scale(.94);}
+.acard-img{position:relative;width:120px;height:168px;border-radius:var(--r2);overflow:hidden;background:#222;box-shadow:0 4px 12px rgba(0,0,0,.5);}
 .acard-img img{width:100%;height:100%;object-fit:cover;display:block;}
-.acard-badge{position:absolute;top:6px;left:6px;font-size:.58rem;font-weight:800;padding:2px 7px;border-radius:4px;text-transform:uppercase;letter-spacing:.5px;}
+.acard-img::after{content:'';position:absolute;inset:0;background:linear-gradient(to bottom,transparent 55%,rgba(0,0,0,.65));pointer-events:none;}
+.acard-badge{position:absolute;top:6px;left:6px;font-size:.58rem;font-weight:800;padding:2px 7px;border-radius:4px;text-transform:uppercase;letter-spacing:.5px;z-index:2;}
 .b-multi{background:#f5c518;color:#000;}
 .b-hindi{background:#ff6b35;color:#fff;}
 .b-dual{background:#6c63ff;color:#fff;}
 .b-sub{background:#00b4d8;color:#fff;}
 .b-fandub{background:#e50914;color:#fff;}
 .b-eng{background:#2ecc71;color:#000;}
-.acard-score{position:absolute;bottom:6px;right:6px;background:rgba(0,0,0,.75);color:var(--gold);font-size:.62rem;font-weight:700;padding:2px 6px;border-radius:4px;}
-.acard-name{margin-top:6px;font-size:.72rem;font-weight:600;line-height:1.3;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;color:var(--txt2);}
-.acard-year{font-size:.65rem;color:var(--muted);margin-top:2px;}
+.acard-score{position:absolute;bottom:6px;right:6px;background:rgba(0,0,0,.82);color:var(--gold);font-size:.62rem;font-weight:700;padding:2px 6px;border-radius:4px;z-index:2;}
+.acard-name{margin-top:7px;font-size:.73rem;font-weight:600;line-height:1.3;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;color:#ccc;}
+.acard-year{font-size:.64rem;color:var(--muted);margin-top:2px;}
 
-/* ── GRID (for movies/series pages) ── */
+/* ── GRID CARDS ── */
 .grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;padding:14px;}
-.gcard{cursor:pointer;}
-.gcard-img{position:relative;aspect-ratio:2/3;border-radius:var(--r);overflow:hidden;background:#222;}
+.gcard{cursor:pointer;transition:transform .18s;}
+.gcard:active{transform:scale(.94);}
+.gcard-img{position:relative;aspect-ratio:2/3;border-radius:var(--r2);overflow:hidden;background:#222;box-shadow:0 4px 12px rgba(0,0,0,.5);}
 .gcard-img img{width:100%;height:100%;object-fit:cover;display:block;}
-.gcard-badge{position:absolute;top:6px;left:6px;font-size:.55rem;font-weight:800;padding:2px 6px;border-radius:4px;text-transform:uppercase;}
-.gcard-score{position:absolute;bottom:5px;right:5px;background:rgba(0,0,0,.75);color:var(--gold);font-size:.6rem;font-weight:700;padding:2px 5px;border-radius:4px;}
-.gcard-name{margin-top:5px;font-size:.72rem;font-weight:600;line-height:1.3;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;color:#ddd;}
-.gcard-year{font-size:.62rem;color:var(--muted);margin-top:1px;}
+.gcard-img::after{content:'';position:absolute;inset:0;background:linear-gradient(to bottom,transparent 55%,rgba(0,0,0,.65));pointer-events:none;}
+.gcard-badge{position:absolute;top:5px;left:5px;font-size:.55rem;font-weight:800;padding:2px 6px;border-radius:4px;text-transform:uppercase;z-index:2;}
+.gcard-score{position:absolute;bottom:5px;right:5px;background:rgba(0,0,0,.82);color:var(--gold);font-size:.6rem;font-weight:700;padding:2px 5px;border-radius:4px;z-index:2;}
+.gcard-name{margin-top:6px;font-size:.72rem;font-weight:600;line-height:1.3;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;color:#ddd;}
+.gcard-year{font-size:.62rem;color:var(--muted);margin-top:2px;}
 
-/* ── OUR ANIME row (horizontal, special) ── */
-.our-card{flex-shrink:0;width:130px;scroll-snap-align:start;cursor:pointer;}
-.our-img{position:relative;width:130px;height:185px;border-radius:var(--r2);overflow:hidden;background:#222;}
+/* ── OUR COLLECTION ── */
+.our-card{flex-shrink:0;width:130px;scroll-snap-align:start;cursor:pointer;transition:transform .18s;}
+.our-card:active{transform:scale(.94);}
+.our-img{position:relative;width:130px;height:185px;border-radius:var(--r2);overflow:hidden;background:#222;box-shadow:0 6px 18px rgba(0,0,0,.55);}
 .our-img img{width:100%;height:100%;object-fit:cover;display:block;}
 .our-pp{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;background:linear-gradient(135deg,#1a1a1a,#0d0d0d);}
 .our-pp-i{font-size:2.2rem;}
 .our-pp-t{font-size:.6rem;font-weight:700;color:var(--green);text-align:center;padding:0 6px;line-height:1.3;}
-.our-badge{position:absolute;top:6px;left:6px;}
-.our-score{position:absolute;bottom:6px;right:6px;background:rgba(0,0,0,.75);color:var(--gold);font-size:.62rem;font-weight:700;padding:2px 6px;border-radius:4px;}
-.our-name{margin-top:6px;font-size:.74rem;font-weight:700;line-height:1.3;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;color:#fff;}
+.our-badge{position:absolute;top:7px;left:7px;z-index:3;}
+.our-score{position:absolute;bottom:7px;right:7px;background:rgba(0,0,0,.82);color:var(--gold);font-size:.62rem;font-weight:700;padding:2px 7px;border-radius:4px;z-index:3;}
+.our-name{margin-top:7px;font-size:.75rem;font-weight:700;line-height:1.3;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;color:#fff;}
 
 /* ── SEARCH ── */
-.search-top{padding:12px 14px;background:var(--bg);position:sticky;top:56px;z-index:100;}
-.sbar{display:flex;align-items:center;background:#222;border-radius:8px;padding:0 14px;gap:10px;}
-.sbar input{flex:1;background:transparent;border:none;color:#fff;font-family:'Outfit',sans-serif;font-size:.9rem;padding:12px 0;outline:none;}
-.sbar input::placeholder{color:var(--muted);}
-.sbar svg{width:18px;height:18px;fill:var(--muted);}
+.search-top{padding:14px 14px 10px;background:var(--bg);position:sticky;top:56px;z-index:100;}
+.sbar{display:flex;align-items:center;background:#1c1c1c;border-radius:12px;padding:0 16px;gap:10px;border:1.5px solid #2a2a2a;transition:border-color .2s,box-shadow .2s;}
+.sbar:focus-within{border-color:rgba(0,230,118,.4);box-shadow:0 0 0 3px rgba(0,230,118,.07);}
+.sbar input{flex:1;background:transparent;border:none;color:#fff;font-family:'Outfit',sans-serif;font-size:.92rem;padding:13px 0;outline:none;}
+.sbar input::placeholder{color:#444;}
+.sbar svg{width:18px;height:18px;fill:none;stroke:#555;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0;}
 
 /* ── DETAIL MODAL ── */
 .det-modal{display:none;position:fixed;inset:0;background:var(--bg);z-index:400;overflow-y:auto;}
@@ -221,7 +236,69 @@ html,body{background:var(--bg);color:var(--txt);font-family:'Outfit',sans-serif;
 .ldr{display:inline-block;width:16px;height:16px;border:2px solid #333;border-top-color:var(--green);border-radius:50%;animation:spin .7s linear infinite;vertical-align:middle;}
 @keyframes spin{to{transform:rotate(360deg)}}
 
-/* ── COMMUNITY CARDS ── */
+/* ══════════════════════════════════
+   STREAMING PLAYER PAGE
+══════════════════════════════════ */
+.player-page{position:fixed;inset:0;background:#000;z-index:450;display:none;flex-direction:column;overflow-y:auto;}
+.player-page.active{display:flex;}
+
+/* Top bar */
+.pl-topbar{display:flex;align-items:center;gap:12px;padding:10px 14px;background:linear-gradient(to bottom,rgba(0,0,0,.9),transparent);position:sticky;top:0;z-index:10;}
+.pl-back{width:36px;height:36px;border-radius:50%;background:rgba(255,255,255,.12);border:none;color:#fff;font-size:1.1rem;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;}
+.pl-title{font-size:.9rem;font-weight:700;color:#fff;flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.pl-ep-badge{background:var(--red);color:#fff;font-size:.65rem;font-weight:800;padding:3px 10px;border-radius:50px;flex-shrink:0;}
+
+/* Video container */
+.pl-video-wrap{position:relative;width:100%;background:#000;aspect-ratio:16/9;overflow:hidden;}
+.pl-iframe{width:100%;height:100%;border:none;display:block;}
+.pl-overlay{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;background:rgba(0,0,0,.6);gap:14px;cursor:pointer;transition:opacity .3s;}
+.pl-overlay.hidden{opacity:0;pointer-events:none;}
+.pl-poster{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;filter:brightness(.4);}
+.pl-play-btn{width:68px;height:68px;border-radius:50%;background:rgba(255,255,255,.18);backdrop-filter:blur(8px);border:2px solid rgba(255,255,255,.3);display:flex;align-items:center;justify-content:center;z-index:2;}
+.pl-play-btn svg{width:28px;height:28px;fill:#fff;margin-left:4px;}
+.pl-overlay-title{font-size:.85rem;font-weight:700;color:#fff;z-index:2;text-align:center;padding:0 20px;}
+.pl-overlay-sub{font-size:.72rem;color:rgba(255,255,255,.6);z-index:2;}
+
+/* Server/Quality row */
+.pl-server-row{padding:10px 14px;background:#111;border-bottom:1px solid #1a1a1a;}
+.pl-srv-lbl{font-size:.65rem;color:#666;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;font-weight:700;}
+.pl-srv-btns{display:flex;gap:8px;flex-wrap:wrap;}
+.pl-srv-btn{background:#222;border:1px solid #333;border-radius:6px;padding:6px 14px;color:#aaa;font-size:.74rem;font-weight:600;cursor:pointer;transition:all .2s;font-family:'Outfit',sans-serif;}
+.pl-srv-btn.active{background:var(--red);border-color:var(--red);color:#fff;}
+.pl-srv-btn:active{transform:scale(.96);}
+
+/* Info row */
+.pl-info-row{padding:14px;}
+.pl-anime-title{font-size:1rem;font-weight:800;color:#fff;margin-bottom:4px;}
+.pl-ep-info{font-size:.78rem;color:#888;margin-bottom:10px;}
+.pl-meta-chips{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px;}
+.pl-chip{background:#1a1a1a;border:1px solid #2a2a2a;border-radius:4px;padding:3px 9px;font-size:.66rem;color:#aaa;font-weight:600;}
+.pl-chip.hl{border-color:rgba(0,230,118,.35);color:var(--green);background:rgba(0,230,118,.06);}
+
+/* TG Open button */
+.pl-tg-btn{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;background:linear-gradient(135deg,#1d9bd1,#0fa3e0);border:none;border-radius:10px;padding:14px;color:#fff;font-family:'Outfit',sans-serif;font-weight:800;font-size:.9rem;cursor:pointer;margin-bottom:14px;text-decoration:none;}
+.pl-tg-btn svg{width:20px;height:20px;fill:#fff;}
+
+/* Episodes section */
+.pl-eps-wrap{padding:0 14px 14px;}
+.pl-eps-hd{font-size:.9rem;font-weight:700;color:#fff;margin-bottom:10px;display:flex;align-items:center;gap:8px;}
+.pl-eps-hd::before{content:'';display:block;width:3px;height:16px;background:var(--red);border-radius:2px;}
+.pl-eps-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:6px;}
+.pl-ep{background:#1a1a1a;border:1px solid #2a2a2a;border-radius:8px;padding:10px 4px;text-align:center;font-size:.72rem;font-weight:700;color:#888;cursor:pointer;transition:all .2s;min-height:40px;display:flex;align-items:center;justify-content:center;}
+.pl-ep.active{background:var(--red);border-color:var(--red);color:#fff;box-shadow:0 4px 14px rgba(229,9,20,.4);}
+.pl-ep:active:not(.active){border-color:#555;color:#fff;}
+
+/* Join notice */
+.pl-join-box{margin:0 14px 14px;background:linear-gradient(135deg,rgba(29,155,209,.12),rgba(0,230,118,.06));border:1px solid rgba(29,155,209,.25);border-radius:12px;padding:16px;}
+.pl-join-icon{font-size:1.8rem;margin-bottom:8px;}
+.pl-join-title{font-size:.88rem;font-weight:800;color:#fff;margin-bottom:5px;}
+.pl-join-desc{font-size:.75rem;color:#888;line-height:1.6;margin-bottom:12px;}
+.pl-join-btn{display:flex;align-items:center;justify-content:center;gap:8px;background:var(--tg);border:none;border-radius:8px;padding:12px;width:100%;color:#fff;font-family:'Outfit',sans-serif;font-weight:800;font-size:.85rem;cursor:pointer;text-decoration:none;}
+
+/* Related row */
+.pl-related{padding:0 14px 80px;}
+.pl-rel-hd{font-size:.9rem;font-weight:700;color:#fff;margin-bottom:10px;display:flex;align-items:center;gap:8px;}
+.pl-rel-hd::before{content:'';display:block;width:3px;height:16px;background:var(--green);border-radius:2px;}
 .comm-card{display:flex;align-items:flex-start;gap:12px;padding:14px 16px;border-bottom:1px solid #1a1a1a;cursor:pointer;transition:background .2s;}
 .comm-card:active{background:rgba(255,255,255,.04);}
 .comm-icon{width:46px;height:46px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:1.2rem;flex-shrink:0;}
@@ -300,37 +377,6 @@ html,body{background:var(--bg);color:var(--txt);font-family:'Outfit',sans-serif;
 
   <div class="drw-div"></div>
 
-  <!-- Streaming Partners -->
-  <div class="drw-sec">Popular Content Networks</div>
-  <div class="platform-row">
-    <div class="pf-item">
-      <div class="pf-logo" style="background:#f5753a;overflow:hidden;">
-        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/2/29/Crunchyroll_Logo.png/320px-Crunchyroll_Logo.png" style="width:100%;height:100%;object-fit:contain;padding:6px;" alt="Crunchyroll" onerror="this.parentElement.innerHTML='<span style=font-size:1.1rem>🟠</span>'"/>
-      </div>
-      <div class="pf-name">Crunchyroll</div>
-    </div>
-    <div class="pf-item">
-      <div class="pf-logo" style="background:#000;overflow:hidden;">
-        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/0/08/Netflix_2015_logo.svg/320px-Netflix_2015_logo.svg.png" style="width:100%;height:100%;object-fit:contain;padding:4px;" alt="Netflix" onerror="this.parentElement.innerHTML='<span style=color:#e50914;font-family:Georgia;font-weight:900;font-size:1.2rem>N</span>'"/>
-      </div>
-      <div class="pf-name">Netflix</div>
-    </div>
-    <div class="pf-item">
-      <div class="pf-logo" style="background:#00a8e0;overflow:hidden;">
-        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/1/11/Amazon_Prime_Video_logo.svg/320px-Amazon_Prime_Video_logo.svg.png" style="width:100%;height:100%;object-fit:contain;padding:5px;" alt="Prime Video" onerror="this.parentElement.innerHTML='<span style=color:#fff;font-size:.7rem;font-weight:800>prime</span>'"/>
-      </div>
-      <div class="pf-name">Prime Video</div>
-    </div>
-    <div class="pf-item">
-      <div class="pf-logo" style="background:#1b74e4;overflow:hidden;">
-        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/0/0e/Hotstar_logo_%28Nov_2023%29.svg/320px-Hotstar_logo_%28Nov_2023%29.svg.png" style="width:100%;height:100%;object-fit:contain;padding:6px;" alt="Hotstar" onerror="this.parentElement.innerHTML='<span style=color:#fff;font-size:.8rem;font-weight:800>H+</span>'"/>
-      </div>
-      <div class="pf-name">Hotstar</div>
-    </div>
-  </div>
-
-  <div class="drw-div"></div>
-
   <!-- Support -->
   <div class="drw-sec">Help & Support</div>
   <div class="comm-card" onclick="window.open('https://t.me/iNFiNiTES_Support','_blank')">
@@ -366,36 +412,28 @@ html,body{background:var(--bg);color:var(--txt);font-family:'Outfit',sans-serif;
   </div>
 
   <!-- Popular Content Networks -->
-  <div style="padding:14px 14px 6px;">
-    <div style="display:flex;align-items:center;gap:12px;">
-      <div style="flex:0 0 auto;">
-        <div style="font-size:.72rem;font-weight:800;color:#fff;text-transform:uppercase;letter-spacing:1px;">POPULAR</div>
-        <div style="font-size:.66rem;color:var(--muted);margin-top:1px;">Content Networks</div>
+  <div style="background:#111;padding:14px 16px;border-top:1px solid #1a1a1a;border-bottom:1px solid #1a1a1a;">
+    <div style="display:flex;align-items:center;gap:14px;">
+      <div style="flex-shrink:0;">
+        <div style="font-size:.78rem;font-weight:800;color:#fff;letter-spacing:.5px;">POPULAR</div>
+        <div style="font-size:.66rem;color:#555;margin-top:1px;">Content Networks</div>
       </div>
-      <div style="display:flex;gap:10px;align-items:center;overflow-x:auto;flex:1;">
+      <div style="display:flex;gap:12px;align-items:center;flex:1;overflow-x:auto;">
         <div style="display:flex;flex-direction:column;align-items:center;gap:4px;flex-shrink:0;">
-          <div style="width:60px;height:60px;border-radius:14px;overflow:hidden;background:#f5753a;">
-            <img src="https://i.ibb.co/GQkGNhxV/x.jpg" style="width:100%;height:100%;object-fit:cover;" alt="Crunchyroll"/>
-          </div>
-          <span style="font-size:.58rem;color:#888;font-weight:600;">Crunchyroll</span>
+          <div style="width:58px;height:58px;border-radius:14px;overflow:hidden;"><img src="https://i.ibb.co/GQkGNhxV/x.jpg" style="width:100%;height:100%;object-fit:cover;" alt="Crunchyroll"/></div>
+          <span style="font-size:.58rem;color:#666;font-weight:600;">Crunchyroll</span>
         </div>
         <div style="display:flex;flex-direction:column;align-items:center;gap:4px;flex-shrink:0;">
-          <div style="width:60px;height:60px;border-radius:14px;overflow:hidden;background:#000;">
-            <img src="https://i.ibb.co/VWq2M3C4/x.jpg" style="width:100%;height:100%;object-fit:cover;" alt="Netflix"/>
-          </div>
-          <span style="font-size:.58rem;color:#888;font-weight:600;">Netflix</span>
+          <div style="width:58px;height:58px;border-radius:14px;overflow:hidden;"><img src="https://i.ibb.co/VWq2M3C4/x.jpg" style="width:100%;height:100%;object-fit:cover;" alt="Netflix"/></div>
+          <span style="font-size:.58rem;color:#666;font-weight:600;">Netflix</span>
         </div>
         <div style="display:flex;flex-direction:column;align-items:center;gap:4px;flex-shrink:0;">
-          <div style="width:60px;height:60px;border-radius:14px;overflow:hidden;background:#00a8e0;">
-            <img src="https://i.ibb.co/MkGkgY16/x.jpg" style="width:100%;height:100%;object-fit:cover;" alt="Prime Video"/>
-          </div>
-          <span style="font-size:.58rem;color:#888;font-weight:600;">Prime Video</span>
+          <div style="width:58px;height:58px;border-radius:14px;overflow:hidden;"><img src="https://i.ibb.co/MkGkgY16/x.jpg" style="width:100%;height:100%;object-fit:cover;" alt="Prime Video"/></div>
+          <span style="font-size:.58rem;color:#666;font-weight:600;">Prime Video</span>
         </div>
         <div style="display:flex;flex-direction:column;align-items:center;gap:4px;flex-shrink:0;">
-          <div style="width:60px;height:60px;border-radius:14px;overflow:hidden;background:#1b74e4;">
-            <img src="https://i.ibb.co/NnTNvRMg/x.jpg" style="width:100%;height:100%;object-fit:cover;" alt="Hotstar"/>
-          </div>
-          <span style="font-size:.58rem;color:#888;font-weight:600;">Disney+ Hotstar</span>
+          <div style="width:58px;height:58px;border-radius:14px;overflow:hidden;"><img src="https://i.ibb.co/NnTNvRMg/x.jpg" style="width:100%;height:100%;object-fit:cover;" alt="Hotstar"/></div>
+          <span style="font-size:.58rem;color:#666;font-weight:600;">Disney+ Hotstar</span>
         </div>
       </div>
     </div>
@@ -533,27 +571,96 @@ html,body{background:var(--bg);color:var(--txt);font-family:'Outfit',sans-serif;
   </div>
 </div>
 
+<!-- ═══ STREAMING PLAYER PAGE ═══ -->
+<div class="player-page" id="playerPage">
+  <div class="pl-topbar">
+    <button class="pl-back" onclick="closePlayer()">‹</button>
+    <div class="pl-title" id="plTitle">Loading...</div>
+    <div class="pl-ep-badge" id="plEpBadge">EP 1</div>
+  </div>
+
+  <!-- Video area -->
+  <div class="pl-video-wrap" id="plVideoWrap">
+    <img class="pl-poster" id="plPoster" src="" alt=""/>
+    <iframe class="pl-iframe" id="plIframe" src="" allowfullscreen allow="autoplay; fullscreen" scrolling="no" style="display:none;"></iframe>
+    <div class="pl-overlay" id="plOverlay" onclick="startPlay()">
+      <div class="pl-play-btn">
+        <svg viewBox="0 0 24 24"><polygon points="5,3 19,12 5,21"/></svg>
+      </div>
+      <div class="pl-overlay-title" id="plOverlayTitle">Tap to Watch</div>
+      <div class="pl-overlay-sub">Episode 1 • HD Quality</div>
+    </div>
+  </div>
+
+  <!-- Server buttons -->
+  <div class="pl-server-row">
+    <div class="pl-srv-lbl">📡 Watch On</div>
+    <div class="pl-srv-btns">
+      <button class="pl-srv-btn active" onclick="setServer('telegram')">▶ Telegram</button>
+      <button class="pl-srv-btn" onclick="setServer('tg2')">📱 TG Player</button>
+      <button class="pl-srv-btn" onclick="setServer('web')">🌐 Web</button>
+    </div>
+  </div>
+
+  <!-- Anime info -->
+  <div class="pl-info-row">
+    <div class="pl-anime-title" id="plAnimeName">Loading...</div>
+    <div class="pl-ep-info" id="plEpInfo">Episode 1 • Tap play to watch</div>
+    <div class="pl-meta-chips" id="plMetaChips">
+      <span class="pl-chip hl">🌐 Multi Language</span>
+      <span class="pl-chip">HD Quality</span>
+      <span class="pl-chip">Free</span>
+    </div>
+
+    <!-- Open in Telegram button -->
+    <a class="pl-tg-btn" id="plTgBtn" href="#" target="_blank">
+      <svg viewBox="0 0 24 24"><path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.562 8.248-1.97 9.289c-.145.658-.537.818-1.084.508l-3-2.21-1.447 1.394c-.16.16-.295.295-.605.295l.213-3.053 5.56-5.023c.242-.213-.054-.333-.373-.12L7.19 14.447l-2.95-.924c-.64-.204-.657-.64.136-.95l11.57-4.461c.537-.194 1.006.131.616.136z"/></svg>
+      OPEN IN TELEGRAM APP
+    </a>
+  </div>
+
+  <!-- Join notice (shown for private channels) -->
+  <div class="pl-join-box" id="plJoinBox" style="display:none;">
+    <div class="pl-join-icon">🔒</div>
+    <div class="pl-join-title">Join Channel to Watch</div>
+    <div class="pl-join-desc">This anime is in a private Telegram channel. Join once for free — then come back and watch all episodes directly here!</div>
+    <a class="pl-join-btn" id="plJoinBtn" href="#" target="_blank">
+      <svg viewBox="0 0 24 24" fill="#fff" width="18" height="18"><path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.562 8.248-1.97 9.289c-.145.658-.537.818-1.084.508l-3-2.21-1.447 1.394c-.16.16-.295.295-.605.295l.213-3.053 5.56-5.023c.242-.213-.054-.333-.373-.12L7.19 14.447l-2.95-.924c-.64-.204-.657-.64.136-.95l11.57-4.461c.537-.194 1.006.131.616.136z"/></svg>
+      JOIN FREE & WATCH
+    </a>
+  </div>
+
+  <!-- Episodes -->
+  <div class="pl-eps-wrap" id="plEpsWrap">
+    <div class="pl-eps-hd">Episodes</div>
+    <div class="pl-eps-grid" id="plEpsGrid"></div>
+  </div>
+
+  <!-- Related anime -->
+  <div class="pl-related" id="plRelated"></div>
+</div>
+
 <!-- BOTTOM NAV -->
 <nav class="bnav">
   <button class="bn-btn active" id="bn0" onclick="goTab('pgHome')">
     <svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9,22 9,12 15,12 15,22"/></svg>
-    Home
+    <span>Home</span>
   </button>
   <button class="bn-btn" id="bn1" onclick="goTab('pgSearch')">
     <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-    Search
+    <span>Search</span>
   </button>
   <button class="bn-btn" id="bn2" onclick="goTab('pgMovies')">
     <svg viewBox="0 0 24 24"><rect x="2" y="2" width="20" height="20" rx="2.18" ry="2.18"/><line x1="7" y1="2" x2="7" y2="22"/><line x1="17" y1="2" x2="17" y2="22"/><line x1="2" y1="12" x2="22" y2="12"/><line x1="2" y1="7" x2="7" y2="7"/><line x1="2" y1="17" x2="7" y2="17"/><line x1="17" y1="17" x2="22" y2="17"/><line x1="17" y1="7" x2="22" y2="7"/></svg>
-    Movies
+    <span>Movies</span>
   </button>
   <button class="bn-btn" id="bn3" onclick="goTab('pgSeries')">
     <svg viewBox="0 0 24 24"><rect x="2" y="7" width="20" height="15" rx="2"/><polyline points="17,2 12,7 7,2"/></svg>
-    Series
+    <span>Series</span>
   </button>
   <button class="bn-btn" id="bn4" onclick="toggleDrawer()">
     <svg viewBox="0 0 24 24"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
-    More
+    <span>More</span>
   </button>
 </nav>
 
@@ -785,7 +892,7 @@ function renderOur(){
   const row = document.getElementById('ourRow');
   document.getElementById('ourCount').textContent = ANIME_DB.length + ' anime';
   row.innerHTML = ANIME_DB.map(a=>`
-    <div class="our-card" onclick="openDetail(${a.malId})">
+    <div class="our-card" onclick="openPlayer(${a.id})">
       <div class="our-img">
         <img id="oimg_${a.id}"
           src="${malImg(a.malId)}"
@@ -861,17 +968,16 @@ function mkGcard(a){
 // LOAD SECTIONS (staggered)
 // ═══════════════════════════════════
 async function loadTrending(){
-  await new Promise(r=>setTimeout(r,600));
   const d = await apiGet('https://api.jikan.moe/v4/top/anime?filter=airing&limit=20');
   document.getElementById('trendRow').innerHTML = d.length ? d.map(mkAcard).join('') : '<div class="no-res">Reload 🔄</div>';
 }
 async function loadTop(){
-  await new Promise(r=>setTimeout(r,1200));
+  await new Promise(r=>setTimeout(r,400));
   const d = await apiGet('https://api.jikan.moe/v4/top/anime?limit=20');
   document.getElementById('topRow').innerHTML = d.length ? d.map(mkAcard).join('') : '<div class="no-res">Could not load.</div>';
 }
 async function loadMovRow(){
-  await new Promise(r=>setTimeout(r,1800));
+  await new Promise(r=>setTimeout(r,800));
   const d = await apiGet('https://api.jikan.moe/v4/top/anime?type=movie&limit=16');
   document.getElementById('movRow').innerHTML = d.length ? d.map(mkAcard).join('') : '<div class="no-res">Could not load.</div>';
 }
@@ -1031,7 +1137,174 @@ async function openDetail(malId){
 }
 function closeDetail(){ document.getElementById('detModal').classList.remove('active'); }
 
-// ── INTRO ──
+// ═══════════════════════════════════
+// STREAMING PLAYER
+// ═══════════════════════════════════
+let curAnime = null;
+let curEp = 1;
+let curServer = 'telegram';
+let isPlaying = false;
+
+// Extract channel username from tgLink
+function getTgChannel(tgLink){
+  if(!tgLink) return null;
+  // Public channel: https://t.me/ChannelName/123 or https://t.me/ChannelName
+  const m = tgLink.match(/t\.me\/([^/+?]+)(?:\/(\d+))?/);
+  if(m && !m[1].startsWith('+')) return {user: m[1], post: m[2]||null};
+  return null; // private
+}
+
+function isPrivate(tgLink){
+  return tgLink && tgLink.includes('/+');
+}
+
+async function openPlayer(animeId){
+  const a = ANIME_DB.find(x=>x.id===animeId);
+  if(!a) return;
+  curAnime = a;
+  curEp = 1;
+  isPlaying = false;
+  curServer = 'telegram';
+
+  // Show player page
+  document.getElementById('playerPage').classList.add('active');
+  document.body.style.overflow = 'hidden';
+
+  // Set initial state
+  document.getElementById('plTitle').textContent = a.title;
+  document.getElementById('plAnimeName').textContent = a.title;
+  document.getElementById('plEpBadge').textContent = 'EP 1';
+  document.getElementById('plEpInfo').textContent = 'Episode 1 • Tap ▶ to watch';
+  document.getElementById('plOverlayTitle').textContent = a.title;
+  document.getElementById('plTgBtn').href = a.tgLink;
+
+  // Reset overlay
+  document.getElementById('plOverlay').classList.remove('hidden');
+  document.getElementById('plIframe').style.display = 'none';
+  document.getElementById('plIframe').src = '';
+
+  // Show/hide join box
+  const isPrivChan = isPrivate(a.tgLink);
+  document.getElementById('plJoinBox').style.display = isPrivChan ? 'block' : 'none';
+  document.getElementById('plJoinBtn').href = a.tgLink;
+
+  // Server buttons
+  document.querySelectorAll('.pl-srv-btn').forEach(b=>b.classList.remove('active'));
+  document.querySelector('.pl-srv-btn').classList.add('active');
+
+  // Load API data
+  const d = await apiGetOne(a.malId);
+  if(d){
+    const img = d.images?.jpg?.large_image_url || d.images?.jpg?.image_url || '';
+    document.getElementById('plPoster').src = img;
+    document.getElementById('plTitle').textContent = d.title || a.title;
+    document.getElementById('plAnimeName').textContent = d.title || a.title;
+    document.getElementById('plOverlayTitle').textContent = d.title || a.title;
+
+    // Meta chips
+    document.getElementById('plMetaChips').innerHTML = `
+      <span class="pl-chip hl">${a.lang==='hindi'?'🇮🇳 Hindi':'🌐 Multi Language'}</span>
+      ${d.type?`<span class="pl-chip">${d.type}</span>`:''}
+      ${d.episodes?`<span class="pl-chip">${d.episodes} Episodes</span>`:''}
+      <span class="pl-chip">⭐ ${d.score||'?'}</span>`;
+  }
+
+  // Build episodes grid
+  // Generate episode buttons based on anime episodes count (from API or default 24)
+  const epCount = (await apiGetOne(a.malId))?.episodes || 24;
+  const safeCnt = Math.min(epCount || 24, 200);
+  document.getElementById('plEpsGrid').innerHTML = Array.from({length:safeCnt},(_,i)=>`
+    <div class="pl-ep${i===0?' active':''}" onclick="selectEp(${i+1})">${i+1}</div>`).join('');
+
+  // Related anime
+  buildRelated(a);
+}
+
+function selectEp(ep){
+  curEp = ep;
+  isPlaying = false;
+  document.querySelectorAll('.pl-ep').forEach((b,i)=>b.classList.toggle('active',i===ep-1));
+  document.getElementById('plEpBadge').textContent = `EP ${ep}`;
+  document.getElementById('plEpInfo').textContent = `Episode ${ep} • Tap ▶ to watch`;
+  document.getElementById('plOverlay').classList.remove('hidden');
+  document.getElementById('plIframe').style.display = 'none';
+  document.getElementById('plIframe').src = '';
+  // Scroll to top of video
+  document.getElementById('playerPage').scrollTo({top:0,behavior:'smooth'});
+}
+
+function setServer(srv){
+  curServer = srv;
+  document.querySelectorAll('.pl-srv-btn').forEach(b=>b.classList.remove('active'));
+  event.target.classList.add('active');
+  // Reset to overlay
+  isPlaying = false;
+  document.getElementById('plOverlay').classList.remove('hidden');
+  document.getElementById('plIframe').style.display = 'none';
+  document.getElementById('plIframe').src = '';
+}
+
+function startPlay(){
+  if(!curAnime) return;
+  const tgLink = curAnime.tgLink;
+  const ch = getTgChannel(tgLink);
+
+  if(ch && ch.user){
+    // Public channel — try embed
+    const postNum = ch.post ? parseInt(ch.post) + (curEp - 1) : curEp;
+    let embedSrc = '';
+    if(curServer === 'telegram' || curServer === 'tg2'){
+      embedSrc = `https://t.me/${ch.user}/${postNum}?embed=1&mode=tme`;
+    } else {
+      embedSrc = `https://t.me/${ch.user}/${postNum}?embed=1`;
+    }
+    document.getElementById('plIframe').src = embedSrc;
+    document.getElementById('plIframe').style.display = 'block';
+    document.getElementById('plOverlay').classList.add('hidden');
+    isPlaying = true;
+  } else {
+    // Private channel — open in Telegram directly
+    window.open(tgLink, '_blank');
+  }
+}
+
+function buildRelated(a){
+  const others = ANIME_DB.filter(x=>x.id!==a.id).slice(0,8);
+  if(!others.length) return;
+  document.getElementById('plRelated').innerHTML = `
+    <div class="pl-rel-hd">More Anime</div>
+    <div style="display:flex;gap:10px;overflow-x:auto;padding-bottom:4px;">
+      ${others.map(x=>`
+        <div style="flex-shrink:0;width:100px;cursor:pointer;" onclick="openPlayer(${x.id})">
+          <div style="width:100px;height:140px;border-radius:8px;overflow:hidden;background:#1a1a1a;position:relative;">
+            <img src="${malImg(x.malId)}" style="width:100%;height:100%;object-fit:cover;display:block;" onerror="this.style.display='none'" loading="lazy"/>
+          </div>
+          <div style="font-size:.68rem;font-weight:600;color:#ccc;margin-top:5px;line-height:1.3;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;">${x.title}</div>
+        </div>`).join('')}
+    </div>`;
+}
+
+function closePlayer(){
+  document.getElementById('playerPage').classList.remove('active');
+  document.getElementById('plIframe').src = '';
+  document.body.style.overflow = '';
+  isPlaying = false;
+}
+
+// Override openDetail's WATCH button to open player instead
+// Update detail watch button to open player for DB anime
+const _origOpenDetail = openDetail;
+async function openDetail(malId){
+  await _origOpenDetail(malId);
+  // Override watch button for our DB anime
+  const dbA = ANIME_DB.find(x=>x.malId===malId);
+  if(dbA){
+    const wb = document.getElementById('detWatchBtn');
+    wb.removeAttribute('href');
+    wb.removeAttribute('target');
+    wb.onclick = (e)=>{ e.preventDefault(); closeDetail(); openPlayer(dbA.id); };
+  }
+}
 (function(){
   const intro = document.getElementById('intro');
   const colors = ['#00e676','#e50914','#f5c518','#18ffff','#ffffff'];
