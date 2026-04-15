@@ -75,13 +75,13 @@ html,body{background:var(--bg);color:var(--txt);font-family:'Outfit',sans-serif;
 .drw-div{height:1px;background:#222;margin:8px 18px;}
 
 /* ── HERO SLIDER — SLIDING ── */
-.hero-wrap{position:relative;height:62vw;max-height:320px;overflow:hidden;background:#111;touch-action:pan-y;}
-.hero-track{display:flex;height:100%;transition:transform .45s cubic-bezier(.25,.46,.45,.94);}
+.hero-wrap{position:relative;height:68vw;max-height:360px;overflow:hidden;background:#111;touch-action:pan-y;}
+.hero-track{display:flex;height:100%;transition:transform .5s cubic-bezier(.25,.46,.45,.94);will-change:transform;}
 .hero-slide{flex-shrink:0;width:100%;height:100%;position:relative;}
-.hero-img{width:100%;height:100%;object-fit:cover;filter:brightness(.45);display:block;}
-.hero-grad{position:absolute;inset:0;background:linear-gradient(to bottom,transparent 30%,rgba(13,13,13,.7) 70%,var(--bg) 100%);}
-.hero-info{position:absolute;bottom:0;left:0;right:0;padding:16px;}
-.hero-title{font-family:'Bebas Neue',sans-serif;font-size:1.6rem;letter-spacing:2px;line-height:1.1;text-shadow:0 2px 8px rgba(0,0,0,.8);margin-bottom:8px;}
+.hero-img{width:100%;height:100%;object-fit:cover;filter:brightness(.5);display:block;}
+.hero-grad{position:absolute;inset:0;background:linear-gradient(to bottom,rgba(13,13,13,.05) 0%,transparent 35%,rgba(13,13,13,.65) 68%,var(--bg) 100%);}
+.hero-info{position:absolute;bottom:0;left:0;right:0;padding:18px 16px;}
+.hero-title{font-family:'Bebas Neue',sans-serif;font-size:1.8rem;letter-spacing:2px;line-height:1.05;text-shadow:0 2px 14px rgba(0,0,0,.9);margin-bottom:8px;}
 .hero-meta{display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
 .hero-score{background:rgba(245,197,24,.2);border:1px solid rgba(245,197,24,.4);color:var(--gold);font-size:.7rem;font-weight:700;padding:2px 8px;border-radius:4px;}
 .hero-type{background:rgba(255,255,255,.15);color:#fff;font-size:.7rem;font-weight:700;padding:2px 8px;border-radius:4px;}
@@ -314,6 +314,11 @@ html,body{background:var(--bg);color:var(--txt);font-family:'Outfit',sans-serif;
 .pf-name{font-size:.62rem;color:#777;font-weight:600;text-align:center;}
 .no-res{text-align:center;color:var(--muted);padding:40px 20px;font-size:.85rem;}
 
+/* ── SCROLL TO TOP ── */
+.scroll-top{position:fixed;bottom:76px;right:14px;width:38px;height:38px;border-radius:50%;background:linear-gradient(135deg,var(--green),#00c853);border:none;color:#000;font-size:1rem;display:flex;align-items:center;justify-content:center;z-index:290;box-shadow:0 4px 14px rgba(0,230,118,.5);opacity:0;transform:scale(0);transition:opacity .25s,transform .25s;pointer-events:none;cursor:pointer;}
+.scroll-top.show{opacity:1;transform:scale(1);pointer-events:auto;}
+.scroll-top:active{transform:scale(.88);}
+
 /* ── TOAST ── */
 .toast{position:fixed;bottom:72px;left:50%;transform:translateX(-50%) translateY(60px);background:#222;border:1px solid var(--green);color:#fff;padding:10px 22px;border-radius:50px;font-size:.78rem;font-weight:600;z-index:9999;transition:transform .3s;white-space:nowrap;}
 .toast.show{transform:translateX(-50%) translateY(0);}
@@ -456,6 +461,16 @@ html,body{background:var(--bg);color:var(--txt);font-family:'Outfit',sans-serif;
     </div>
   </div>
 
+  <!-- New Releases -->
+  <div class="section">
+    <div class="sec-hd">
+      <div class="sec-ttl">🆕 New Releases</div>
+    </div>
+    <div class="hrow" id="newRow">
+      <div class="sk sk-card"></div><div class="sk sk-card"></div><div class="sk sk-card"></div><div class="sk sk-card"></div>
+    </div>
+  </div>
+
   <!-- Top Rated -->
   <div class="section">
     <div class="sec-hd"><div class="sec-ttl">⭐ Top Rated</div></div>
@@ -471,6 +486,22 @@ html,body{background:var(--bg);color:var(--txt);font-family:'Outfit',sans-serif;
       <span class="sec-view" onclick="goTab('pgMovies')">View All ›</span>
     </div>
     <div class="hrow" id="movRow">
+      <div class="sk sk-card"></div><div class="sk sk-card"></div><div class="sk sk-card"></div><div class="sk sk-card"></div>
+    </div>
+  </div>
+
+  <!-- Action Anime -->
+  <div class="section">
+    <div class="sec-hd"><div class="sec-ttl">⚔️ Action Anime</div></div>
+    <div class="hrow" id="actionRow">
+      <div class="sk sk-card"></div><div class="sk sk-card"></div><div class="sk sk-card"></div><div class="sk sk-card"></div>
+    </div>
+  </div>
+
+  <!-- Romance Anime -->
+  <div class="section">
+    <div class="sec-hd"><div class="sec-ttl">💕 Romance</div></div>
+    <div class="hrow" id="romanceRow">
       <div class="sk sk-card"></div><div class="sk sk-card"></div><div class="sk sk-card"></div><div class="sk sk-card"></div>
     </div>
   </div>
@@ -665,6 +696,7 @@ html,body{background:var(--bg);color:var(--txt);font-family:'Outfit',sans-serif;
 </nav>
 
 <div class="toast" id="toast"></div>
+<button class="scroll-top" id="scrollTop" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑</button>
 
 <script>
 // ══════════════════════════════════════════════
@@ -1320,12 +1352,38 @@ async function openDetail(malId){
   });
 })();
 
+// ── SCROLL TO TOP ──
+window.addEventListener('scroll', ()=>{
+  const btn = document.getElementById('scrollTop');
+  if(btn) btn.classList.toggle('show', window.scrollY > 300);
+}, {passive:true});
+
+// ── NEW SECTIONS ──
+async function loadNewReleases(){
+  await new Promise(r=>setTimeout(r,500));
+  const d = await apiGet('https://api.jikan.moe/v4/seasons/now?limit=20');
+  document.getElementById('newRow').innerHTML = d.length ? d.map(mkAcard).join('') : '<div class="no-res">Reload 🔄</div>';
+}
+async function loadAction(){
+  await new Promise(r=>setTimeout(r,1200));
+  const d = await apiGet('https://api.jikan.moe/v4/anime?genres=1&order_by=score&sort=desc&limit=16');
+  document.getElementById('actionRow').innerHTML = d.length ? d.map(mkAcard).join('') : '<div class="no-res">Could not load.</div>';
+}
+async function loadRomance(){
+  await new Promise(r=>setTimeout(r,1800));
+  const d = await apiGet('https://api.jikan.moe/v4/anime?genres=22&order_by=score&sort=desc&limit=16');
+  document.getElementById('romanceRow').innerHTML = d.length ? d.map(mkAcard).join('') : '<div class="no-res">Could not load.</div>';
+}
+
 // ── INIT ──
 renderOur();
 loadHero();
 loadTrending();
+loadNewReleases();
 loadTop();
 loadMovRow();
+loadAction();
+loadRomance();
 loadMoviesPage(true);
 loadSeriesPage(true);
 </script>
