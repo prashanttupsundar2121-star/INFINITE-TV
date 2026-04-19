@@ -35,7 +35,7 @@ html,body{background:var(--bg);color:var(--txt);font-family:'Outfit',sans-serif;
 }
 #intro::before{width:48vw;height:48vw;min-width:210px;min-height:210px;background:rgba(168,85,247,.34);left:-12vw;top:-8vw;}
 #intro::after{width:42vw;height:42vw;min-width:180px;min-height:180px;background:rgba(34,211,238,.3);right:-11vw;bottom:-14vw;}
-.ic{position:relative;z-index:2;text-align:center;animation:introLogo 2.5s ease forwards;will-change:opacity,transform,filter;}
+.ic{position:relative;z-index:2;text-align:center;animation:introLogo 2.5s ease forwards;will-change:opacity,transform;}
 .ic-l{
   display:block;font-family:'Bebas Neue',sans-serif;font-size:clamp(3rem,16vw,5.5rem);font-weight:700;letter-spacing:7px;
   color:#f8faff;text-shadow:0 0 14px rgba(168,85,247,.75),0 0 26px rgba(34,211,238,.65),0 0 46px rgba(34,211,238,.34);
@@ -1589,7 +1589,7 @@ async function openDetail(malId){
       if(!Ctx) return;
       const ctx = new Ctx();
       const now = ctx.currentTime;
-      const MS_PER_SECOND = 1000;
+      const MILLISECONDS_PER_SECOND = 1000;
       const SILENCE_LEVEL = 0.0001;
       const INTRO_AUDIO_DURATION = 1.4;
       const AUDIO_CLEANUP_BUFFER = .1;
@@ -1633,8 +1633,8 @@ async function openDetail(malId){
       noise.connect(band).connect(noiseGain).connect(master);
       noise.start(now);
       noise.stop(now + 1.06);
-      setTimeout(()=>{ if(ctx.state!=='closed') ctx.close(); }, Math.round((audioEnd - now + AUDIO_CLEANUP_BUFFER) * MS_PER_SECOND));
-    }catch(autoplayErr){ void autoplayErr; /* Audio may be blocked by autoplay policy; safely ignore. */}
+      setTimeout(()=>{ if(ctx.state!=='closed') ctx.close(); }, Math.round((INTRO_AUDIO_DURATION + AUDIO_CLEANUP_BUFFER) * MILLISECONDS_PER_SECOND));
+    }catch{/* Audio may be blocked by autoplay policy; safely ignore. */}
   }
 
   function hideIntro(){
