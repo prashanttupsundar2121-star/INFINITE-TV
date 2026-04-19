@@ -971,7 +971,7 @@ body::before{
   <div class="pl-topbar">
     <button class="pl-back" onclick="closePlayer()">‹</button>
     <div class="pl-title" id="plTitle">Loading...</div>
-    <div class="pl-ep-badge" id="plEpBadge" aria-label="Watch on Telegram">WATCH</div>
+    <div class="pl-ep-badge" id="plEpBadge">WATCH</div>
   </div>
 
   <!-- Video area -->
@@ -1141,6 +1141,7 @@ const ALL_Q = [{icon:'📱',name:'480p'},{icon:'📺',name:'720p'},{icon:'🖥�
 // Global API cache
 const CACHE = {};
 const API_RETRY_DELAYS = [400, 900, 1600];
+const MAX_API_ATTEMPTS = API_RETRY_DELAYS.length + 1;
 const FALLBACK_POSTER = `data:image/svg+xml,${encodeURIComponent(`
 <svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 560'>
   <defs>
@@ -1184,7 +1185,7 @@ function posterFromAnime(a){
   return a?.images?.jpg?.large_image_url || a?.images?.jpg?.image_url || a?.images?.webp?.large_image_url || a?.images?.webp?.image_url || FALLBACK_POSTER;
 }
 async function fetchJsonWithRetry(url){
-  for(let attempt=0;attempt<API_RETRY_DELAYS.length+1;attempt++){
+  for(let attempt=0;attempt<MAX_API_ATTEMPTS;attempt++){
     try{
       const r = await fetch(url);
       if(r.ok) return await r.json();
@@ -1475,7 +1476,7 @@ const scrollObs = new IntersectionObserver(entries => {
     if(document.getElementById('pgMovies').classList.contains('active')) loadMoviesPage();
     if(document.getElementById('pgSeries').classList.contains('active')) loadSeriesPage();
   });
-}, {threshold:0.05, rootMargin:SCROLL_LOAD_MARGIN});
+}, {threshold:0.1, rootMargin:SCROLL_LOAD_MARGIN});
 
 // Sentinel divs for infinite scroll
 ['movGrid','serGrid'].forEach(id => {
@@ -1724,7 +1725,7 @@ function buildRelated(a){
     <div class="pl-rel-hd">More Anime</div>
     <div style="display:flex;gap:10px;overflow-x:auto;padding-bottom:4px;">
       ${others.map(x=>`
-        <div style="flex-shrink:0;width:100px;cursor:pointer;" onclick="closePlayer();openDetail(${x.malId})">
+        <div style="flex-shrink:0;width:100px;cursor:pointer;" onclick="openRelatedDetail(${x.malId})">
           <div style="width:100px;height:140px;border-radius:8px;overflow:hidden;background:#1a1a1a;position:relative;">
             <img src="${malImg(x.malId)}" style="width:100%;height:100%;object-fit:cover;display:block;" onerror="this.onerror=null;this.src='${FALLBACK_POSTER}'" loading="lazy"/>
           </div>
@@ -1738,6 +1739,10 @@ function closePlayer(){
   document.getElementById('plIframe').src = '';
   document.body.style.overflow = '';
   isPlaying = false;
+}
+function openRelatedDetail(malId){
+  closePlayer();
+  openDetail(malId);
 }
 (function(){
   const intro = document.getElementById('intro');
