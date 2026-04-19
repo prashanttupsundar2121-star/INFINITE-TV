@@ -991,9 +991,9 @@ body::before{
   <div class="pl-server-row">
     <div class="pl-srv-lbl">📡 Watch On</div>
     <div class="pl-srv-btns">
-      <button class="pl-srv-btn active" onclick="setServer('telegram',this)">▶ Telegram</button>
-      <button class="pl-srv-btn" onclick="setServer('tg2',this)">📱 TG Player</button>
-      <button class="pl-srv-btn" onclick="setServer('web',this)">🌐 Web</button>
+      <button class="pl-srv-btn active" data-srv="telegram" onclick="setServer('telegram',this)">▶ Telegram</button>
+      <button class="pl-srv-btn" data-srv="tg2" onclick="setServer('tg2',this)">📱 TG Player</button>
+      <button class="pl-srv-btn" data-srv="web" onclick="setServer('web',this)">🌐 Web</button>
     </div>
   </div>
 
@@ -1645,8 +1645,7 @@ async function openPlayer(animeId){
   document.getElementById('plIframe').src = '';
 
   // Show/hide join box
-  const isPrivChan = false;
-  document.getElementById('plJoinBox').style.display = isPrivChan ? 'block' : 'none';
+  document.getElementById('plJoinBox').style.display = 'none';
   document.getElementById('plJoinBtn').href = DEFAULT_LINK;
 
   // Server buttons
@@ -1691,7 +1690,8 @@ function selectEp(ep){
 function setServer(srv,btn){
   curServer = srv;
   document.querySelectorAll('.pl-srv-btn').forEach(b=>b.classList.remove('active'));
-  if(btn) btn.classList.add('active');
+  const activeBtn = btn || document.querySelector(`.pl-srv-btn[data-srv="${srv}"]`);
+  if(activeBtn) activeBtn.classList.add('active');
   // Reset to overlay
   isPlaying = false;
   document.getElementById('plOverlay').classList.remove('hidden');
@@ -1701,8 +1701,7 @@ function setServer(srv,btn){
 
 function startPlay(){
   if(!curAnime) return;
-  const tgLink = DEFAULT_LINK;
-  const ch = getTgChannel(tgLink);
+  const ch = getTgChannel(DEFAULT_LINK);
 
   if(ch && ch.user){
     // Public channel — try embed
@@ -1719,7 +1718,7 @@ function startPlay(){
     isPlaying = true;
   } else {
     // Private channel — open in Telegram directly
-    window.open(tgLink, '_blank');
+    window.open(DEFAULT_LINK, '_blank');
   }
 }
 
