@@ -1193,6 +1193,7 @@ async function fetchJsonWithRetry(url){
     try{
       const r = await fetch(url);
       if(r.ok) return await r.json();
+      // Retry only rate limits and transient server-side failures.
       if(r.status===429 || r.status>=500){
         if(attempt<API_RETRY_DELAYS.length) await sleep(API_RETRY_DELAYS[attempt]);
         continue;
@@ -1209,7 +1210,7 @@ async function apiGet(url){
   return d?.data || [];
 }
 async function apiGetOne(malId){
-  if(malId in CACHE) return CACHE[malId];
+  if(Object.hasOwn(CACHE, malId)) return CACHE[malId];
   const d = await fetchJsonWithRetry(`https://api.jikan.moe/v4/anime/${malId}`);
   if(d?.data) CACHE[malId] = d.data;
   return d?.data || null;
@@ -1480,6 +1481,7 @@ const scrollObs = new IntersectionObserver(entries => {
     if(document.getElementById('pgMovies').classList.contains('active')) loadMoviesPage();
     if(document.getElementById('pgSeries').classList.contains('active')) loadSeriesPage();
   });
+// Preload slightly before cards enter viewport for smoother infinite scrolling.
 }, {threshold:0.1, rootMargin:SCROLL_LOAD_MARGIN});
 
 // Sentinel divs for infinite scroll
@@ -1688,10 +1690,10 @@ function selectEp(ep){
   document.getElementById('playerPage').scrollTo({top:0,behavior:'smooth'});
 }
 
-function setServer(srv,btn){
+function setServer(srv,buttonEl){
   curServer = srv;
   document.querySelectorAll('.pl-srv-btn').forEach(b=>b.classList.remove('active'));
-  btn.classList.add('active');
+  buttonEl.classList.add('active');
   // Reset to overlay
   isPlaying = false;
   document.getElementById('plOverlay').classList.remove('hidden');
