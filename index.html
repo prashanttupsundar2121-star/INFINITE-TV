@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0"/>
 <meta name="theme-color" content="#000000"/>
 <title>iNFiNiTE TV</title>
-<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@300;400;500;600;700;800&family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet"/>
 <style>
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
 :root{
@@ -383,142 +383,297 @@ html,body{background:var(--bg);color:var(--txt);font-family:'Outfit',sans-serif;
 .toast{position:fixed;bottom:calc(var(--bnav-height) + var(--bnav-bottom) + 14px);left:50%;transform:translateX(-50%) translateY(60px);background:#222;border:1px solid var(--green);color:#fff;padding:10px 22px;border-radius:50px;font-size:.78rem;font-weight:600;z-index:9999;transition:transform .3s;white-space:nowrap;}
 .toast.show{transform:translateX(-50%) translateY(0);}
 
-/* ── PREMIUM UI/UX UPGRADE (visual-only overrides) ── */
+/* ══════════════════════════════════════════════════════
+   PREMIUM UI/UX UPGRADE — Netflix Cinematic Dark Red Theme
+   ══════════════════════════════════════════════════════ */
 :root{
-  --bg:#06070b;
-  --txt:#f7f9ff;
+  --bg:#0b0b0f;
+  --txt:#f8f9ff;
   --txt2:#9ba6bf;
   --muted:#6b7691;
-  --card:rgba(16,20,32,.56);
-  --glass-brd:rgba(166,189,255,.16);
-  --n1:#a855f7;
-  --n2:#4f46e5;
-  --n3:#06b6d4;
-  --glow:0 0 0 1px rgba(168,85,247,.16),0 10px 35px rgba(79,70,229,.22),0 0 30px rgba(6,182,212,.14);
+  --card:rgba(14,14,20,.6);
+  --glass-brd:rgba(229,9,20,.14);
+  --acc1:#e50914;
+  --acc2:#ff2a2a;
+  --acc3:#8b0000;
+  --glow:0 0 0 1px rgba(229,9,20,.2),0 10px 35px rgba(229,9,20,.2),0 0 32px rgba(255,42,42,.12);
+  --bnav-border:rgba(229,9,20,.28);
 }
-html,body{font-family:'Inter','Outfit',sans-serif;}
+
+/* ── Fonts ── */
+html,body{font-family:'Poppins','Inter','Outfit',sans-serif;}
+
+/* ── Deep cinematic background ── */
 body{
   background:
-    radial-gradient(circle at 15% calc(12% + var(--bg-shift,0px)), rgba(168,85,247,.16), transparent 34%),
-    radial-gradient(circle at 86% calc(5% + var(--bg-shift,0px)), rgba(6,182,212,.14), transparent 28%),
-    linear-gradient(180deg,#05060a 0%,#070912 40%,#06070b 100%);
+    radial-gradient(circle at 18% calc(10% + var(--bg-shift,0px)),rgba(229,9,20,.1),transparent 32%),
+    radial-gradient(circle at 84% calc(4% + var(--bg-shift,0px)),rgba(139,0,0,.08),transparent 26%),
+    linear-gradient(180deg,#0b0b0f 0%,#0e0b0f 40%,#0b0b0f 100%);
 }
+/* Subtle grain texture */
 body::before{
-  content:'';
-  position:fixed;inset:0;pointer-events:none;z-index:-1;
-  background-image:radial-gradient(rgba(255,255,255,.05) .5px,transparent .5px);
-  background-size:3px 3px;
-  opacity:.16;
+  content:'';position:fixed;inset:0;pointer-events:none;z-index:-1;
+  background-image:radial-gradient(rgba(255,255,255,.04) .5px,transparent .5px);
+  background-size:3px 3px;opacity:.1;
 }
 
+/* ── INTRO — Red Cinematic Glow ── */
+#intro{
+  background:
+    radial-gradient(circle at 28% 22%,rgba(229,9,20,.2),transparent 48%),
+    radial-gradient(circle at 76% 34%,rgba(139,0,0,.16),transparent 42%),
+    linear-gradient(145deg,#090002 0%,#0c0005 55%,#060003 100%);
+}
+#intro::before{background:rgba(229,9,20,.18);}
+#intro::after{background:rgba(160,0,0,.15);}
+.ic-l{
+  color:#fff;
+  text-shadow:0 0 16px rgba(229,9,20,.85),0 0 32px rgba(255,42,42,.65),0 0 64px rgba(229,9,20,.38);
+}
+/* Override intro glow keyframes to red */
+@keyframes introGlow{
+  0%,100%{text-shadow:0 0 16px rgba(229,9,20,.75),0 0 28px rgba(255,42,42,.55),0 0 50px rgba(229,9,20,.32)}
+  50%{text-shadow:0 0 26px rgba(229,9,20,1),0 0 44px rgba(255,42,42,.9),0 0 78px rgba(229,9,20,.6)}
+}
+
+/* ── TOP NAV — Sticky Blur ── */
 .topnav{
-  background:rgba(10,12,20,.72);
-  border-bottom:1px solid var(--glass-brd);
-  box-shadow:0 8px 30px rgba(0,0,0,.38);
+  background:rgba(9,9,13,.85);
+  border-bottom:1px solid rgba(229,9,20,.14);
+  box-shadow:0 8px 32px rgba(0,0,0,.55),0 1px 0 rgba(255,255,255,.03);
 }
-.tn-logo{letter-spacing:2.6px;background:linear-gradient(135deg,#d5c5ff,#85ccff 45%,#78f2ff);}
-.tn-menu{border:1px solid transparent;transition:.25s ease;}
-.tn-menu:hover,.tn-menu:focus-visible{border-color:rgba(133,204,255,.35);box-shadow:var(--glow);background:rgba(255,255,255,.07);}
+/* Logo: white-to-red gradient with hover underline */
+.tn-logo{
+  letter-spacing:2.2px;
+  background:linear-gradient(135deg,#fff 20%,#ffaaaa 60%,#e50914 100%);
+  -webkit-background-clip:text;
+  -webkit-text-fill-color:transparent;
+  position:relative;
+}
+.tn-logo::after{
+  content:'';position:absolute;bottom:-4px;left:0;
+  width:0;height:2px;border-radius:2px;
+  background:linear-gradient(90deg,var(--acc1),var(--acc2));
+  transition:width .32s ease;
+}
+.tn-logo:hover::after{width:100%;}
 
+/* ── Hamburger 3-line button ── */
+.tn-menu{
+  font-size:0; /* hide text fallback */
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:5px;width:40px;height:40px;border-radius:10px;padding:8px;
+  border:1px solid transparent;background:none;cursor:pointer;color:var(--txt);
+  transition:border-color .25s ease,box-shadow .25s ease,background .25s ease;
+}
+.tn-menu:hover,.tn-menu:focus-visible{
+  border-color:rgba(229,9,20,.35);
+  box-shadow:0 0 0 1px rgba(229,9,20,.12),0 6px 20px rgba(229,9,20,.18);
+  background:rgba(229,9,20,.07);
+}
+/* 3 lines — animate to X when menu-open */
+.hb-line{
+  display:block;width:22px;height:2px;
+  background:#e0e0f0;border-radius:2px;
+  transform-origin:center;
+  transition:transform .36s cubic-bezier(.25,.46,.45,.94),opacity .25s ease,background .25s ease;
+}
+.tn-menu.menu-open .hb-line:nth-child(1){transform:translateY(7px) rotate(45deg);background:var(--acc2);}
+.tn-menu.menu-open .hb-line:nth-child(2){opacity:0;transform:scaleX(0);}
+.tn-menu.menu-open .hb-line:nth-child(3){transform:translateY(-7px) rotate(-45deg);background:var(--acc2);}
+
+/* ── HERO BANNER — Full-width Cinematic ── */
 .hero-wrap{
-  height:min(74vw,430px);
-  border-bottom:1px solid rgba(166,189,255,.18);
+  height:min(74vw,440px);
+  border-bottom:1px solid rgba(229,9,20,.15);
 }
-.hero-img{filter:brightness(.42) saturate(1.12);}
-.hero-grad{background:linear-gradient(to bottom,rgba(4,5,8,.08) 0%,rgba(8,10,16,.2) 30%,rgba(7,9,15,.86) 74%,var(--bg) 100%);}
-.hero-slide .hero-info{opacity:0;transform:translateY(16px);transition:opacity .6s ease,transform .6s ease;}
+.hero-img{filter:brightness(.38) saturate(1.15);}
+/* Strong black fade gradient overlay */
+.hero-grad{
+  background:linear-gradient(
+    to bottom,
+    rgba(11,11,15,.05) 0%,
+    transparent 25%,
+    rgba(11,11,15,.72) 66%,
+    var(--bg) 100%
+  );
+}
+.hero-slide .hero-info{opacity:0;transform:translateY(18px);transition:opacity .65s ease,transform .65s ease;}
 .hero-slide.active .hero-info{opacity:1;transform:translateY(0);}
-.hero-title{text-shadow:0 8px 30px rgba(0,0,0,.9);}
-.hdot.active{background:linear-gradient(135deg,var(--n1),var(--n3));box-shadow:0 0 12px rgba(79,70,229,.8);}
+.hero-title{
+  font-size:clamp(1.6rem,5vw,2.4rem);letter-spacing:2px;
+  text-shadow:0 4px 24px rgba(0,0,0,.95),0 0 40px rgba(229,9,20,.25);
+}
+/* Dots — red active */
+.hdot{background:rgba(255,255,255,.25);}
+.hdot.active{
+  background:linear-gradient(135deg,var(--acc1),var(--acc2));
+  box-shadow:0 0 10px rgba(229,9,20,.75);
+  width:22px;
+}
 
+/* ── BUTTONS — Red Gradient + Glow ── */
 .hbtn-watch,.hbtn-info,.det-watch-btn,.pl-tg-btn,.pl-join-btn{
   border-radius:12px;
-  transition:transform .22s ease,box-shadow .28s ease,filter .28s ease,background .28s ease;
+  transition:transform .22s ease,box-shadow .28s ease,filter .25s ease;
 }
 .hbtn-watch,.det-watch-btn,.pl-tg-btn,.pl-join-btn{
-  background:linear-gradient(135deg,var(--n1),var(--n2) 55%,var(--n3));
+  background:linear-gradient(135deg,var(--acc1),var(--acc2));
   color:#fff;
-  box-shadow:0 8px 22px rgba(79,70,229,.35),0 0 18px rgba(6,182,212,.2);
+  box-shadow:0 8px 22px rgba(229,9,20,.38),0 0 16px rgba(255,42,42,.18);
 }
 .hbtn-watch svg{fill:#fff;}
 .hbtn-info{
-  background:rgba(15,20,34,.55);
-  border:1px solid var(--glass-brd);
-  backdrop-filter:blur(10px);
+  background:rgba(11,11,20,.65);
+  border:1px solid rgba(255,255,255,.18);
+  backdrop-filter:blur(12px);
 }
-.hbtn-watch:hover,.hbtn-info:hover,.det-watch-btn:hover,.pl-tg-btn:hover,.pl-join-btn:hover{
-  transform:translateY(-2px) scale(1.02);
-  box-shadow:0 10px 26px rgba(79,70,229,.4),0 0 20px rgba(6,182,212,.25);
+.hbtn-watch:hover,.det-watch-btn:hover,.pl-tg-btn:hover,.pl-join-btn:hover{
+  transform:translateY(-2px) scale(1.025);
+  box-shadow:0 12px 32px rgba(229,9,20,.54),0 0 26px rgba(255,42,42,.3);
+  filter:brightness(1.08);
+}
+.hbtn-info:hover{
+  transform:translateY(-2px);
+  border-color:rgba(229,9,20,.45);
+  box-shadow:0 8px 22px rgba(229,9,20,.15);
 }
 
+/* ── GLASS SECTIONS ── */
 .section,.det-block,.search-top,.pl-server-row,.pl-info-row,.pl-eps-wrap,.pl-related,.pl-join-box{
-  border:1px solid var(--glass-brd);
-  background:rgba(11,15,26,.46);
-  backdrop-filter:blur(10px);
-  -webkit-backdrop-filter:blur(10px);
-  border-radius:16px;
+  border:1px solid rgba(229,9,20,.1);
+  background:rgba(10,10,16,.55);
+  backdrop-filter:blur(12px);
+  -webkit-backdrop-filter:blur(12px);
+  border-radius:18px;
 }
 .section{margin:12px 10px 0;padding:16px 0 10px;}
 .sec-hd{padding:0 16px;}
 .hrow{padding:0 16px 6px;}
+/* Red accent bar on section titles */
+.sec-ttl::before{background:linear-gradient(to bottom,var(--acc1),var(--acc2));}
 
+/* ── ANIME CARDS — Poster Style ── */
 .acard-img,.gcard-img,.our-img,.rec-img{
-  border-radius:18px;
-  border:1px solid rgba(166,189,255,.2);
-  box-shadow:0 12px 28px rgba(0,0,0,.45);
+  border-radius:16px;
+  border:1px solid rgba(229,9,20,.12);
+  box-shadow:0 8px 20px rgba(0,0,0,.5);
 }
-.acard,.gcard,.our-card,.rec-card{transition:transform .25s ease,filter .25s ease;}
+.acard,.gcard,.our-card,.rec-card{transition:transform .28s ease,filter .28s ease;}
+
+/* Play button overlay (added via JS templates) */
+.card-play-btn{
+  position:absolute;top:50%;left:50%;
+  transform:translate(-50%,-50%) scale(0.6);
+  width:48px;height:48px;border-radius:50%;
+  background:rgba(229,9,20,.92);
+  display:flex;align-items:center;justify-content:center;
+  z-index:10;opacity:0;
+  transition:transform .3s cubic-bezier(.25,.46,.45,.94),opacity .3s ease;
+  box-shadow:0 0 0 4px rgba(229,9,20,.25),0 0 24px rgba(229,9,20,.65);
+  pointer-events:none;
+}
+.card-play-btn svg{width:16px;height:16px;fill:#fff;margin-left:3px;}
+
+/* Hover effects */
 @media (hover:hover){
-  .acard:hover,.gcard:hover,.our-card:hover,.rec-card:hover{transform:translateY(-6px) scale(1.03);}
+  .acard:hover,.gcard:hover,.our-card:hover,.rec-card:hover{
+    transform:translateY(-8px) scale(1.035);
+    filter:brightness(1.07);
+  }
   .acard:hover .acard-img,.gcard:hover .gcard-img,.our-card:hover .our-img,.rec-card:hover .rec-img{
     box-shadow:var(--glow);
-    border-color:rgba(133,204,255,.4);
+    border-color:rgba(229,9,20,.4);
+  }
+  .acard:hover .card-play-btn,.gcard:hover .card-play-btn,.our-card:hover .card-play-btn{
+    transform:translate(-50%,-50%) scale(1);
+    opacity:1;
   }
 }
 
-.page-hd,.search-top{margin:12px 10px 0;}
-.grid-3{padding:14px;}
-.sbar{background:rgba(15,20,34,.65);border:1px solid var(--glass-brd);}
-.sbar:focus-within{border-color:rgba(133,204,255,.48);box-shadow:0 0 0 3px rgba(79,70,229,.18),0 0 20px rgba(6,182,212,.15);}
-
-.sk{
-  background:linear-gradient(110deg,rgba(25,31,46,.85) 28%,rgba(57,68,100,.8) 45%,rgba(25,31,46,.85) 62%);
-  background-size:220% 100%;
-  border-radius:14px;
+/* ── BOTTOM NAV — Floating Glass ── */
+.bnav{
+  background:rgba(8,8,14,.74);
+  border:1px solid rgba(229,9,20,.18);
+  box-shadow:0 10px 32px rgba(0,0,0,.55),0 0 0 1px rgba(229,9,20,.07),0 0 32px rgba(229,9,20,.08);
 }
+.bn-btn.active{
+  color:#fff;transform:scale(1.05);
+  background:linear-gradient(135deg,rgba(229,9,20,.3),rgba(160,0,0,.22));
+  box-shadow:0 0 16px rgba(229,9,20,.45),0 0 26px rgba(255,42,42,.22);
+}
+.bn-btn.active::after{opacity:1;border-color:rgba(255,140,140,.25);}
+.bn-btn.active svg{stroke:#ff7070;transform:scale(1.08);filter:drop-shadow(0 0 8px rgba(229,9,20,.85));}
+.bn-btn.active span{color:#ffd0d0;transform:translateY(-.5px);}
 
+/* ── DRAWER — Glass Slide-in ── */
+.drw{
+  background:rgba(8,8,14,.92);
+  border-right:1px solid rgba(229,9,20,.18);
+  backdrop-filter:blur(20px);
+  -webkit-backdrop-filter:blur(20px);
+}
+/* Red accent bar at top */
+.drw::before{background:linear-gradient(90deg,var(--acc1),var(--acc2),var(--acc1));}
+.drw-logo{background:linear-gradient(135deg,#fff,#ffaaaa,var(--acc1));-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
+.drw-hd{background:linear-gradient(135deg,rgba(229,9,20,.08),rgba(160,0,0,.04));}
+
+/* ── PLAYER PAGE ── */
 .player-page{
-  background:radial-gradient(circle at 10% -10%,rgba(168,85,247,.26),transparent 40%),linear-gradient(180deg,#03040a 0%,#06070c 100%);
+  background:
+    radial-gradient(circle at 10% -10%,rgba(229,9,20,.15),transparent 40%),
+    linear-gradient(180deg,#08080e 0%,#09090f 100%);
 }
-.pl-topbar{background:linear-gradient(to bottom,rgba(3,5,10,.94),rgba(3,5,10,.45));}
+.pl-topbar{background:linear-gradient(to bottom,rgba(8,8,14,.96),rgba(8,8,14,.5));}
 .pl-video-wrap{
   max-width:min(1100px,calc(100% - 20px));
-  margin:10px auto 0;
-  border-radius:16px;
-  border:1px solid rgba(166,189,255,.26);
+  margin:10px auto 0;border-radius:16px;
+  border:1px solid rgba(229,9,20,.22);
   box-shadow:var(--glow);
 }
-.pl-overlay{background:linear-gradient(180deg,rgba(5,8,14,.38),rgba(5,8,14,.78));}
+.pl-overlay{background:linear-gradient(180deg,rgba(8,8,14,.35),rgba(8,8,14,.78));}
 .pl-play-btn{
-  background:rgba(18,26,42,.58);
-  border:1px solid rgba(166,189,255,.4);
-  box-shadow:0 0 26px rgba(79,70,229,.35);
+  background:rgba(229,9,20,.25);
+  border:1px solid rgba(229,9,20,.55);
+  box-shadow:0 0 28px rgba(229,9,20,.42);
 }
-.pl-srv-btn.active,.pl-ep.active{background:linear-gradient(135deg,var(--n1),var(--n2));border-color:transparent;}
+.pl-srv-btn.active,.pl-ep.active{
+  background:linear-gradient(135deg,var(--acc1),var(--acc2));
+  border-color:transparent;
+}
 
+/* ── SEARCH BAR ── */
+.page-hd,.search-top{margin:12px 10px 0;}
+.grid-3{padding:14px;}
+.sbar{background:rgba(12,12,20,.74);border:1px solid rgba(229,9,20,.14);}
+.sbar:focus-within{
+  border-color:rgba(229,9,20,.5);
+  box-shadow:0 0 0 3px rgba(229,9,20,.1),0 0 20px rgba(229,9,20,.1);
+}
+
+/* ── SCROLL TO TOP ── */
 .scroll-top{
-  background:linear-gradient(135deg,var(--n1),var(--n3));
+  background:linear-gradient(135deg,var(--acc1),var(--acc2));
   color:#fff;
-  box-shadow:0 8px 22px rgba(79,70,229,.38);
+  box-shadow:0 8px 22px rgba(229,9,20,.42);
 }
-.toast{background:rgba(9,13,24,.9);border-color:rgba(133,204,255,.5);}
+/* ── TOAST ── */
+.toast{background:rgba(8,8,14,.94);border-color:rgba(229,9,20,.5);}
 
-.reveal{opacity:0;transform:translateY(16px);transition:opacity .6s ease,transform .6s ease;}
+/* ── SKELETON ── */
+.sk{
+  background:linear-gradient(110deg,rgba(18,14,14,.92) 28%,rgba(40,20,20,.86) 45%,rgba(18,14,14,.92) 62%);
+  background-size:220% 100%;border-radius:14px;
+}
+
+/* ── SCROLL REVEAL ── */
+.reveal{opacity:0;transform:translateY(18px);transition:opacity .65s ease,transform .65s ease;}
 .reveal.revealed{opacity:1;transform:translateY(0);}
 
+/* ── RESPONSIVE ── */
 @media (max-width:600px){
   :root{--bnav-height:74px;}
-  .hero-wrap{height:min(82vw,420px);}
+  .hero-wrap{height:min(84vw,420px);}
   .hero-btns{gap:8px;}
   .hbtn-watch,.hbtn-info{padding:10px 12px;font-size:.8rem;}
   .section{margin:10px 8px 0;}
@@ -599,9 +754,9 @@ body::before{
     <div class="comm-arr">›</div>
   </div>
 
-  <div style="padding:16px 18px 8px;">
-    <div style="background:#111;border:1px solid #222;border-radius:12px;padding:14px;">
-      <div style="font-size:.72rem;font-weight:700;color:var(--green);margin-bottom:6px;">ℹ️ About iNFiNiTE TV</div>
+    <div style="padding:16px 18px 8px;">
+    <div style="background:rgba(12,8,8,.7);border:1px solid rgba(229,9,20,.18);border-radius:12px;padding:14px;backdrop-filter:blur(8px);">
+      <div style="font-size:.72rem;font-weight:700;color:var(--acc2);margin-bottom:6px;">ℹ️ About iNFiNiTE TV</div>
       <div style="font-size:.72rem;color:#888;line-height:1.7;">iNFiNiTE TV is your free streaming destination for anime in Hindi, Tamil, Telugu, Malayalam, English & Japanese. All content is delivered via Telegram channels — completely free, no login required, no ads.</div>
     </div>
   </div>
@@ -609,9 +764,13 @@ body::before{
 
 <!-- TOP NAV (shared) -->
 <div class="topnav" id="topnav" style="display:flex;">
-  <button class="tn-menu" onclick="toggleDrawer()">☰</button>
   <div class="tn-logo">iNFiNiTE TV</div>
-  <div style="width:36px;"></div>
+  <div style="flex:1;"></div>
+  <button class="tn-menu" id="tnMenu" onclick="toggleDrawer()" aria-label="Open menu">
+    <span class="hb-line"></span>
+    <span class="hb-line"></span>
+    <span class="hb-line"></span>
+  </button>
 </div>
 
 <!-- ═══ HOME PAGE ═══ -->
@@ -622,28 +781,28 @@ body::before{
   </div>
 
   <!-- Popular Content Networks -->
-  <div style="background:#111;padding:14px 16px;border-top:1px solid #1a1a1a;border-bottom:1px solid #1a1a1a;">
+  <div style="background:rgba(10,10,16,.7);backdrop-filter:blur(10px);padding:14px 16px;border-top:1px solid rgba(229,9,20,.12);border-bottom:1px solid rgba(229,9,20,.12);">
     <div style="display:flex;align-items:center;gap:14px;">
       <div style="flex-shrink:0;">
         <div style="font-size:.78rem;font-weight:800;color:#fff;letter-spacing:.5px;">POPULAR</div>
-        <div style="font-size:.66rem;color:#555;margin-top:1px;">Content Networks</div>
+        <div style="font-size:.66rem;color:var(--muted);margin-top:1px;">Content Networks</div>
       </div>
       <div style="display:flex;gap:12px;align-items:center;flex:1;overflow-x:auto;">
         <div style="display:flex;flex-direction:column;align-items:center;gap:4px;flex-shrink:0;">
           <div style="width:58px;height:58px;border-radius:14px;overflow:hidden;"><img src="https://i.ibb.co/GQkGNhxV/x.jpg" style="width:100%;height:100%;object-fit:cover;" alt="Crunchyroll"/></div>
-          <span style="font-size:.58rem;color:#666;font-weight:600;">Crunchyroll</span>
+          <span style="font-size:.58rem;color:#999;font-weight:600;">Crunchyroll</span>
         </div>
         <div style="display:flex;flex-direction:column;align-items:center;gap:4px;flex-shrink:0;">
           <div style="width:58px;height:58px;border-radius:14px;overflow:hidden;"><img src="https://i.ibb.co/VWq2M3C4/x.jpg" style="width:100%;height:100%;object-fit:cover;" alt="Netflix"/></div>
-          <span style="font-size:.58rem;color:#666;font-weight:600;">Netflix</span>
+          <span style="font-size:.58rem;color:#999;font-weight:600;">Netflix</span>
         </div>
         <div style="display:flex;flex-direction:column;align-items:center;gap:4px;flex-shrink:0;">
           <div style="width:58px;height:58px;border-radius:14px;overflow:hidden;"><img src="https://i.ibb.co/MkGkgY16/x.jpg" style="width:100%;height:100%;object-fit:cover;" alt="Prime Video"/></div>
-          <span style="font-size:.58rem;color:#666;font-weight:600;">Prime Video</span>
+          <span style="font-size:.58rem;color:#999;font-weight:600;">Prime Video</span>
         </div>
         <div style="display:flex;flex-direction:column;align-items:center;gap:4px;flex-shrink:0;">
           <div style="width:58px;height:58px;border-radius:14px;overflow:hidden;"><img src="https://i.ibb.co/NnTNvRMg/x.jpg" style="width:100%;height:100%;object-fit:cover;" alt="Hotstar"/></div>
-          <span style="font-size:.58rem;color:#666;font-weight:600;">Disney+ Hotstar</span>
+          <span style="font-size:.58rem;color:#999;font-weight:600;">Disney+ Hotstar</span>
         </div>
       </div>
     </div>
@@ -1032,8 +1191,16 @@ function goTab(pgId){
   });
   window.scrollTo(0,0);
 }
-function toggleDrawer(){['drw','dov'].forEach(id=>document.getElementById(id).classList.toggle('open'));}
-function closeDrawer(){['drw','dov'].forEach(id=>document.getElementById(id).classList.remove('open'));}
+function toggleDrawer(){
+  ['drw','dov'].forEach(id=>document.getElementById(id).classList.toggle('open'));
+  const btn = document.getElementById('tnMenu');
+  if(btn) btn.classList.toggle('menu-open');
+}
+function closeDrawer(){
+  ['drw','dov'].forEach(id=>document.getElementById(id).classList.remove('open'));
+  const btn = document.getElementById('tnMenu');
+  if(btn) btn.classList.remove('menu-open');
+}
 
 // ═══════════════════════════════════
 // HERO SLIDER — ANIME_DB, SLIDING, TOUCH
@@ -1070,7 +1237,7 @@ async function loadHero(){
         <div class="hero-meta" id="hmeta_${i}"></div>
         <div class="hero-btns">
           <a href="${a.tgLink}" target="_blank" class="hbtn-watch">
-            <svg viewBox="0 0 24 24" fill="#000" width="16" height="16"><polygon points="5,3 19,12 5,21"/></svg>
+            <svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16"><polygon points="5,3 19,12 5,21"/></svg>
             WATCH NOW
           </a>
           <button class="hbtn-info" onclick="openDetail(${a.malId})">
@@ -1157,6 +1324,7 @@ function renderOur(){
         </div>
         <div class="our-badge">${langBadge(a.lang)}</div>
         <div class="our-score" id="oscr_${a.id}"></div>
+        <div class="card-play-btn"><svg viewBox="0 0 24 24"><polygon points="5,3 19,12 5,21"/></svg></div>
       </div>
       <div class="our-name" id="onamefull_${a.id}">${a.title}</div>
     </div>`).join('');
@@ -1196,6 +1364,7 @@ function mkAcard(a){
       <img src="${img}" alt="${a.title||''}" loading="lazy" onerror="this.src=''"/>
       ${TG[a.mal_id] ? '<div class="acard-badge b-multi">MULTI</div>' : '<div class="acard-badge b-sub">SUB</div>'}
       ${score}
+      <div class="card-play-btn"><svg viewBox="0 0 24 24"><polygon points="5,3 19,12 5,21"/></svg></div>
     </div>
     <div class="acard-name">${a.title||''}</div>
     <div class="acard-year">${a.year||''}</div>
@@ -1209,6 +1378,7 @@ function mkGcard(a){
       <img src="${img}" alt="${a.title||''}" loading="lazy" onerror="this.src=''"/>
       ${TG[a.mal_id] ? '<div class="gcard-badge b-multi">MULTI</div>' : '<div class="gcard-badge b-sub">SUB</div>'}
       ${score}
+      <div class="card-play-btn"><svg viewBox="0 0 24 24"><polygon points="5,3 19,12 5,21"/></svg></div>
     </div>
     <div class="gcard-name">${a.title||''}</div>
     <div class="gcard-year">${a.year||''}</div>
