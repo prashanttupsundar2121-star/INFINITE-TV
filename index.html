@@ -1184,6 +1184,10 @@ function sleep(ms){ return new Promise(r=>setTimeout(r,ms)); }
 function posterFromAnime(a){
   return a?.images?.jpg?.large_image_url || a?.images?.jpg?.image_url || a?.images?.webp?.large_image_url || a?.images?.webp?.image_url || FALLBACK_POSTER;
 }
+function imgFallback(el){
+  el.onerror = null;
+  el.src = FALLBACK_POSTER;
+}
 async function fetchJsonWithRetry(url){
   for(let attempt=0;attempt<MAX_API_ATTEMPTS;attempt++){
     try{
@@ -1358,7 +1362,7 @@ function renderOur(){
           src="${malImg(a.malId)}"
           alt="${a.title}"
           style="width:100%;height:100%;object-fit:cover;display:block;"
-          onerror="this.onerror=null;this.src='${FALLBACK_POSTER}';"
+          onerror="imgFallback(this)"
         />
         <div class="our-badge">${langBadge(a.lang)}</div>
         <div class="our-score" id="oscr_${a.id}"></div>
@@ -1395,7 +1399,7 @@ function mkAcard(a){
   const score = a.score ? `<div class="acard-score">⭐${a.score}</div>` : '';
   return `<div class="acard" onclick="openDetail(${a.mal_id})">
     <div class="acard-img">
-      <img src="${img}" alt="${a.title||''}" loading="lazy" onerror="this.onerror=null;this.src='${FALLBACK_POSTER}'"/>
+      <img src="${img}" alt="${a.title||''}" loading="lazy" onerror="imgFallback(this)"/>
       ${TG[a.mal_id] ? '<div class="acard-badge b-multi">MULTI</div>' : '<div class="acard-badge b-sub">SUB</div>'}
       ${score}
       <div class="card-play-btn" aria-hidden="true"><svg viewBox="0 0 24 24"><polygon points="5,3 19,12 5,21"/></svg></div>
@@ -1409,7 +1413,7 @@ function mkGcard(a){
   const score = a.score ? `<div class="gcard-score">⭐${a.score}</div>` : '';
   return `<div class="gcard" onclick="openDetail(${a.mal_id})">
     <div class="gcard-img">
-      <img src="${img}" alt="${a.title||''}" loading="lazy" onerror="this.onerror=null;this.src='${FALLBACK_POSTER}'"/>
+      <img src="${img}" alt="${a.title||''}" loading="lazy" onerror="imgFallback(this)"/>
       ${TG[a.mal_id] ? '<div class="gcard-badge b-multi">MULTI</div>' : '<div class="gcard-badge b-sub">SUB</div>'}
       ${score}
       <div class="card-play-btn" aria-hidden="true"><svg viewBox="0 0 24 24"><polygon points="5,3 19,12 5,21"/></svg></div>
@@ -1579,7 +1583,7 @@ async function openDetail(malId){
   document.getElementById('detRec').innerHTML = rec.slice(0,6).map(r=>{
     const ra=r.entry, ri=ra.images?.jpg?.large_image_url||ra.images?.jpg?.image_url||'';
     return `<div class="rec-card" onclick="openDetail(${ra.mal_id})">
-      <div class="rec-img"><img src="${ri||FALLBACK_POSTER}" alt="${ra.title}" loading="lazy" onerror="this.onerror=null;this.src='${FALLBACK_POSTER}'"/></div>
+      <div class="rec-img"><img src="${ri||FALLBACK_POSTER}" alt="${ra.title}" loading="lazy" onerror="imgFallback(this)"/></div>
       <div class="rec-name">${ra.title}</div></div>`;
   }).join('') || '<p style="color:#555;font-size:.8rem">No recommendations.</p>';
 
@@ -1727,7 +1731,7 @@ function buildRelated(a){
       ${others.map(x=>`
         <div style="flex-shrink:0;width:100px;cursor:pointer;" onclick="openRelatedDetail(${x.malId})">
           <div style="width:100px;height:140px;border-radius:8px;overflow:hidden;background:#1a1a1a;position:relative;">
-            <img src="${malImg(x.malId)}" style="width:100%;height:100%;object-fit:cover;display:block;" onerror="this.onerror=null;this.src='${FALLBACK_POSTER}'" loading="lazy"/>
+            <img src="${malImg(x.malId)}" style="width:100%;height:100%;object-fit:cover;display:block;" onerror="imgFallback(this)" loading="lazy"/>
           </div>
           <div style="font-size:.68rem;font-weight:600;color:#ccc;margin-top:5px;line-height:1.3;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;">${x.title}</div>
         </div>`).join('')}
