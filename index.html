@@ -971,7 +971,7 @@ body::before{
   <div class="pl-topbar">
     <button class="pl-back" onclick="closePlayer()">‹</button>
     <div class="pl-title" id="plTitle">Loading...</div>
-    <div class="pl-ep-badge" id="plEpBadge">WATCH</div>
+    <div class="pl-ep-badge" id="plEpBadge" aria-label="Watch on Telegram">WATCH</div>
   </div>
 
   <!-- Video area -->
@@ -1184,17 +1184,17 @@ function posterFromAnime(a){
   return a?.images?.jpg?.large_image_url || a?.images?.jpg?.image_url || a?.images?.webp?.large_image_url || a?.images?.webp?.image_url || FALLBACK_POSTER;
 }
 async function fetchJsonWithRetry(url){
-  for(let i=0;i<API_RETRY_DELAYS.length+1;i++){
+  for(let attempt=0;attempt<API_RETRY_DELAYS.length+1;attempt++){
     try{
       const r = await fetch(url);
       if(r.ok) return await r.json();
       if(r.status===429 || r.status>=500){
-        if(i<API_RETRY_DELAYS.length) await sleep(API_RETRY_DELAYS[i]);
+        if(attempt<API_RETRY_DELAYS.length) await sleep(API_RETRY_DELAYS[attempt]);
         continue;
       }
       return null;
     }catch{
-      if(i<API_RETRY_DELAYS.length) await sleep(API_RETRY_DELAYS[i]);
+      if(attempt<API_RETRY_DELAYS.length) await sleep(API_RETRY_DELAYS[attempt]);
     }
   }
   return null;
@@ -1204,10 +1204,10 @@ async function apiGet(url){
   return d?.data || [];
 }
 async function apiGetOne(malId){
-  if(CACHE[malId]) return CACHE[malId];
+  if(Object.prototype.hasOwnProperty.call(CACHE, malId)) return CACHE[malId];
   const d = await fetchJsonWithRetry(`https://api.jikan.moe/v4/anime/${malId}`);
-  CACHE[malId] = d?.data || null;
-  return CACHE[malId];
+  if(d?.data) CACHE[malId] = d.data;
+  return d?.data || null;
 }
 
 // Nav
@@ -1479,7 +1479,7 @@ const scrollObs = new IntersectionObserver(entries => {
     if(document.getElementById('pgMovies').classList.contains('active')) loadMoviesPage();
     if(document.getElementById('pgSeries').classList.contains('active')) loadSeriesPage();
   });
-}, {threshold:0, rootMargin:SCROLL_LOAD_MARGIN});
+}, {threshold:0.05, rootMargin:SCROLL_LOAD_MARGIN});
 
 // Sentinel divs for infinite scroll
 ['movGrid','serGrid'].forEach(id => {
@@ -1690,8 +1690,7 @@ function selectEp(ep){
 function setServer(srv,btn){
   curServer = srv;
   document.querySelectorAll('.pl-srv-btn').forEach(b=>b.classList.remove('active'));
-  const activeBtn = btn || document.querySelector(`.pl-srv-btn[data-srv="${srv}"]`);
-  if(activeBtn) activeBtn.classList.add('active');
+  btn.classList.add('active');
   // Reset to overlay
   isPlaying = false;
   document.getElementById('plOverlay').classList.remove('hidden');
