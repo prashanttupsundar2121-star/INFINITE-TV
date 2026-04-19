@@ -15,6 +15,7 @@
   --tg:#1d9bd1;--r:8px;--r2:12px;
   --bnav-height:76px;
   --bnav-bottom:calc(12px + env(safe-area-inset-bottom));
+  --bnav-border:rgba(196,215,255,.42);
 }
 html{scroll-behavior:smooth;}
 html,body{background:var(--bg);color:var(--txt);font-family:'Outfit',sans-serif;min-height:100vh;overflow-x:hidden;-webkit-font-smoothing:antialiased;}
@@ -24,8 +25,8 @@ html,body{background:var(--bg);color:var(--txt);font-family:'Outfit',sans-serif;
 #intro{
   position:fixed;inset:0;z-index:99999;display:flex;align-items:center;justify-content:center;overflow:hidden;
   background:
-    radial-gradient(circle at 25% 25%,rgba(168,85,247,.34),transparent 46%),
-    radial-gradient(circle at 80% 30%,rgba(6,182,212,.3),transparent 42%),
+    radial-gradient(circle at 25% 25%, rgba(168,85,247,.34), transparent 46%),
+    radial-gradient(circle at 80% 30%, rgba(6,182,212,.3), transparent 42%),
     linear-gradient(145deg,#05060c 0%,#04050a 55%,#020307 100%);
   transition:opacity .35s ease;
 }
@@ -41,10 +42,10 @@ html,body{background:var(--bg);color:var(--txt);font-family:'Outfit',sans-serif;
   animation:introGlow 1.05s ease-in-out .45s 2;
 }
 @keyframes introLogo{
-  0%{opacity:0;transform:scale(.9);filter:blur(2px)}
-  26%{opacity:1;transform:scale(1);filter:blur(0)}
+  0%{opacity:0;transform:scale(.9)}
+  26%{opacity:1;transform:scale(1)}
   66%{opacity:1;transform:scale(1.07)}
-  100%{opacity:0;transform:scale(1.13);filter:blur(1.2px)}
+  100%{opacity:0;transform:scale(1.13)}
 }
 @keyframes introGlow{
   0%,100%{text-shadow:0 0 14px rgba(168,85,247,.72),0 0 24px rgba(34,211,238,.58),0 0 44px rgba(34,211,238,.32)}
@@ -83,7 +84,7 @@ html,body{background:var(--bg);color:var(--txt);font-family:'Outfit',sans-serif;
 .bnav{
   position:fixed;left:12px;right:12px;bottom:var(--bnav-bottom);
   z-index:300;height:var(--bnav-height);padding:8px;display:flex;gap:7px;
-  border-radius:24px;border:1px solid rgba(196,215,255,.42);
+  border-radius:24px;border:1px solid var(--bnav-border);
   background:rgba(9,12,20,.56);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);
   box-shadow:0 10px 28px rgba(0,0,0,.46),0 0 0 1px rgba(168,85,247,.1),0 0 30px rgba(6,182,212,.16);
 }
@@ -1588,12 +1589,14 @@ async function openDetail(malId){
       if(!Ctx) return;
       const ctx = new Ctx();
       const now = ctx.currentTime;
+      const SILENCE_LEVEL = 0.0001;
+      const INTRO_AUDIO_DURATION = 1.4;
       const AUDIO_CLEANUP_BUFFER = .1;
-      const audioEnd = now + 1.4;
+      const audioEnd = now + INTRO_AUDIO_DURATION;
       const master = ctx.createGain();
-      master.gain.setValueAtTime(0.0001, now);
+      master.gain.setValueAtTime(SILENCE_LEVEL, now);
       master.gain.exponentialRampToValueAtTime(0.2, now + 0.05);
-      master.gain.exponentialRampToValueAtTime(0.0001, audioEnd);
+      master.gain.exponentialRampToValueAtTime(SILENCE_LEVEL, audioEnd);
       master.connect(ctx.destination);
 
       const bass = ctx.createOscillator();
@@ -1601,9 +1604,9 @@ async function openDetail(malId){
       bass.frequency.setValueAtTime(78, now);
       bass.frequency.exponentialRampToValueAtTime(42, now + 1.2);
       const bassGain = ctx.createGain();
-      bassGain.gain.setValueAtTime(0.0001, now);
+      bassGain.gain.setValueAtTime(SILENCE_LEVEL, now);
       bassGain.gain.exponentialRampToValueAtTime(0.34, now + 0.08);
-      bassGain.gain.exponentialRampToValueAtTime(0.0001, now + 1.2);
+      bassGain.gain.exponentialRampToValueAtTime(SILENCE_LEVEL, now + 1.2);
       bass.connect(bassGain).connect(master);
       bass.start(now);
       bass.stop(now + 1.25);
@@ -1623,14 +1626,14 @@ async function openDetail(malId){
       band.frequency.exponentialRampToValueAtTime(220, now + 1.02);
       band.Q.value = .72;
       const noiseGain = ctx.createGain();
-      noiseGain.gain.setValueAtTime(0.0001, now);
+      noiseGain.gain.setValueAtTime(SILENCE_LEVEL, now);
       noiseGain.gain.exponentialRampToValueAtTime(0.18, now + 0.06);
-      noiseGain.gain.exponentialRampToValueAtTime(0.0001, now + 1.0);
+      noiseGain.gain.exponentialRampToValueAtTime(SILENCE_LEVEL, now + 1.0);
       noise.connect(band).connect(noiseGain).connect(master);
       noise.start(now);
       noise.stop(now + 1.06);
-      setTimeout(()=>ctx.close(), Math.round((audioEnd - now + AUDIO_CLEANUP_BUFFER) * 1000));
-    }catch{}
+      setTimeout(()=>{ if(ctx.state!=='closed') ctx.close(); }, Math.round((audioEnd - now + AUDIO_CLEANUP_BUFFER) * 1000));
+    }catch(_err){/* Audio may be blocked by autoplay policy; safely ignore. */}
   }
 
   function hideIntro(){
