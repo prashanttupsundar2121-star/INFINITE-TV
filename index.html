@@ -13,6 +13,8 @@
   --green:#00e676;--red:#e50914;--gold:#f5c518;
   --txt:#ffffff;--txt2:#aaaaaa;--muted:#555;
   --tg:#1d9bd1;--r:8px;--r2:12px;
+  --bnav-height:76px;
+  --bnav-bottom:calc(12px + env(safe-area-inset-bottom));
 }
 html{scroll-behavior:smooth;}
 html,body{background:var(--bg);color:var(--txt);font-family:'Outfit',sans-serif;min-height:100vh;overflow-x:hidden;-webkit-font-smoothing:antialiased;}
@@ -67,7 +69,7 @@ html,body{background:var(--bg);color:var(--txt);font-family:'Outfit',sans-serif;
 }
 
 /* ── PAGES ── */
-.page{display:none;padding-bottom:108px;}
+.page{display:none;padding-bottom:calc(var(--bnav-height) + var(--bnav-bottom) + 20px);}
 .page.active{display:block;animation:pgIn .3s ease;}
 @keyframes pgIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
 
@@ -79,8 +81,8 @@ html,body{background:var(--bg);color:var(--txt);font-family:'Outfit',sans-serif;
 
 /* ── BOTTOM NAV ── */
 .bnav{
-  position:fixed;left:12px;right:12px;bottom:calc(12px + env(safe-area-inset-bottom));
-  z-index:300;height:76px;padding:8px;display:flex;gap:7px;
+  position:fixed;left:12px;right:12px;bottom:var(--bnav-bottom);
+  z-index:300;height:var(--bnav-height);padding:8px;display:flex;gap:7px;
   border-radius:24px;border:1px solid rgba(166,189,255,.26);
   background:rgba(9,12,20,.56);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);
   box-shadow:0 10px 28px rgba(0,0,0,.46),0 0 0 1px rgba(168,85,247,.1),0 0 30px rgba(6,182,212,.16);
@@ -372,12 +374,12 @@ html,body{background:var(--bg);color:var(--txt);font-family:'Outfit',sans-serif;
 .no-res{text-align:center;color:var(--muted);padding:40px 20px;font-size:.85rem;}
 
 /* ── SCROLL TO TOP ── */
-.scroll-top{position:fixed;bottom:102px;right:14px;width:38px;height:38px;border-radius:50%;background:linear-gradient(135deg,var(--green),#00c853);border:none;color:#000;font-size:1rem;display:flex;align-items:center;justify-content:center;z-index:290;box-shadow:0 4px 14px rgba(0,230,118,.5);opacity:0;transform:scale(0);transition:opacity .25s,transform .25s;pointer-events:none;cursor:pointer;}
+.scroll-top{position:fixed;bottom:calc(var(--bnav-height) + var(--bnav-bottom) + 14px);right:14px;width:38px;height:38px;border-radius:50%;background:linear-gradient(135deg,var(--green),#00c853);border:none;color:#000;font-size:1rem;display:flex;align-items:center;justify-content:center;z-index:290;box-shadow:0 4px 14px rgba(0,230,118,.5);opacity:0;transform:scale(0);transition:opacity .25s,transform .25s;pointer-events:none;cursor:pointer;}
 .scroll-top.show{opacity:1;transform:scale(1);pointer-events:auto;}
 .scroll-top:active{transform:scale(.88);}
 
 /* ── TOAST ── */
-.toast{position:fixed;bottom:102px;left:50%;transform:translateX(-50%) translateY(60px);background:#222;border:1px solid var(--green);color:#fff;padding:10px 22px;border-radius:50px;font-size:.78rem;font-weight:600;z-index:9999;transition:transform .3s;white-space:nowrap;}
+.toast{position:fixed;bottom:calc(var(--bnav-height) + var(--bnav-bottom) + 14px);left:50%;transform:translateX(-50%) translateY(60px);background:#222;border:1px solid var(--green);color:#fff;padding:10px 22px;border-radius:50px;font-size:.78rem;font-weight:600;z-index:9999;transition:transform .3s;white-space:nowrap;}
 .toast.show{transform:translateX(-50%) translateY(0);}
 
 /* ── PREMIUM UI/UX UPGRADE (visual-only overrides) ── */
@@ -514,11 +516,12 @@ body::before{
 .reveal.revealed{opacity:1;transform:translateY(0);}
 
 @media (max-width:600px){
+  :root{--bnav-height:74px;}
   .hero-wrap{height:min(82vw,420px);}
   .hero-btns{gap:8px;}
   .hbtn-watch,.hbtn-info{padding:10px 12px;font-size:.8rem;}
   .section{margin:10px 8px 0;}
-  .bnav{left:10px;right:10px;height:74px;border-radius:22px;}
+  .bnav{left:10px;right:10px;border-radius:22px;}
 }
 @media (prefers-reduced-motion:reduce){
   html{scroll-behavior:auto;}
@@ -1585,10 +1588,11 @@ async function openDetail(malId){
       if(!Ctx) return;
       const ctx = new Ctx();
       const now = ctx.currentTime;
+      const audioEnd = now + 1.4;
       const master = ctx.createGain();
       master.gain.setValueAtTime(0.0001, now);
       master.gain.exponentialRampToValueAtTime(0.2, now + 0.05);
-      master.gain.exponentialRampToValueAtTime(0.0001, now + 1.4);
+      master.gain.exponentialRampToValueAtTime(0.0001, audioEnd);
       master.connect(ctx.destination);
 
       const bass = ctx.createOscillator();
@@ -1624,13 +1628,13 @@ async function openDetail(malId){
       noise.connect(band).connect(noiseGain).connect(master);
       noise.start(now);
       noise.stop(now + 1.06);
-      setTimeout(()=>ctx.close(), 1700);
+      setTimeout(()=>ctx.close(), Math.round((audioEnd - now + .1) * 1000));
     }catch{}
   }
 
   function hideIntro(){
     intro.style.opacity = '0';
-    setTimeout(()=>{ intro.style.display = 'none'; }, 360);
+    setTimeout(()=>{ intro.style.display = 'none'; }, 350);
   }
 
   window.addEventListener('load', ()=>{
