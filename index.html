@@ -1204,7 +1204,7 @@ async function apiGet(url){
   return d?.data || [];
 }
 async function apiGetOne(malId){
-  if(Object.prototype.hasOwnProperty.call(CACHE, malId)) return CACHE[malId];
+  if(malId in CACHE) return CACHE[malId];
   const d = await fetchJsonWithRetry(`https://api.jikan.moe/v4/anime/${malId}`);
   if(d?.data) CACHE[malId] = d.data;
   return d?.data || null;
@@ -1359,10 +1359,6 @@ function renderOur(){
           style="width:100%;height:100%;object-fit:cover;display:block;"
           onerror="this.onerror=null;this.src='${FALLBACK_POSTER}';"
         />
-        <div class="our-pp" id="opp_${a.id}" style="display:none;">
-          <div class="our-pp-i">🎌</div>
-          <div class="our-pp-t">${a.title}</div>
-        </div>
         <div class="our-badge">${langBadge(a.lang)}</div>
         <div class="our-score" id="oscr_${a.id}"></div>
         <div class="card-play-btn" aria-hidden="true"><svg viewBox="0 0 24 24"><polygon points="5,3 19,12 5,21"/></svg></div>
