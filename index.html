@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0"/>
 <meta name="theme-color" content="#000000"/>
 <title>iNFiNiTE TV</title>
-<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@300;400;500;600;700;800&family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet"/>
 <style>
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
 :root{
@@ -463,7 +463,12 @@ body::before{
   .section{margin:10px 8px 0;}
 }
 @media (prefers-reduced-motion:reduce){
-  *,*::before,*::after{animation:none!important;transition:none!important;scroll-behavior:auto!important;}
+  html{scroll-behavior:auto;}
+  .hero-track,.hero-slide .hero-info,.reveal,.page.active,.det-modal.active,.ic,.ic-bar,.ip,.sk,.scroll-top,
+  .hbtn-watch,.hbtn-info,.det-watch-btn,.pl-tg-btn,.pl-join-btn,.acard,.gcard,.our-card,.rec-card{
+    animation:none;
+    transition:none;
+  }
 }
 </style>
 </head>
@@ -919,6 +924,13 @@ const ALL_Q = [{icon:'📱',name:'480p'},{icon:'📺',name:'720p'},{icon:'🖥�
 
 // Global API cache
 const CACHE = {};
+const REVEAL_STAGGER_DELAY = 40;
+const REVEAL_THRESHOLD = .14;
+const REVEAL_ROOT_MARGIN = '0px 0px -8% 0px';
+const PARALLAX_MULTIPLIER = .14;
+const MAX_PARALLAX_SHIFT = 120;
+const REVEAL_SELECTORS = '.section,.page-hd,.grid-3,.search-top,.det-block,.pl-server-row,.pl-info-row,.pl-eps-wrap,.pl-related,.pl-join-box';
+let navRevealTimers = [];
 
 // Badge
 function langBadge(lang){
@@ -955,10 +967,11 @@ function goTab(pgId){
   const map={'pgHome':0,'pgSearch':1,'pgMovies':2,'pgSeries':3};
   const idx=map[pgId];
   if(idx!==undefined) document.getElementById('bn'+idx).classList.add('active');
-  requestAnimationFrame(()=>{
-    document.querySelectorAll(`#${pgId} .reveal`).forEach((el, i)=>{
-      setTimeout(()=>el.classList.add('revealed'), i*40);
-    });
+  navRevealTimers.forEach(clearTimeout);
+  navRevealTimers = [];
+  document.querySelectorAll(`#${pgId} .reveal`).forEach((el, i)=>{
+    const t = setTimeout(()=>el.classList.add('revealed'), i*REVEAL_STAGGER_DELAY);
+    navRevealTimers.push(t);
   });
   window.scrollTo(0,0);
 }
@@ -1508,17 +1521,28 @@ window.addEventListener('scroll', ()=>{
 }, {passive:true});
 
 function initPremiumMotion(){
-  const revealEls = document.querySelectorAll('.section,.page-hd,.grid-3,.search-top,.det-block,.pl-server-row,.pl-info-row,.pl-eps-wrap,.pl-related,.pl-join-box');
+  const revealEls = document.querySelectorAll(REVEAL_SELECTORS);
   revealEls.forEach(el=>el.classList.add('reveal'));
 
   const io = new IntersectionObserver(entries=>{
     entries.forEach(e=>{ if(e.isIntersecting) e.target.classList.add('revealed'); });
-  }, {threshold:.14, rootMargin:'0px 0px -8% 0px'});
+  }, {threshold:REVEAL_THRESHOLD, rootMargin:REVEAL_ROOT_MARGIN});
   revealEls.forEach(el=>io.observe(el));
 
-  const setBgShift = ()=>document.documentElement.style.setProperty('--bg-shift', `${Math.min(window.scrollY*0.14, 120)}px`);
+  let parallaxRAF = null;
+  let lastBgShift = '';
+  const setBgShift = ()=>{
+    parallaxRAF = null;
+    const shift = `${Math.min(window.scrollY*PARALLAX_MULTIPLIER, MAX_PARALLAX_SHIFT)}px`;
+    if(shift===lastBgShift) return;
+    lastBgShift = shift;
+    document.documentElement.style.setProperty('--bg-shift', shift);
+  };
   setBgShift();
-  window.addEventListener('scroll', setBgShift, {passive:true});
+  window.addEventListener('scroll', ()=>{
+    if(parallaxRAF!==null) return;
+    parallaxRAF = requestAnimationFrame(setBgShift);
+  }, {passive:true});
 }
 
 // ── NEW SECTIONS ──
