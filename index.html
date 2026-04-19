@@ -971,7 +971,7 @@ body::before{
   <div class="pl-topbar">
     <button class="pl-back" onclick="closePlayer()">‹</button>
     <div class="pl-title" id="plTitle">Loading...</div>
-    <div class="pl-ep-badge" id="plEpBadge">EP 1</div>
+    <div class="pl-ep-badge" id="plEpBadge">WATCH</div>
   </div>
 
   <!-- Video area -->
@@ -983,7 +983,7 @@ body::before{
         <svg viewBox="0 0 24 24"><polygon points="5,3 19,12 5,21"/></svg>
       </div>
       <div class="pl-overlay-title" id="plOverlayTitle">Tap to Watch</div>
-      <div class="pl-overlay-sub">Episode 1 • HD Quality</div>
+      <div class="pl-overlay-sub">HD Quality • Telegram</div>
     </div>
   </div>
 
@@ -991,16 +991,16 @@ body::before{
   <div class="pl-server-row">
     <div class="pl-srv-lbl">📡 Watch On</div>
     <div class="pl-srv-btns">
-      <button class="pl-srv-btn active" onclick="setServer('telegram')">▶ Telegram</button>
-      <button class="pl-srv-btn" onclick="setServer('tg2')">📱 TG Player</button>
-      <button class="pl-srv-btn" onclick="setServer('web')">🌐 Web</button>
+      <button class="pl-srv-btn active" data-srv="telegram" onclick="setServer('telegram',this)">▶ Telegram</button>
+      <button class="pl-srv-btn" data-srv="tg2" onclick="setServer('tg2',this)">📱 TG Player</button>
+      <button class="pl-srv-btn" data-srv="web" onclick="setServer('web',this)">🌐 Web</button>
     </div>
   </div>
 
   <!-- Anime info -->
   <div class="pl-info-row">
     <div class="pl-anime-title" id="plAnimeName">Loading...</div>
-    <div class="pl-ep-info" id="plEpInfo">Episode 1 • Tap play to watch</div>
+    <div class="pl-ep-info" id="plEpInfo">Tap play to watch on Telegram</div>
     <div class="pl-meta-chips" id="plMetaChips">
       <span class="pl-chip hl">🌐 Multi Language</span>
       <span class="pl-chip">HD Quality</span>
@@ -1026,8 +1026,8 @@ body::before{
   </div>
 
   <!-- Episodes -->
-  <div class="pl-eps-wrap" id="plEpsWrap">
-    <div class="pl-eps-hd">Episodes</div>
+  <div class="pl-eps-wrap" id="plEpsWrap" style="display:none;">
+    <div class="pl-eps-hd">Watch</div>
     <div class="pl-eps-grid" id="plEpsGrid"></div>
   </div>
 
@@ -1140,11 +1140,29 @@ const ALL_Q = [{icon:'📱',name:'480p'},{icon:'📺',name:'720p'},{icon:'🖥�
 
 // Global API cache
 const CACHE = {};
+const API_RETRY_DELAYS = [400, 900, 1600];
+const MAX_API_ATTEMPTS = API_RETRY_DELAYS.length + 1;
+const FALLBACK_POSTER = `data:image/svg+xml,${encodeURIComponent(`
+<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 560'>
+  <defs>
+    <linearGradient id='g' x1='0' x2='1' y1='0' y2='1'>
+      <stop offset='0' stop-color='#181826'/>
+      <stop offset='1' stop-color='#0c0c12'/>
+    </linearGradient>
+  </defs>
+  <rect width='400' height='560' fill='url(#g)'/>
+  <circle cx='200' cy='220' r='68' fill='#202035'/>
+  <path d='M180 190l60 30-60 30z' fill='#f4f7ff'/>
+  <text x='200' y='325' text-anchor='middle' fill='#f4f7ff' font-size='24' font-family='Outfit,Arial,sans-serif' font-weight='700'>INFINITE TV</text>
+  <text x='200' y='356' text-anchor='middle' fill='#9da3b5' font-size='16' font-family='Outfit,Arial,sans-serif'>Poster Unavailable</text>
+</svg>
+`)}`;
 const REVEAL_STAGGER_DELAY = 40;
 const REVEAL_THRESHOLD = .14;
 const REVEAL_ROOT_MARGIN = '0px 0px -8% 0px';
 const PARALLAX_MULTIPLIER = .14;
 const MAX_PARALLAX_SHIFT = 120;
+const SCROLL_LOAD_MARGIN = '600px 0px';
 const REVEAL_SELECTORS = '.section,.page-hd,.grid-3,.search-top,.det-block,.pl-server-row,.pl-info-row,.pl-eps-wrap,.pl-related,.pl-join-box';
 let navRevealTimers = [];
 
@@ -1162,17 +1180,40 @@ function apiBadge(a){
 }
 
 // API helpers
+function sleep(ms){ return new Promise(r=>setTimeout(r,ms)); }
+function posterFromAnime(a){
+  return a?.images?.jpg?.large_image_url || a?.images?.jpg?.image_url || a?.images?.webp?.large_image_url || a?.images?.webp?.image_url || FALLBACK_POSTER;
+}
+function imgFallback(el){
+  el.onerror = null;
+  el.src = FALLBACK_POSTER;
+}
+async function fetchJsonWithRetry(url){
+  for(let attempt=0;attempt<MAX_API_ATTEMPTS;attempt++){
+    try{
+      const r = await fetch(url);
+      if(r.ok) return await r.json();
+      // Retry only rate limits and transient server-side failures.
+      if(r.status===429 || r.status>=500){
+        if(attempt<API_RETRY_DELAYS.length) await sleep(API_RETRY_DELAYS[attempt]);
+        continue;
+      }
+      return null;
+    }catch{
+      if(attempt<API_RETRY_DELAYS.length) await sleep(API_RETRY_DELAYS[attempt]);
+    }
+  }
+  return null;
+}
 async function apiGet(url){
-  try{const r=await fetch(url);const d=await r.json();return d.data||[];}catch{return[];}
+  const d = await fetchJsonWithRetry(url);
+  return d?.data || [];
 }
 async function apiGetOne(malId){
-  if(CACHE[malId]) return CACHE[malId];
-  try{
-    const r=await fetch(`https://api.jikan.moe/v4/anime/${malId}`);
-    const d=await r.json();
-    if(d.data) CACHE[malId]=d.data;
-    return d.data||null;
-  }catch{return null;}
+  if(Object.prototype.hasOwnProperty.call(CACHE, malId)) return CACHE[malId];
+  const d = await fetchJsonWithRetry(`https://api.jikan.moe/v4/anime/${malId}`);
+  if(d?.data) CACHE[malId] = d.data;
+  return d?.data || null;
 }
 
 // Nav
@@ -1242,7 +1283,7 @@ async function loadHero(){
         <div class="hero-title" id="htitle_${i}">${a.title}</div>
         <div class="hero-meta" id="hmeta_${i}"></div>
         <div class="hero-btns">
-          <a href="${a.tgLink}" target="_blank" class="hbtn-watch">
+          <a href="${DEFAULT_LINK}" target="_blank" class="hbtn-watch">
             <svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16"><polygon points="5,3 19,12 5,21"/></svg>
             WATCH NOW
           </a>
@@ -1316,18 +1357,14 @@ function renderOur(){
   const row = document.getElementById('ourRow');
   document.getElementById('ourCount').textContent = ANIME_DB.length + ' anime';
   row.innerHTML = ANIME_DB.map(a=>`
-    <div class="our-card" onclick="openPlayer(${a.id})">
+    <div class="our-card" onclick="openDetail(${a.malId})">
       <div class="our-img">
         <img id="oimg_${a.id}"
           src="${malImg(a.malId)}"
           alt="${a.title}"
           style="width:100%;height:100%;object-fit:cover;display:block;"
-          onerror="this.style.display='none';document.getElementById('opp_${a.id}').style.display='flex';"
+          onerror="imgFallback(this)"
         />
-        <div class="our-pp" id="opp_${a.id}" style="display:none;">
-          <div class="our-pp-i">🎌</div>
-          <div class="our-pp-t">${a.title}</div>
-        </div>
         <div class="our-badge">${langBadge(a.lang)}</div>
         <div class="our-score" id="oscr_${a.id}"></div>
         <div class="card-play-btn" aria-hidden="true"><svg viewBox="0 0 24 24"><polygon points="5,3 19,12 5,21"/></svg></div>
@@ -1347,13 +1384,9 @@ async function loadOurScores(){
       const nm = document.getElementById(`onamefull_${a.id}`);
       if(scr && d.score) scr.textContent = '⭐' + d.score;
       if(nm && d.title) nm.textContent = d.title;
-      // Update image with high-res if CDN failed
+      // Update image with API poster
       const imgEl = document.getElementById(`oimg_${a.id}`);
-      if(imgEl && d.images?.jpg?.large_image_url && imgEl.style.display==='none'){
-        imgEl.src = d.images.jpg.large_image_url;
-        imgEl.style.display = 'block';
-        document.getElementById(`opp_${a.id}`).style.display = 'none';
-      }
+      if(imgEl) imgEl.src = posterFromAnime(d);
     }
     if(i < ANIME_DB.length-1) await new Promise(r=>setTimeout(r,500));
   }
@@ -1363,11 +1396,11 @@ async function loadOurScores(){
 // API CARDS
 // ═══════════════════════════════════
 function mkAcard(a){
-  const img = a.images?.jpg?.large_image_url || a.images?.jpg?.image_url || '';
+  const img = posterFromAnime(a);
   const score = a.score ? `<div class="acard-score">⭐${a.score}</div>` : '';
   return `<div class="acard" onclick="openDetail(${a.mal_id})">
     <div class="acard-img">
-      <img src="${img}" alt="${a.title||''}" loading="lazy" onerror="this.src=''"/>
+      <img src="${img}" alt="${a.title||''}" loading="lazy" onerror="imgFallback(this)"/>
       ${TG[a.mal_id] ? '<div class="acard-badge b-multi">MULTI</div>' : '<div class="acard-badge b-sub">SUB</div>'}
       ${score}
       <div class="card-play-btn" aria-hidden="true"><svg viewBox="0 0 24 24"><polygon points="5,3 19,12 5,21"/></svg></div>
@@ -1377,11 +1410,11 @@ function mkAcard(a){
   </div>`;
 }
 function mkGcard(a){
-  const img = a.images?.jpg?.large_image_url || a.images?.jpg?.image_url || '';
+  const img = posterFromAnime(a);
   const score = a.score ? `<div class="gcard-score">⭐${a.score}</div>` : '';
   return `<div class="gcard" onclick="openDetail(${a.mal_id})">
     <div class="gcard-img">
-      <img src="${img}" alt="${a.title||''}" loading="lazy" onerror="this.src=''"/>
+      <img src="${img}" alt="${a.title||''}" loading="lazy" onerror="imgFallback(this)"/>
       ${TG[a.mal_id] ? '<div class="gcard-badge b-multi">MULTI</div>' : '<div class="gcard-badge b-sub">SUB</div>'}
       ${score}
       <div class="card-play-btn" aria-hidden="true"><svg viewBox="0 0 24 24"><polygon points="5,3 19,12 5,21"/></svg></div>
@@ -1448,7 +1481,8 @@ const scrollObs = new IntersectionObserver(entries => {
     if(document.getElementById('pgMovies').classList.contains('active')) loadMoviesPage();
     if(document.getElementById('pgSeries').classList.contains('active')) loadSeriesPage();
   });
-}, {threshold:0.1});
+// Preload slightly before cards enter viewport for smoother infinite scrolling.
+}, { threshold: 0.1, rootMargin: SCROLL_LOAD_MARGIN });
 
 // Sentinel divs for infinite scroll
 ['movGrid','serGrid'].forEach(id => {
@@ -1505,13 +1539,16 @@ async function openDetail(malId){
   document.getElementById('detBanImg').src = '';
   document.getElementById('detPoster').src = '';
 
-  const watchUrl = TG[malId] || DEFAULT_LINK;
-  document.getElementById('detWatchBtn').href = watchUrl;
+  const watchUrl = DEFAULT_LINK;
+  const watchBtn = document.getElementById('detWatchBtn');
+  watchBtn.href = watchUrl;
+  watchBtn.target = '_blank';
+  watchBtn.onclick = null;
 
   const a = await apiGetOne(malId);
   if(!a){ document.getElementById('detTitle').textContent='Error loading.'; return; }
 
-  const img = a.images?.jpg?.large_image_url || a.images?.jpg?.image_url || '';
+  const img = posterFromAnime(a);
   document.getElementById('detBanImg').src = img;
   document.getElementById('detPoster').src = img;
   document.getElementById('detTitle').textContent = a.title || 'Unknown';
@@ -1534,7 +1571,7 @@ async function openDetail(malId){
   document.getElementById('detInfoGrid').innerHTML = [
     ['Status',a.status||'?'], ['Studio',studio],
     ['Released',aired], ['Ended',ended],
-    ['Episodes',a.episodes||'?'], ['Duration',a.duration||'?'],
+    ['Duration',a.duration||'?'],
     ['Type',a.type||'?'], ['Score',a.score?`${a.score}/10`:'?'],
     ['Ranked',a.rank?`#${a.rank}`:'?'], ['Members',a.members?a.members.toLocaleString():'?'],
   ].map(([k,v])=>`<div class="info-item"><div class="info-dot"></div><span class="info-k">${k}:</span><span class="info-v">${v}</span></div>`).join('');
@@ -1548,7 +1585,7 @@ async function openDetail(malId){
   document.getElementById('detRec').innerHTML = rec.slice(0,6).map(r=>{
     const ra=r.entry, ri=ra.images?.jpg?.large_image_url||ra.images?.jpg?.image_url||'';
     return `<div class="rec-card" onclick="openDetail(${ra.mal_id})">
-      <div class="rec-img"><img src="${ri}" alt="${ra.title}" loading="lazy" onerror="this.src=''"/></div>
+      <div class="rec-img"><img src="${ri||FALLBACK_POSTER}" alt="${ra.title}" loading="lazy" onerror="imgFallback(this)"/></div>
       <div class="rec-name">${ra.title}</div></div>`;
   }).join('') || '<p style="color:#555;font-size:.8rem">No recommendations.</p>';
 
@@ -1600,10 +1637,10 @@ async function openPlayer(animeId){
   // Set initial state
   document.getElementById('plTitle').textContent = a.title;
   document.getElementById('plAnimeName').textContent = a.title;
-  document.getElementById('plEpBadge').textContent = 'EP 1';
-  document.getElementById('plEpInfo').textContent = 'Episode 1 • Tap ▶ to watch';
+  document.getElementById('plEpBadge').textContent = 'WATCH';
+  document.getElementById('plEpInfo').textContent = 'Tap ▶ to watch on Telegram';
   document.getElementById('plOverlayTitle').textContent = a.title;
-  document.getElementById('plTgBtn').href = a.tgLink;
+  document.getElementById('plTgBtn').href = DEFAULT_LINK;
 
   // Reset overlay
   document.getElementById('plOverlay').classList.remove('hidden');
@@ -1611,9 +1648,8 @@ async function openPlayer(animeId){
   document.getElementById('plIframe').src = '';
 
   // Show/hide join box
-  const isPrivChan = isPrivate(a.tgLink);
-  document.getElementById('plJoinBox').style.display = isPrivChan ? 'block' : 'none';
-  document.getElementById('plJoinBtn').href = a.tgLink;
+  document.getElementById('plJoinBox').style.display = 'none';
+  document.getElementById('plJoinBtn').href = DEFAULT_LINK;
 
   // Server buttons
   document.querySelectorAll('.pl-srv-btn').forEach(b=>b.classList.remove('active'));
@@ -1622,7 +1658,7 @@ async function openPlayer(animeId){
   // Load API data
   const d = await apiGetOne(a.malId);
   if(d){
-    const img = d.images?.jpg?.large_image_url || d.images?.jpg?.image_url || '';
+    const img = posterFromAnime(d);
     document.getElementById('plPoster').src = img;
     document.getElementById('plTitle').textContent = d.title || a.title;
     document.getElementById('plAnimeName').textContent = d.title || a.title;
@@ -1632,16 +1668,10 @@ async function openPlayer(animeId){
     document.getElementById('plMetaChips').innerHTML = `
       <span class="pl-chip hl">${a.lang==='hindi'?'🇮🇳 Hindi':'🌐 Multi Language'}</span>
       ${d.type?`<span class="pl-chip">${d.type}</span>`:''}
-      ${d.episodes?`<span class="pl-chip">${d.episodes} Episodes</span>`:''}
       <span class="pl-chip">⭐ ${d.score||'?'}</span>`;
   }
 
-  // Build episodes grid
-  // Generate episode buttons based on anime episodes count (from API or default 24)
-  const epCount = (await apiGetOne(a.malId))?.episodes || 24;
-  const safeCnt = Math.min(epCount || 24, 200);
-  document.getElementById('plEpsGrid').innerHTML = Array.from({length:safeCnt},(_,i)=>`
-    <div class="pl-ep${i===0?' active':''}" onclick="selectEp(${i+1})">${i+1}</div>`).join('');
+  document.getElementById('plEpsGrid').innerHTML = '';
 
   // Related anime
   buildRelated(a);
@@ -1651,8 +1681,8 @@ function selectEp(ep){
   curEp = ep;
   isPlaying = false;
   document.querySelectorAll('.pl-ep').forEach((b,i)=>b.classList.toggle('active',i===ep-1));
-  document.getElementById('plEpBadge').textContent = `EP ${ep}`;
-  document.getElementById('plEpInfo').textContent = `Episode ${ep} • Tap ▶ to watch`;
+  document.getElementById('plEpBadge').textContent = 'WATCH';
+  document.getElementById('plEpInfo').textContent = 'Tap ▶ to watch on Telegram';
   document.getElementById('plOverlay').classList.remove('hidden');
   document.getElementById('plIframe').style.display = 'none';
   document.getElementById('plIframe').src = '';
@@ -1660,10 +1690,10 @@ function selectEp(ep){
   document.getElementById('playerPage').scrollTo({top:0,behavior:'smooth'});
 }
 
-function setServer(srv){
+function setServer(srv,buttonEl){
   curServer = srv;
   document.querySelectorAll('.pl-srv-btn').forEach(b=>b.classList.remove('active'));
-  event.target.classList.add('active');
+  if(buttonEl) buttonEl.classList.add('active');
   // Reset to overlay
   isPlaying = false;
   document.getElementById('plOverlay').classList.remove('hidden');
@@ -1673,8 +1703,7 @@ function setServer(srv){
 
 function startPlay(){
   if(!curAnime) return;
-  const tgLink = curAnime.tgLink;
-  const ch = getTgChannel(tgLink);
+  const ch = getTgChannel(DEFAULT_LINK);
 
   if(ch && ch.user){
     // Public channel — try embed
@@ -1691,7 +1720,7 @@ function startPlay(){
     isPlaying = true;
   } else {
     // Private channel — open in Telegram directly
-    window.open(tgLink, '_blank');
+    window.open(DEFAULT_LINK, '_blank');
   }
 }
 
@@ -1702,9 +1731,9 @@ function buildRelated(a){
     <div class="pl-rel-hd">More Anime</div>
     <div style="display:flex;gap:10px;overflow-x:auto;padding-bottom:4px;">
       ${others.map(x=>`
-        <div style="flex-shrink:0;width:100px;cursor:pointer;" onclick="openPlayer(${x.id})">
+        <div style="flex-shrink:0;width:100px;cursor:pointer;" onclick="openRelatedDetail(${x.malId})">
           <div style="width:100px;height:140px;border-radius:8px;overflow:hidden;background:#1a1a1a;position:relative;">
-            <img src="${malImg(x.malId)}" style="width:100%;height:100%;object-fit:cover;display:block;" onerror="this.style.display='none'" loading="lazy"/>
+            <img src="${malImg(x.malId)}" style="width:100%;height:100%;object-fit:cover;display:block;" onerror="imgFallback(this)" loading="lazy"/>
           </div>
           <div style="font-size:.68rem;font-weight:600;color:#ccc;margin-top:5px;line-height:1.3;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;">${x.title}</div>
         </div>`).join('')}
@@ -1717,20 +1746,9 @@ function closePlayer(){
   document.body.style.overflow = '';
   isPlaying = false;
 }
-
-// Override openDetail's WATCH button to open player instead
-// Update detail watch button to open player for DB anime
-const _origOpenDetail = openDetail;
-async function openDetail(malId){
-  await _origOpenDetail(malId);
-  // Override watch button for our DB anime
-  const dbA = ANIME_DB.find(x=>x.malId===malId);
-  if(dbA){
-    const wb = document.getElementById('detWatchBtn');
-    wb.removeAttribute('href');
-    wb.removeAttribute('target');
-    wb.onclick = (e)=>{ e.preventDefault(); closeDetail(); openPlayer(dbA.id); };
-  }
+function openRelatedDetail(malId){
+  closePlayer();
+  openDetail(malId);
 }
 (function(){
   const intro = document.getElementById('intro');
