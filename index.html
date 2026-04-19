@@ -1589,6 +1589,7 @@ async function openDetail(malId){
       if(!Ctx) return;
       const ctx = new Ctx();
       const now = ctx.currentTime;
+      const MS_PER_SECOND = 1000;
       const SILENCE_LEVEL = 0.0001;
       const INTRO_AUDIO_DURATION = 1.4;
       const AUDIO_CLEANUP_BUFFER = .1;
@@ -1632,8 +1633,8 @@ async function openDetail(malId){
       noise.connect(band).connect(noiseGain).connect(master);
       noise.start(now);
       noise.stop(now + 1.06);
-      setTimeout(()=>{ if(ctx.state!=='closed') ctx.close(); }, Math.round((audioEnd - now + AUDIO_CLEANUP_BUFFER) * 1000));
-    }catch(_err){/* Audio may be blocked by autoplay policy; safely ignore. */}
+      setTimeout(()=>{ if(ctx.state!=='closed') ctx.close(); }, Math.round((audioEnd - now + AUDIO_CLEANUP_BUFFER) * MS_PER_SECOND));
+    }catch(autoplayErr){ void autoplayErr; /* Audio may be blocked by autoplay policy; safely ignore. */}
   }
 
   function hideIntro(){
