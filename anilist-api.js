@@ -26,6 +26,7 @@
         if (res.ok) {
           const json = await res.json();
           if (json?.errors?.length) {
+            console.warn('AniList GraphQL errors', json.errors);
             return { data: null, error: 'AniList request failed.' };
           }
           return { data: json?.data || null, error: null };

@@ -1161,6 +1161,7 @@ const PARALLAX_MULTIPLIER = .14;
 const MAX_PARALLAX_SHIFT = 120;
 const SCROLL_LOAD_MARGIN = '600px 0px';
 const REVEAL_SELECTORS = '.section,.page-hd,.grid-3,.search-top,.det-block,.pl-server-row,.pl-info-row,.pl-eps-wrap,.pl-related,.pl-join-box';
+const WATCH_ICON_SVG = '<svg viewBox="0 0 24 24"><path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.562 8.248-1.97 9.289c-.145.658-.537.818-1.084.508l-3-2.21-1.447 1.394c-.16.16-.295.295-.605.295l.213-3.053 5.56-5.023c.242-.213-.054-.333-.373-.12L7.19 14.447l-2.95-.924c-.64-.204-.657-.64.136-.95l11.57-4.461c.537-.194 1.006.131.616.136z"/></svg>';
 let navRevealTimers = [];
 
 // Badge
@@ -1688,7 +1689,11 @@ function renderDetail(a, error){
   const studio = (a.studios?.nodes||[]).map(s=>s.name).join(', ') || '?';
   const duration = a.duration ? `${a.duration} min/ep` : '?';
   const rankings = a.rankings || [];
-  const rankEntry = rankings.find(r=>r.type==='RATED' && r.allTime) || rankings[0];
+  const rankEntry = rankings.find(r=>r.type==='RATED' && r.allTime)
+    || rankings.find(r=>r.type==='POPULAR' && r.allTime)
+    || rankings.find(r=>r.type==='RATED')
+    || rankings.find(r=>r.type==='POPULAR')
+    || null;
   const rankLabel = rankEntry?.rank ? `#${rankEntry.rank}` : '?';
   document.getElementById('detInfoGrid').innerHTML = [
     ['Status',status.label || '?'], ['Studio',studio],
@@ -1747,15 +1752,15 @@ function renderDetail(a, error){
 
   if(tgUrl){
     watchBtn.href = tgUrl;
-    watchBtn.innerHTML = `<svg viewBox="0 0 24 24"><path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.562 8.248-1.97 9.289c-.145.658-.537.818-1.084.508l-3-2.21-1.447 1.394c-.16.16-.295.295-.605.295l.213-3.053 5.56-5.023c.242-.213-.054-.333-.373-.12L7.19 14.447l-2.95-.924c-.64-.204-.657-.64.136-.95l11.57-4.461c.537-.194 1.006.131.616.136z"/></svg>▶ WATCH ON TELEGRAM`;
+    watchBtn.innerHTML = `${WATCH_ICON_SVG}▶ WATCH ON TELEGRAM`;
     watchBtn.style.display = 'flex';
   } else if(trailer){
     watchBtn.href = trailer;
-    watchBtn.innerHTML = `<svg viewBox="0 0 24 24"><path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.562 8.248-1.97 9.289c-.145.658-.537.818-1.084.508l-3-2.21-1.447 1.394c-.16.16-.295.295-.605.295l.213-3.053 5.56-5.023c.242-.213-.054-.333-.373-.12L7.19 14.447l-2.95-.924c-.64-.204-.657-.64.136-.95l11.57-4.461c.537-.194 1.006.131.616.136z"/></svg>▶ WATCH TRAILER`;
+    watchBtn.innerHTML = `${WATCH_ICON_SVG}▶ WATCH TRAILER`;
     watchBtn.style.display = 'flex';
   } else if(siteUrl){
     watchBtn.href = siteUrl;
-    watchBtn.innerHTML = `<svg viewBox="0 0 24 24"><path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.562 8.248-1.97 9.289c-.145.658-.537.818-1.084.508l-3-2.21-1.447 1.394c-.16.16-.295.295-.605.295l.213-3.053 5.56-5.023c.242-.213-.054-.333-.373-.12L7.19 14.447l-2.95-.924c-.64-.204-.657-.64.136-.95l11.57-4.461c.537-.194 1.006.131.616.136z"/></svg>▶ VIEW ON ANILIST`;
+    watchBtn.innerHTML = `${WATCH_ICON_SVG}▶ VIEW ON ANILIST`;
     watchBtn.style.display = 'flex';
   }
 }
