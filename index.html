@@ -1179,6 +1179,10 @@ function escapeHtml(str){
     .replace(/"/g,'&quot;')
     .replace(/'/g,'&#39;');
 }
+function toSafeNumber(value, fallback = 0){
+  const num = Number(value);
+  return Number.isFinite(num) ? num : fallback;
+}
 function titleFromMedia(a){
   return a?.title?.userPreferred || a?.title?.english || a?.title?.romaji || a?.title?.native || 'Unknown';
 }
@@ -1298,7 +1302,7 @@ async function loadHero(){
             <svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16"><polygon points="5,3 19,12 5,21"/></svg>
             WATCH NOW
           </a>
-          <button class="hbtn-info" onclick="openDetailByMalId(${Number(a.malId)})">
+          <button class="hbtn-info" onclick="openDetailByMalId(${toSafeNumber(a.malId)})">
             <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" width="14" height="14"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
             Info
           </button>
@@ -1371,7 +1375,7 @@ function renderOur(){
   const row = document.getElementById('ourRow');
   document.getElementById('ourCount').textContent = ANIME_DB.length + ' anime';
   row.innerHTML = ANIME_DB.map(a=>`
-    <div class="our-card" onclick="openDetailByMalId(${Number(a.malId)})">
+    <div class="our-card" onclick="openDetailByMalId(${toSafeNumber(a.malId)})">
       <div class="our-img">
         <img id="oimg_${a.id}"
           src="${malImg(a.malId)}"
@@ -1416,7 +1420,7 @@ function mkAcard(a){
   const title = titleFromMedia(a);
   const score = scoreFromMedia(a);
   const scoreTag = score ? `<div class="acard-score">⭐${score.toFixed(1)}</div>` : '';
-  return `<div class="acard" onclick="openDetailById(${Number(a.id)})">
+  return `<div class="acard" onclick="openDetailById(${toSafeNumber(a.id)})">
     <div class="acard-img">
       <img src="${img}" alt="${escapeHtml(title)}" loading="lazy" onerror="imgFallback(this)"/>
       ${a.idMal && TG[a.idMal] ? '<div class="acard-badge b-multi">MULTI</div>' : '<div class="acard-badge b-sub">SUB</div>'}
@@ -1432,7 +1436,7 @@ function mkGcard(a){
   const title = titleFromMedia(a);
   const score = scoreFromMedia(a);
   const scoreTag = score ? `<div class="gcard-score">⭐${score.toFixed(1)}</div>` : '';
-  return `<div class="gcard" onclick="openDetailById(${Number(a.id)})">
+  return `<div class="gcard" onclick="openDetailById(${toSafeNumber(a.id)})">
     <div class="gcard-img">
       <img src="${img}" alt="${escapeHtml(title)}" loading="lazy" onerror="imgFallback(this)"/>
       ${a.idMal && TG[a.idMal] ? '<div class="gcard-badge b-multi">MULTI</div>' : '<div class="gcard-badge b-sub">SUB</div>'}
@@ -1629,16 +1633,22 @@ function resetDetailModal(){
 }
 
 async function openDetailById(id){
-  const safeId = Number(id);
-  if(!Number.isFinite(safeId)) return;
+  const safeId = toSafeNumber(id, null);
+  if(safeId === null){
+    console.warn('Invalid AniList id', id);
+    return;
+  }
   resetDetailModal();
   const result = await AniListApi.fetchMediaById(safeId);
   renderDetail(result?.data, result?.error);
 }
 
 async function openDetailByMalId(malId){
-  const safeId = Number(malId);
-  if(!Number.isFinite(safeId)) return;
+  const safeId = toSafeNumber(malId, null);
+  if(safeId === null){
+    console.warn('Invalid MAL id', malId);
+    return;
+  }
   resetDetailModal();
   const result = await AniListApi.fetchMediaByMalId(safeId);
   renderDetail(result?.data, result?.error);
@@ -1677,7 +1687,8 @@ function renderDetail(a, error){
   const ended = a.status === 'RELEASING' ? 'Ongoing' : formatAniDate(a.endDate);
   const studio = (a.studios?.nodes||[]).map(s=>s.name).join(', ') || '?';
   const duration = a.duration ? `${a.duration} min/ep` : '?';
-  const rankEntry = (a.rankings||[]).find(r=>r.type==='RATED' && r.allTime) || (a.rankings||[])[0];
+  const rankings = a.rankings || [];
+  const rankEntry = rankings.find(r=>r.type==='RATED' && r.allTime) || rankings[0];
   const rankLabel = rankEntry?.rank ? `#${rankEntry.rank}` : '?';
   document.getElementById('detInfoGrid').innerHTML = [
     ['Status',status.label || '?'], ['Studio',studio],
@@ -1695,7 +1706,7 @@ function renderDetail(a, error){
   const recNodes = (a.recommendations?.nodes || []).map(n=>n.mediaRecommendation).filter(Boolean).slice(0,6);
   document.getElementById('detRec').innerHTML = recNodes.length ? recNodes.map(r=>{
     const recTitle = titleFromMedia(r);
-    return `<div class="rec-card" onclick="openDetailById(${Number(r.id)})">
+    return `<div class="rec-card" onclick="openDetailById(${toSafeNumber(r.id)})">
       <div class="rec-img"><img src="${posterFromAnime(r)}" alt="${escapeHtml(recTitle)}" loading="lazy" onerror="imgFallback(this)"/></div>
       <div class="rec-name">${escapeHtml(recTitle)}</div></div>`;
   }).join('') : '<p style="color:#555;font-size:.8rem">No recommendations.</p>';
@@ -1885,7 +1896,7 @@ function buildRelated(a){
     <div class="pl-rel-hd">More Anime</div>
     <div style="display:flex;gap:10px;overflow-x:auto;padding-bottom:4px;">
       ${others.map(x=>`
-        <div style="flex-shrink:0;width:100px;cursor:pointer;" onclick="openRelatedDetail(${Number(x.malId)})">
+        <div style="flex-shrink:0;width:100px;cursor:pointer;" onclick="openRelatedDetail(${toSafeNumber(x.malId)})">
           <div style="width:100px;height:140px;border-radius:8px;overflow:hidden;background:#1a1a1a;position:relative;">
             <img src="${malImg(x.malId)}" style="width:100%;height:100%;object-fit:cover;display:block;" onerror="imgFallback(this)" loading="lazy"/>
           </div>

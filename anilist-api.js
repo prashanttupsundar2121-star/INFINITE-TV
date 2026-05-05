@@ -26,7 +26,7 @@
         if (res.ok) {
           const json = await res.json();
           if (json?.errors?.length) {
-            return { data: null, error: json.errors.map((e) => e.message).join(', ') };
+            return { data: null, error: 'AniList request failed.' };
           }
           return { data: json?.data || null, error: null };
         }
