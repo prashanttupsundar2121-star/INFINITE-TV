@@ -1617,11 +1617,11 @@ function statusMeta(status){
   if(!status) return { label: '', cls: 'ch-type' };
   return { label: status.replace(/_/g,' '), cls: 'ch-type' };
 }
-const MAX_SCORE = 10;
-const STAR_SCALE = 5;
+const ANILIST_SCORE_MAX = 10;
+const STAR_COUNT = 5;
 function renderStars(score){
   if(!hasScore(score)) return '';
-  const stars = Math.round((parseFloat(score)/MAX_SCORE)*STAR_SCALE*2)/2;
+  const stars = Math.round((parseFloat(score)/ANILIST_SCORE_MAX)*STAR_COUNT*2)/2;
   let h = '<div class="det-stars">';
   for(let i=1;i<=5;i++) h += `<span class="det-star${i<=stars?' on':''}">★</span>`;
   return h + `</div><span class="det-score-num">${score}/10</span>`;
@@ -1888,7 +1888,11 @@ function setServer(srv,buttonEl){
 function startPlay(){
   if(!curAnime) return;
   const tgLink = sanitizeUrl(curAnime.tgLink) || sanitizeUrl(DEFAULT_LINK);
-  if(!tgLink) return;
+  if(!tgLink){
+    const infoEl = document.getElementById('plEpInfo');
+    if(infoEl) infoEl.textContent = 'Watch link unavailable.';
+    return;
+  }
   const ch = getTgChannel(tgLink);
 
   if(ch && ch.user){

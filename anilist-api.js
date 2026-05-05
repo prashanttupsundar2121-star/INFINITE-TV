@@ -27,7 +27,8 @@
           const json = await res.json();
           if (json?.errors?.length) {
             console.warn('AniList GraphQL errors', json.errors);
-            return { data: null, error: 'AniList request failed.' };
+            const message = json.errors[0]?.message;
+            return { data: null, error: message ? `AniList request failed: ${message}` : 'AniList request failed.' };
           }
           return { data: json?.data || null, error: null };
         }
