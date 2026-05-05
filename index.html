@@ -1062,6 +1062,7 @@ body::before{
 <div class="toast" id="toast"></div>
 <button class="scroll-top" id="scrollTop" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑</button>
 
+<script src="anilist-api.js"></script>
 <script>
 // ══════════════════════════════════════════════
 // ★ ANIME DATABASE — Your channels
@@ -1138,10 +1139,6 @@ const ALL_LANGS = [
 ];
 const ALL_Q = [{icon:'📱',name:'480p'},{icon:'📺',name:'720p'},{icon:'🖥️',name:'1080p'},{icon:'💎',name:'4K'},{icon:'📝',name:'Eng Sub'},{icon:'🎙️',name:'Dubbed'}];
 
-// Global API cache
-const CACHE = {};
-const API_RETRY_DELAYS = [400, 900, 1600];
-const MAX_API_ATTEMPTS = API_RETRY_DELAYS.length + 1;
 const FALLBACK_POSTER = `data:image/svg+xml,${encodeURIComponent(`
 <svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 560'>
   <defs>
@@ -1173,47 +1170,67 @@ function langBadge(lang){
   return`<div class="acard-badge b-multi">MULTI</div>`;
 }
 function apiBadge(a){
-  // Use MAL data to determine badge
-  const lang = a.title_english ? 'DUAL' : 'SUB';
-  if(TG[a.mal_id]) return`<div class="acard-badge b-multi">MULTI</div>`;
+  const lang = a?.title?.english ? 'DUAL' : 'SUB';
+  if(a?.idMal && TG[a.idMal]) return`<div class="acard-badge b-multi">MULTI</div>`;
   return`<div class="acard-badge b-sub">${lang}</div>`;
 }
 
 // API helpers
-function sleep(ms){ return new Promise(r=>setTimeout(r,ms)); }
+function escapeHtml(str){
+  if(str === null || str === undefined) return '';
+  return String(str)
+    .replace(/&/g,'&amp;')
+    .replace(/</g,'&lt;')
+    .replace(/>/g,'&gt;')
+    .replace(/"/g,'&quot;')
+    .replace(/'/g,'&#39;');
+}
+function titleFromMedia(a){
+  return a?.title?.userPreferred || a?.title?.english || a?.title?.romaji || a?.title?.native || 'Unknown';
+}
+function scoreToTen(score){
+  if(score === null || score === undefined) return null;
+  const normalized = score > 10 ? score / 10 : score;
+  return Math.round(normalized * 10) / 10;
+}
+function scoreFromMedia(a){
+  return scoreToTen(a?.averageScore);
+}
+function yearFromMedia(a){
+  return a?.seasonYear || a?.startDate?.year || '';
+}
 function posterFromAnime(a){
-  return a?.images?.jpg?.large_image_url || a?.images?.jpg?.image_url || a?.images?.webp?.large_image_url || a?.images?.webp?.image_url || FALLBACK_POSTER;
+  return a?.coverImage?.extraLarge || a?.coverImage?.large || a?.coverImage?.medium || a?.bannerImage || FALLBACK_POSTER;
 }
 function imgFallback(el){
   el.onerror = null;
   el.src = FALLBACK_POSTER;
 }
-async function fetchJsonWithRetry(url){
-  for(let attempt=0;attempt<MAX_API_ATTEMPTS;attempt++){
-    try{
-      const r = await fetch(url);
-      if(r.ok) return await r.json();
-      // Retry only rate limits and transient server-side failures.
-      if(r.status===429 || r.status>=500){
-        if(attempt<API_RETRY_DELAYS.length) await sleep(API_RETRY_DELAYS[attempt]);
-        continue;
-      }
-      return null;
-    }catch{
-      if(attempt<API_RETRY_DELAYS.length) await sleep(API_RETRY_DELAYS[attempt]);
-    }
-  }
+function formatAniDate(date){
+  if(!date?.year) return '?';
+  const month = date.month || 1;
+  const day = date.day || 1;
+  const dt = new Date(Date.UTC(date.year, month - 1, day));
+  return dt.toLocaleDateString('en-US',{year:'numeric',month:'short',day:'numeric'});
+}
+function cleanDescription(html){
+  if(!html) return '';
+  const div = document.createElement('div');
+  div.innerHTML = html;
+  return div.textContent || div.innerText || '';
+}
+function trailerUrl(trailer){
+  if(!trailer?.site || !trailer?.id) return null;
+  const site = trailer.site.toLowerCase();
+  if(site === 'youtube') return `https://www.youtube.com/watch?v=${trailer.id}`;
+  if(site === 'dailymotion') return `https://www.dailymotion.com/video/${trailer.id}`;
   return null;
 }
-async function apiGet(url){
-  const d = await fetchJsonWithRetry(url);
-  return d?.data || [];
+function renderLoader(){
+  return '<div style="text-align:center;padding:16px"><div class="ldr"></div></div>';
 }
-async function apiGetOne(malId){
-  if(Object.prototype.hasOwnProperty.call(CACHE, malId)) return CACHE[malId];
-  const d = await fetchJsonWithRetry(`https://api.jikan.moe/v4/anime/${malId}`);
-  if(d?.data) CACHE[malId] = d.data;
-  return d?.data || null;
+function renderEmpty(message){
+  return `<div class="no-res">${escapeHtml(message)}</div>`;
 }
 
 // Nav
@@ -1283,11 +1300,11 @@ async function loadHero(){
         <div class="hero-title" id="htitle_${i}">${a.title}</div>
         <div class="hero-meta" id="hmeta_${i}"></div>
         <div class="hero-btns">
-          <a href="${DEFAULT_LINK}" target="_blank" class="hbtn-watch">
+          <a href="${a.tgLink || DEFAULT_LINK}" target="_blank" class="hbtn-watch">
             <svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16"><polygon points="5,3 19,12 5,21"/></svg>
             WATCH NOW
           </a>
-          <button class="hbtn-info" onclick="openDetail(${a.malId})">
+          <button class="hbtn-info" onclick="openDetailByMalId(${a.malId})">
             <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" width="14" height="14"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
             Info
           </button>
@@ -1321,18 +1338,21 @@ async function loadHero(){
   // Load API data for each slide (500ms gap)
   for(let i=0; i<HERO_LIST.length; i++){
     const a = HERO_LIST[i];
-    const d = await apiGetOne(a.malId);
+    const result = await AniListApi.fetchMediaByMalId(a.malId);
+    const d = result?.data;
     if(d){
       const imgEl = document.getElementById(`himg_${i}`);
       const titleEl = document.getElementById(`htitle_${i}`);
       const metaEl = document.getElementById(`hmeta_${i}`);
+      const score = scoreFromMedia(d);
+      const year = yearFromMedia(d);
       // Use API title (real name)
-      if(titleEl) titleEl.textContent = d.title || a.title;
-      if(imgEl && d.images?.jpg?.large_image_url) imgEl.src = d.images.jpg.large_image_url;
+      if(titleEl) titleEl.textContent = titleFromMedia(d) || a.title;
+      if(imgEl) imgEl.src = posterFromAnime(d);
       if(metaEl) metaEl.innerHTML =
-        (d.score ? `<span class="hero-score">⭐ ${d.score}</span>` : '') +
-        (d.type ? `<span class="hero-type">${d.type}</span>` : '') +
-        (d.year ? `<span class="hero-type">${d.year}</span>` : '');
+        (score ? `<span class="hero-score">⭐ ${score.toFixed(1)}</span>` : '') +
+        (d.format ? `<span class="hero-type">${escapeHtml(d.format)}</span>` : '') +
+        (year ? `<span class="hero-type">${escapeHtml(year)}</span>` : '');
     }
     if(i < HERO_LIST.length-1) await new Promise(r=>setTimeout(r,500));
   }
@@ -1357,7 +1377,7 @@ function renderOur(){
   const row = document.getElementById('ourRow');
   document.getElementById('ourCount').textContent = ANIME_DB.length + ' anime';
   row.innerHTML = ANIME_DB.map(a=>`
-    <div class="our-card" onclick="openDetail(${a.malId})">
+    <div class="our-card" onclick="openDetailByMalId(${a.malId})">
       <div class="our-img">
         <img id="oimg_${a.id}"
           src="${malImg(a.malId)}"
@@ -1378,12 +1398,14 @@ function renderOur(){
 async function loadOurScores(){
   for(let i=0; i<ANIME_DB.length; i++){
     const a = ANIME_DB[i];
-    const d = await apiGetOne(a.malId);
+    const result = await AniListApi.fetchMediaByMalId(a.malId);
+    const d = result?.data;
     if(d){
       const scr = document.getElementById(`oscr_${a.id}`);
       const nm = document.getElementById(`onamefull_${a.id}`);
-      if(scr && d.score) scr.textContent = '⭐' + d.score;
-      if(nm && d.title) nm.textContent = d.title;
+      const score = scoreFromMedia(d);
+      if(scr && score) scr.textContent = '⭐' + score.toFixed(1);
+      if(nm) nm.textContent = titleFromMedia(d);
       // Update image with API poster
       const imgEl = document.getElementById(`oimg_${a.id}`);
       if(imgEl) imgEl.src = posterFromAnime(d);
@@ -1397,30 +1419,34 @@ async function loadOurScores(){
 // ═══════════════════════════════════
 function mkAcard(a){
   const img = posterFromAnime(a);
-  const score = a.score ? `<div class="acard-score">⭐${a.score}</div>` : '';
-  return `<div class="acard" onclick="openDetail(${a.mal_id})">
+  const title = titleFromMedia(a);
+  const score = scoreFromMedia(a);
+  const scoreTag = score ? `<div class="acard-score">⭐${score.toFixed(1)}</div>` : '';
+  return `<div class="acard" onclick="openDetail(${a.id})">
     <div class="acard-img">
-      <img src="${img}" alt="${a.title||''}" loading="lazy" onerror="imgFallback(this)"/>
-      ${TG[a.mal_id] ? '<div class="acard-badge b-multi">MULTI</div>' : '<div class="acard-badge b-sub">SUB</div>'}
-      ${score}
+      <img src="${img}" alt="${escapeHtml(title)}" loading="lazy" onerror="imgFallback(this)"/>
+      ${a.idMal && TG[a.idMal] ? '<div class="acard-badge b-multi">MULTI</div>' : '<div class="acard-badge b-sub">SUB</div>'}
+      ${scoreTag}
       <div class="card-play-btn" aria-hidden="true"><svg viewBox="0 0 24 24"><polygon points="5,3 19,12 5,21"/></svg></div>
     </div>
-    <div class="acard-name">${a.title||''}</div>
-    <div class="acard-year">${a.year||''}</div>
+    <div class="acard-name">${escapeHtml(title)}</div>
+    <div class="acard-year">${escapeHtml(yearFromMedia(a))}</div>
   </div>`;
 }
 function mkGcard(a){
   const img = posterFromAnime(a);
-  const score = a.score ? `<div class="gcard-score">⭐${a.score}</div>` : '';
-  return `<div class="gcard" onclick="openDetail(${a.mal_id})">
+  const title = titleFromMedia(a);
+  const score = scoreFromMedia(a);
+  const scoreTag = score ? `<div class="gcard-score">⭐${score.toFixed(1)}</div>` : '';
+  return `<div class="gcard" onclick="openDetail(${a.id})">
     <div class="gcard-img">
-      <img src="${img}" alt="${a.title||''}" loading="lazy" onerror="imgFallback(this)"/>
-      ${TG[a.mal_id] ? '<div class="gcard-badge b-multi">MULTI</div>' : '<div class="gcard-badge b-sub">SUB</div>'}
-      ${score}
+      <img src="${img}" alt="${escapeHtml(title)}" loading="lazy" onerror="imgFallback(this)"/>
+      ${a.idMal && TG[a.idMal] ? '<div class="gcard-badge b-multi">MULTI</div>' : '<div class="gcard-badge b-sub">SUB</div>'}
+      ${scoreTag}
       <div class="card-play-btn" aria-hidden="true"><svg viewBox="0 0 24 24"><polygon points="5,3 19,12 5,21"/></svg></div>
     </div>
-    <div class="gcard-name">${a.title||''}</div>
-    <div class="gcard-year">${a.year||''}</div>
+    <div class="gcard-name">${escapeHtml(title)}</div>
+    <div class="gcard-year">${escapeHtml(yearFromMedia(a))}</div>
   </div>`;
 }
 
@@ -1428,18 +1454,39 @@ function mkGcard(a){
 // LOAD SECTIONS (staggered)
 // ═══════════════════════════════════
 async function loadTrending(){
-  const d = await apiGet('https://api.jikan.moe/v4/top/anime?filter=airing&limit=20');
-  document.getElementById('trendRow').innerHTML = d.length ? d.map(mkAcard).join('') : '<div class="no-res">Reload 🔄</div>';
+  const row = document.getElementById('trendRow');
+  row.innerHTML = renderLoader();
+  const result = await AniListApi.fetchPage({ page: 1, perPage: 20, sort: ['TRENDING_DESC'], status: 'RELEASING' });
+  const media = result?.data?.Page?.media || [];
+  if(result?.error){
+    row.innerHTML = renderEmpty('Could not load.');
+    return;
+  }
+  row.innerHTML = media.length ? media.map(mkAcard).join('') : renderEmpty('No results yet.');
 }
 async function loadTop(){
   await new Promise(r=>setTimeout(r,400));
-  const d = await apiGet('https://api.jikan.moe/v4/top/anime?limit=20');
-  document.getElementById('topRow').innerHTML = d.length ? d.map(mkAcard).join('') : '<div class="no-res">Could not load.</div>';
+  const row = document.getElementById('topRow');
+  row.innerHTML = renderLoader();
+  const result = await AniListApi.fetchPage({ page: 1, perPage: 20, sort: ['SCORE_DESC'] });
+  const media = result?.data?.Page?.media || [];
+  if(result?.error){
+    row.innerHTML = renderEmpty('Could not load.');
+    return;
+  }
+  row.innerHTML = media.length ? media.map(mkAcard).join('') : renderEmpty('No results.');
 }
 async function loadMovRow(){
   await new Promise(r=>setTimeout(r,800));
-  const d = await apiGet('https://api.jikan.moe/v4/top/anime?type=movie&limit=16');
-  document.getElementById('movRow').innerHTML = d.length ? d.map(mkAcard).join('') : '<div class="no-res">Could not load.</div>';
+  const row = document.getElementById('movRow');
+  row.innerHTML = renderLoader();
+  const result = await AniListApi.fetchPage({ page: 1, perPage: 16, sort: ['POPULARITY_DESC'], format: 'MOVIE' });
+  const media = result?.data?.Page?.media || [];
+  if(result?.error){
+    row.innerHTML = renderEmpty('Could not load.');
+    return;
+  }
+  row.innerHTML = media.length ? media.map(mkAcard).join('') : renderEmpty('No results.');
 }
 
 // ═══════════════════════════════════
@@ -1450,10 +1497,23 @@ async function loadMoviesPage(reset){
   if(reset){ movPage=1; movLoading=false; movDone=false; document.getElementById('movGrid').innerHTML=''; }
   if(movLoading || movDone) return;
   movLoading = true;
-  const d = await apiGet(`https://api.jikan.moe/v4/top/anime?type=movie&limit=24&page=${movPage}`);
-  if(d.length < 24) movDone = true;
   const grid = document.getElementById('movGrid');
-  grid.insertAdjacentHTML('beforeend', d.map(mkGcard).join(''));
+  const result = await AniListApi.fetchPage({ page: movPage, perPage: 24, sort: ['POPULARITY_DESC'], format: 'MOVIE' });
+  const media = result?.data?.Page?.media || [];
+  if(result?.error && movPage === 1){
+    grid.innerHTML = renderEmpty('Could not load movies.');
+    movDone = true;
+    movLoading = false;
+    return;
+  }
+  if(!media.length){
+    if(movPage === 1) grid.innerHTML = renderEmpty('No movies found.');
+    movDone = true;
+  } else {
+    grid.insertAdjacentHTML('beforeend', media.map(mkGcard).join(''));
+  }
+  const hasNext = result?.data?.Page?.pageInfo?.hasNextPage;
+  if(hasNext === false) movDone = true;
   movPage++;
   movLoading = false;
 }
@@ -1466,10 +1526,23 @@ async function loadSeriesPage(reset){
   if(reset){ serPage=1; serLoading=false; serDone=false; document.getElementById('serGrid').innerHTML=''; }
   if(serLoading || serDone) return;
   serLoading = true;
-  const d = await apiGet(`https://api.jikan.moe/v4/top/anime?type=tv&limit=24&page=${serPage}`);
-  if(d.length < 24) serDone = true;
   const grid = document.getElementById('serGrid');
-  grid.insertAdjacentHTML('beforeend', d.map(mkGcard).join(''));
+  const result = await AniListApi.fetchPage({ page: serPage, perPage: 24, sort: ['POPULARITY_DESC'], format: 'TV' });
+  const media = result?.data?.Page?.media || [];
+  if(result?.error && serPage === 1){
+    grid.innerHTML = renderEmpty('Could not load series.');
+    serDone = true;
+    serLoading = false;
+    return;
+  }
+  if(!media.length){
+    if(serPage === 1) grid.innerHTML = renderEmpty('No series found.');
+    serDone = true;
+  } else {
+    grid.insertAdjacentHTML('beforeend', media.map(mkGcard).join(''));
+  }
+  const hasNext = result?.data?.Page?.pageInfo?.hasNextPage;
+  if(hasNext === false) serDone = true;
   serPage++;
   serLoading = false;
 }
@@ -1499,11 +1572,16 @@ let srchTimer = null;
 document.getElementById('srchIn').addEventListener('input', function(){
   clearTimeout(srchTimer);
   const q = this.value.trim();
-  if(!q){ document.getElementById('srchResult').innerHTML='<div class="no-res">Search for your favourite anime 🔍</div>'; return; }
+  if(!q){ document.getElementById('srchResult').innerHTML=renderEmpty('Search for your favourite anime 🔍'); return; }
   document.getElementById('srchResult').innerHTML='<div style="text-align:center;padding:30px"><div class="ldr"></div></div>';
   srchTimer = setTimeout(async()=>{
-    const d = await apiGet(`https://api.jikan.moe/v4/anime?q=${encodeURIComponent(q)}&limit=18`);
-    document.getElementById('srchResult').innerHTML = d.length ? `<div class="grid-3">${d.map(mkGcard).join('')}</div>` : '<div class="no-res">No results found 😢</div>';
+    const result = await AniListApi.fetchPage({ page: 1, perPage: 18, search: q, sort: ['POPULARITY_DESC'] });
+    const media = result?.data?.Page?.media || [];
+    if(result?.error){
+      document.getElementById('srchResult').innerHTML = renderEmpty('Search unavailable. Please try again.');
+      return;
+    }
+    document.getElementById('srchResult').innerHTML = media.length ? `<div class="grid-3">${media.map(mkGcard).join('')}</div>` : renderEmpty('No results found 😢');
   }, 600);
 });
 
@@ -1517,6 +1595,15 @@ function toggleSyn(){
   document.getElementById('detSynFade').classList.toggle('open', synOpen);
   document.getElementById('moreBtn').textContent = synOpen ? 'less ▲' : 'more ▼';
 }
+function statusMeta(status){
+  if(status === 'RELEASING') return { label: 'Ongoing', cls: 'ch-air' };
+  if(status === 'FINISHED') return { label: 'Finished', cls: 'ch-fin' };
+  if(status === 'NOT_YET_RELEASED') return { label: 'Upcoming', cls: 'ch-type' };
+  if(status === 'HIATUS') return { label: 'Hiatus', cls: 'ch-air' };
+  if(status === 'CANCELLED') return { label: 'Cancelled', cls: 'ch-fin' };
+  if(!status) return { label: '', cls: 'ch-type' };
+  return { label: status.replace(/_/g,' '), cls: 'ch-type' };
+}
 function renderStars(score){
   if(!score) return '';
   const stars = Math.round((parseFloat(score)/10)*5*2)/2;
@@ -1525,7 +1612,7 @@ function renderStars(score){
   return h + `</div><span class="det-score-num">${score}/10</span>`;
 }
 
-async function openDetail(malId){
+async function openDetail(id, malId){
   const modal = document.getElementById('detModal');
   modal.classList.add('active');
   modal.scrollTop = 0;
@@ -1539,65 +1626,116 @@ async function openDetail(malId){
   document.getElementById('detBanImg').src = '';
   document.getElementById('detPoster').src = '';
 
-  const watchUrl = DEFAULT_LINK;
   const watchBtn = document.getElementById('detWatchBtn');
-  watchBtn.href = watchUrl;
+  watchBtn.style.display = 'none';
   watchBtn.target = '_blank';
   watchBtn.onclick = null;
 
-  const a = await apiGetOne(malId);
-  if(!a){ document.getElementById('detTitle').textContent='Error loading.'; return; }
+  const result = id ? await AniListApi.fetchMediaById(id) : await AniListApi.fetchMediaByMalId(malId);
+  const a = result?.data;
+  if(!a){
+    document.getElementById('detTitle').textContent='Error loading.';
+    document.getElementById('detChannels').innerHTML = renderEmpty('Unable to load details.');
+    return;
+  }
 
-  const img = posterFromAnime(a);
-  document.getElementById('detBanImg').src = img;
-  document.getElementById('detPoster').src = img;
-  document.getElementById('detTitle').textContent = a.title || 'Unknown';
-  document.getElementById('detBackTitle').textContent = a.title || '';
+  const title = titleFromMedia(a);
+  const banner = a.bannerImage || posterFromAnime(a);
+  const poster = posterFromAnime(a);
+  document.getElementById('detBanImg').src = banner;
+  document.getElementById('detPoster').src = poster;
+  document.getElementById('detTitle').textContent = title;
+  document.getElementById('detBackTitle').textContent = title;
 
-  const sCls = a.status==='Currently Airing' ? 'ch-air' : 'ch-fin';
-  const sLbl = a.status==='Currently Airing' ? 'Ongoing' : 'Finished';
+  const status = statusMeta(a.status);
+  const year = yearFromMedia(a);
   document.getElementById('detMeta').innerHTML =
-    (a.status ? `<span class="det-chip ${sCls}">${sLbl}</span>` : '') +
-    (a.type ? `<span class="det-chip ch-type">${a.type}</span>` : '') +
-    (a.year ? `<span class="det-chip ch-type">${a.year}</span>` : '');
+    (status.label ? `<span class="det-chip ${status.cls}">${escapeHtml(status.label)}</span>` : '') +
+    (a.format ? `<span class="det-chip ch-type">${escapeHtml(a.format)}</span>` : '') +
+    (year ? `<span class="det-chip ch-type">${escapeHtml(year)}</span>` : '');
 
-  document.getElementById('detScore').innerHTML = renderStars(a.score) + (a.scored_by ? `<span class="det-votes">(${a.scored_by.toLocaleString()})</span>` : '');
-  document.getElementById('detSyn').textContent = a.synopsis || 'No synopsis available.';
-  document.getElementById('detGenres').innerHTML = (a.genres||[]).map(g=>`<span class="gtag">${g.name}</span>`).join('');
+  const score = scoreFromMedia(a);
+  document.getElementById('detScore').innerHTML = score ? renderStars(score) + (a.popularity ? `<span class="det-votes">(${a.popularity.toLocaleString()})</span>` : '') : '';
+  const synopsis = cleanDescription(a.description);
+  document.getElementById('detSyn').textContent = synopsis || 'No synopsis available.';
+  document.getElementById('detGenres').innerHTML = (a.genres||[]).map(g=>`<span class="gtag">${escapeHtml(g)}</span>`).join('');
 
-  const aired = a.aired?.from ? new Date(a.aired.from).toLocaleDateString('en-US',{year:'numeric',month:'short',day:'numeric'}) : '?';
-  const ended = a.aired?.to ? new Date(a.aired.to).toLocaleDateString('en-US',{year:'numeric',month:'short',day:'numeric'}) : 'Ongoing';
-  const studio = (a.studios||[]).map(s=>s.name).join(', ') || '?';
+  const aired = formatAniDate(a.startDate);
+  const ended = a.status === 'RELEASING' ? 'Ongoing' : formatAniDate(a.endDate);
+  const studio = (a.studios?.nodes||[]).map(s=>s.name).join(', ') || '?';
+  const duration = a.duration ? `${a.duration} min/ep` : '?';
   document.getElementById('detInfoGrid').innerHTML = [
-    ['Status',a.status||'?'], ['Studio',studio],
+    ['Status',status.label || '?'], ['Studio',studio],
     ['Released',aired], ['Ended',ended],
-    ['Duration',a.duration||'?'],
-    ['Type',a.type||'?'], ['Score',a.score?`${a.score}/10`:'?'],
-    ['Ranked',a.rank?`#${a.rank}`:'?'], ['Members',a.members?a.members.toLocaleString():'?'],
-  ].map(([k,v])=>`<div class="info-item"><div class="info-dot"></div><span class="info-k">${k}:</span><span class="info-v">${v}</span></div>`).join('');
+    ['Duration',duration],
+    ['Type',a.format||'?'], ['Score',score?`${score}/10`:'?'],
+    ['Ranked','?'], ['Members',a.popularity?a.popularity.toLocaleString():'?'],
+  ].map(([k,v])=>`<div class="info-item"><div class="info-dot"></div><span class="info-k">${escapeHtml(k)}:</span><span class="info-v">${escapeHtml(v)}</span></div>`).join('');
 
   document.getElementById('detLangs').innerHTML = ALL_LANGS.map(l=>`
     <div class="lang-it yes"><span class="lang-flag">${l.flag}</span><span class="lang-name">${l.name}</span><span class="lang-chk">✅</span></div>`).join('');
   document.getElementById('detQuality').innerHTML = ALL_Q.map(q=>`
     <div class="lang-it yes"><span class="lang-flag">${q.icon}</span><span class="lang-name" style="color:#18ffff">${q.name}</span><span class="lang-chk">✅</span></div>`).join('');
 
-  const rec = await apiGet(`https://api.jikan.moe/v4/anime/${malId}/recommendations`);
-  document.getElementById('detRec').innerHTML = rec.slice(0,6).map(r=>{
-    const ra=r.entry, ri=ra.images?.jpg?.large_image_url||ra.images?.jpg?.image_url||'';
-    return `<div class="rec-card" onclick="openDetail(${ra.mal_id})">
-      <div class="rec-img"><img src="${ri||FALLBACK_POSTER}" alt="${ra.title}" loading="lazy" onerror="imgFallback(this)"/></div>
-      <div class="rec-name">${ra.title}</div></div>`;
-  }).join('') || '<p style="color:#555;font-size:.8rem">No recommendations.</p>';
+  const recNodes = (a.recommendations?.nodes || []).map(n=>n.mediaRecommendation).filter(Boolean).slice(0,6);
+  document.getElementById('detRec').innerHTML = recNodes.length ? recNodes.map(r=>{
+    const recTitle = titleFromMedia(r);
+    return `<div class="rec-card" onclick="openDetail(${r.id})">
+      <div class="rec-img"><img src="${posterFromAnime(r)}" alt="${escapeHtml(recTitle)}" loading="lazy" onerror="imgFallback(this)"/></div>
+      <div class="rec-name">${escapeHtml(recTitle)}</div></div>`;
+  }).join('') : '<p style="color:#555;font-size:.8rem">No recommendations.</p>';
 
-  document.getElementById('detChannels').innerHTML = `
-    <a href="${watchUrl}" target="_blank" class="ch-row-btn main">
-      <div class="ch-row-icon">🎌</div>
-      <div><div class="ch-row-name">Watch on Telegram</div><div class="ch-row-handle">Free • HD • No Ads</div></div>
-    </a>
-    <a href="https://t.me/infinite_animes" target="_blank" class="ch-row-btn">
-      <div class="ch-row-icon">📺</div>
-      <div><div class="ch-row-name">iNFiNiTE ANiMES</div><div class="ch-row-handle">@infinite_animes</div></div>
-    </a>`;
+  const tgUrl = a.idMal && TG[a.idMal] ? TG[a.idMal] : null;
+  const trailer = trailerUrl(a.trailer);
+  const siteUrl = a.siteUrl || null;
+  const channels = [];
+
+  if(tgUrl){
+    channels.push(`
+      <a href="${tgUrl}" target="_blank" class="ch-row-btn main">
+        <div class="ch-row-icon">🎌</div>
+        <div><div class="ch-row-name">Watch on Telegram</div><div class="ch-row-handle">Free • HD • No Ads</div></div>
+      </a>
+      <a href="https://t.me/infinite_animes" target="_blank" class="ch-row-btn">
+        <div class="ch-row-icon">📺</div>
+        <div><div class="ch-row-name">iNFiNiTE ANiMES</div><div class="ch-row-handle">@infinite_animes</div></div>
+      </a>`);
+  } else {
+    if(trailer){
+      channels.push(`
+        <a href="${trailer}" target="_blank" class="ch-row-btn main">
+          <div class="ch-row-icon">🎬</div>
+          <div><div class="ch-row-name">Watch Trailer</div><div class="ch-row-handle">${escapeHtml(a.trailer?.site || 'Trailer')}</div></div>
+        </a>`);
+    }
+    if(siteUrl){
+      channels.push(`
+        <a href="${siteUrl}" target="_blank" class="ch-row-btn">
+          <div class="ch-row-icon">⭐</div>
+          <div><div class="ch-row-name">View on AniList</div><div class="ch-row-handle">Official page</div></div>
+        </a>`);
+    }
+  }
+
+  document.getElementById('detChannels').innerHTML = channels.length ? channels.join('') : renderEmpty('No streaming links available.');
+
+  if(tgUrl){
+    watchBtn.href = tgUrl;
+    watchBtn.innerHTML = `<svg viewBox="0 0 24 24"><path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.562 8.248-1.97 9.289c-.145.658-.537.818-1.084.508l-3-2.21-1.447 1.394c-.16.16-.295.295-.605.295l.213-3.053 5.56-5.023c.242-.213-.054-.333-.373-.12L7.19 14.447l-2.95-.924c-.64-.204-.657-.64.136-.95l11.57-4.461c.537-.194 1.006.131.616.136z"/></svg>▶ WATCH ON TELEGRAM`;
+    watchBtn.style.display = 'flex';
+  } else if(trailer){
+    watchBtn.href = trailer;
+    watchBtn.innerHTML = `<svg viewBox="0 0 24 24"><path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.562 8.248-1.97 9.289c-.145.658-.537.818-1.084.508l-3-2.21-1.447 1.394c-.16.16-.295.295-.605.295l.213-3.053 5.56-5.023c.242-.213-.054-.333-.373-.12L7.19 14.447l-2.95-.924c-.64-.204-.657-.64.136-.95l11.57-4.461c.537-.194 1.006.131.616.136z"/></svg>▶ WATCH TRAILER`;
+    watchBtn.style.display = 'flex';
+  } else if(siteUrl){
+    watchBtn.href = siteUrl;
+    watchBtn.innerHTML = `<svg viewBox="0 0 24 24"><path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.562 8.248-1.97 9.289c-.145.658-.537.818-1.084.508l-3-2.21-1.447 1.394c-.16.16-.295.295-.605.295l.213-3.053 5.56-5.023c.242-.213-.054-.333-.373-.12L7.19 14.447l-2.95-.924c-.64-.204-.657-.64.136-.95l11.57-4.461c.537-.194 1.006.131.616.136z"/></svg>▶ VIEW ON ANILIST`;
+    watchBtn.style.display = 'flex';
+  }
+}
+function openDetailByMalId(malId){
+  if(!malId) return;
+  openDetail(null, malId);
 }
 function closeDetail(){ document.getElementById('detModal').classList.remove('active'); }
 
@@ -1635,12 +1773,13 @@ async function openPlayer(animeId){
   document.body.style.overflow = 'hidden';
 
   // Set initial state
+  const tgLink = a.tgLink || DEFAULT_LINK;
   document.getElementById('plTitle').textContent = a.title;
   document.getElementById('plAnimeName').textContent = a.title;
   document.getElementById('plEpBadge').textContent = 'WATCH';
   document.getElementById('plEpInfo').textContent = 'Tap ▶ to watch on Telegram';
   document.getElementById('plOverlayTitle').textContent = a.title;
-  document.getElementById('plTgBtn').href = DEFAULT_LINK;
+  document.getElementById('plTgBtn').href = tgLink;
 
   // Reset overlay
   document.getElementById('plOverlay').classList.remove('hidden');
@@ -1649,26 +1788,29 @@ async function openPlayer(animeId){
 
   // Show/hide join box
   document.getElementById('plJoinBox').style.display = 'none';
-  document.getElementById('plJoinBtn').href = DEFAULT_LINK;
+  document.getElementById('plJoinBtn').href = tgLink;
 
   // Server buttons
   document.querySelectorAll('.pl-srv-btn').forEach(b=>b.classList.remove('active'));
   document.querySelector('.pl-srv-btn').classList.add('active');
 
   // Load API data
-  const d = await apiGetOne(a.malId);
+  const result = await AniListApi.fetchMediaByMalId(a.malId);
+  const d = result?.data;
   if(d){
     const img = posterFromAnime(d);
+    const title = titleFromMedia(d);
+    const score = scoreFromMedia(d);
     document.getElementById('plPoster').src = img;
-    document.getElementById('plTitle').textContent = d.title || a.title;
-    document.getElementById('plAnimeName').textContent = d.title || a.title;
-    document.getElementById('plOverlayTitle').textContent = d.title || a.title;
+    document.getElementById('plTitle').textContent = title || a.title;
+    document.getElementById('plAnimeName').textContent = title || a.title;
+    document.getElementById('plOverlayTitle').textContent = title || a.title;
 
     // Meta chips
     document.getElementById('plMetaChips').innerHTML = `
       <span class="pl-chip hl">${a.lang==='hindi'?'🇮🇳 Hindi':'🌐 Multi Language'}</span>
-      ${d.type?`<span class="pl-chip">${d.type}</span>`:''}
-      <span class="pl-chip">⭐ ${d.score||'?'}</span>`;
+      ${d.format?`<span class="pl-chip">${escapeHtml(d.format)}</span>`:''}
+      <span class="pl-chip">⭐ ${score?score.toFixed(1):'?'}</span>`;
   }
 
   document.getElementById('plEpsGrid').innerHTML = '';
@@ -1703,7 +1845,8 @@ function setServer(srv,buttonEl){
 
 function startPlay(){
   if(!curAnime) return;
-  const ch = getTgChannel(DEFAULT_LINK);
+  const tgLink = curAnime.tgLink || DEFAULT_LINK;
+  const ch = getTgChannel(tgLink);
 
   if(ch && ch.user){
     // Public channel — try embed
@@ -1720,7 +1863,7 @@ function startPlay(){
     isPlaying = true;
   } else {
     // Private channel — open in Telegram directly
-    window.open(DEFAULT_LINK, '_blank');
+    window.open(tgLink, '_blank');
   }
 }
 
@@ -1748,7 +1891,7 @@ function closePlayer(){
 }
 function openRelatedDetail(malId){
   closePlayer();
-  openDetail(malId);
+  openDetailByMalId(malId);
 }
 (function(){
   const intro = document.getElementById('intro');
@@ -1878,18 +2021,39 @@ function initPremiumMotion(){
 // ── NEW SECTIONS ──
 async function loadNewReleases(){
   await new Promise(r=>setTimeout(r,500));
-  const d = await apiGet('https://api.jikan.moe/v4/seasons/now?limit=20');
-  document.getElementById('newRow').innerHTML = d.length ? d.map(mkAcard).join('') : '<div class="no-res">Reload 🔄</div>';
+  const row = document.getElementById('newRow');
+  row.innerHTML = renderLoader();
+  const result = await AniListApi.fetchPage({ page: 1, perPage: 20, sort: ['START_DATE_DESC'], status: 'RELEASING' });
+  const media = result?.data?.Page?.media || [];
+  if(result?.error){
+    row.innerHTML = renderEmpty('Could not load.');
+    return;
+  }
+  row.innerHTML = media.length ? media.map(mkAcard).join('') : renderEmpty('No results.');
 }
 async function loadAction(){
   await new Promise(r=>setTimeout(r,1200));
-  const d = await apiGet('https://api.jikan.moe/v4/anime?genres=1&order_by=score&sort=desc&limit=16');
-  document.getElementById('actionRow').innerHTML = d.length ? d.map(mkAcard).join('') : '<div class="no-res">Could not load.</div>';
+  const row = document.getElementById('actionRow');
+  row.innerHTML = renderLoader();
+  const result = await AniListApi.fetchPage({ page: 1, perPage: 16, sort: ['SCORE_DESC'], genres: ['Action'] });
+  const media = result?.data?.Page?.media || [];
+  if(result?.error){
+    row.innerHTML = renderEmpty('Could not load.');
+    return;
+  }
+  row.innerHTML = media.length ? media.map(mkAcard).join('') : renderEmpty('No results.');
 }
 async function loadRomance(){
   await new Promise(r=>setTimeout(r,1800));
-  const d = await apiGet('https://api.jikan.moe/v4/anime?genres=22&order_by=score&sort=desc&limit=16');
-  document.getElementById('romanceRow').innerHTML = d.length ? d.map(mkAcard).join('') : '<div class="no-res">Could not load.</div>';
+  const row = document.getElementById('romanceRow');
+  row.innerHTML = renderLoader();
+  const result = await AniListApi.fetchPage({ page: 1, perPage: 16, sort: ['SCORE_DESC'], genres: ['Romance'] });
+  const media = result?.data?.Page?.media || [];
+  if(result?.error){
+    row.innerHTML = renderEmpty('Could not load.');
+    return;
+  }
+  row.innerHTML = media.length ? media.map(mkAcard).join('') : renderEmpty('No results.');
 }
 
 // ── INIT ──
