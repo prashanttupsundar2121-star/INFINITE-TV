@@ -1184,6 +1184,20 @@ function toSafeNumber(value, fallback = 0){
   const num = Number(value);
   return Number.isFinite(num) ? num : fallback;
 }
+function hasScore(score){
+  return Number.isFinite(score);
+}
+function sanitizeUrl(url){
+  if(!url) return null;
+  try{
+    const parsed = new URL(url, window.location.href);
+    if(parsed.protocol === 'http:' || parsed.protocol === 'https:') return parsed.href;
+  }catch{}
+  return null;
+}
+function safeHref(url){
+  return sanitizeUrl(url) || '#';
+}
 function titleFromMedia(a){
   return a?.title?.userPreferred || a?.title?.english || a?.title?.romaji || a?.title?.native || 'Unknown';
 }
@@ -1299,7 +1313,7 @@ async function loadHero(){
         <div class="hero-title" id="htitle_${i}">${a.title}</div>
         <div class="hero-meta" id="hmeta_${i}"></div>
         <div class="hero-btns">
-          <a href="${a.tgLink || DEFAULT_LINK}" target="_blank" class="hbtn-watch">
+          <a href="${safeHref(a.tgLink || DEFAULT_LINK)}" target="_blank" class="hbtn-watch">
             <svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16"><polygon points="5,3 19,12 5,21"/></svg>
             WATCH NOW
           </a>
@@ -1349,7 +1363,7 @@ async function loadHero(){
       if(titleEl) titleEl.textContent = titleFromMedia(d) || a.title;
       if(imgEl) imgEl.src = posterFromAnime(d);
       if(metaEl) metaEl.innerHTML =
-        (score ? `<span class="hero-score">⭐ ${score.toFixed(1)}</span>` : '') +
+        (hasScore(score) ? `<span class="hero-score">⭐ ${score.toFixed(1)}</span>` : '') +
         (d.format ? `<span class="hero-type">${escapeHtml(d.format)}</span>` : '') +
         (year ? `<span class="hero-type">${escapeHtml(year)}</span>` : '');
     }
@@ -1403,7 +1417,7 @@ async function loadOurScores(){
       const scr = document.getElementById(`oscr_${a.id}`);
       const nm = document.getElementById(`onamefull_${a.id}`);
       const score = scoreFromMedia(d);
-      if(scr && score) scr.textContent = '⭐' + score.toFixed(1);
+      if(scr && hasScore(score)) scr.textContent = '⭐' + score.toFixed(1);
       if(nm) nm.textContent = titleFromMedia(d);
       // Update image with API poster
       const imgEl = document.getElementById(`oimg_${a.id}`);
@@ -1420,7 +1434,7 @@ function mkAcard(a){
   const img = posterFromAnime(a);
   const title = titleFromMedia(a);
   const score = scoreFromMedia(a);
-  const scoreTag = score ? `<div class="acard-score">⭐${score.toFixed(1)}</div>` : '';
+  const scoreTag = hasScore(score) ? `<div class="acard-score">⭐${score.toFixed(1)}</div>` : '';
   return `<div class="acard" onclick="openDetailById(${toSafeNumber(a.id)})">
     <div class="acard-img">
       <img src="${img}" alt="${escapeHtml(title)}" loading="lazy" onerror="imgFallback(this)"/>
@@ -1436,7 +1450,7 @@ function mkGcard(a){
   const img = posterFromAnime(a);
   const title = titleFromMedia(a);
   const score = scoreFromMedia(a);
-  const scoreTag = score ? `<div class="gcard-score">⭐${score.toFixed(1)}</div>` : '';
+  const scoreTag = hasScore(score) ? `<div class="gcard-score">⭐${score.toFixed(1)}</div>` : '';
   return `<div class="gcard" onclick="openDetailById(${toSafeNumber(a.id)})">
     <div class="gcard-img">
       <img src="${img}" alt="${escapeHtml(title)}" loading="lazy" onerror="imgFallback(this)"/>
@@ -1606,7 +1620,7 @@ function statusMeta(status){
 const MAX_SCORE = 10;
 const STAR_SCALE = 5;
 function renderStars(score){
-  if(!score) return '';
+  if(!hasScore(score)) return '';
   const stars = Math.round((parseFloat(score)/MAX_SCORE)*STAR_SCALE*2)/2;
   let h = '<div class="det-stars">';
   for(let i=1;i<=5;i++) h += `<span class="det-star${i<=stars?' on':''}">★</span>`;
@@ -1679,7 +1693,7 @@ function renderDetail(a, error){
     (year ? `<span class="det-chip ch-type">${escapeHtml(year)}</span>` : '');
 
   const score = scoreFromMedia(a);
-  document.getElementById('detScore').innerHTML = score ? renderStars(score) + (a.popularity ? `<span class="det-votes">(${a.popularity.toLocaleString()} users)</span>` : '') : '';
+  document.getElementById('detScore').innerHTML = hasScore(score) ? renderStars(score) + (a.popularity ? `<span class="det-votes">(${a.popularity.toLocaleString()} users)</span>` : '') : '';
   const synopsis = cleanDescription(a.description);
   document.getElementById('detSyn').textContent = synopsis || 'No synopsis available.';
   document.getElementById('detGenres').innerHTML = (a.genres||[]).map(g=>`<span class="gtag">${escapeHtml(g)}</span>`).join('');
@@ -1699,7 +1713,7 @@ function renderDetail(a, error){
     ['Status',status.label || '?'], ['Studio',studio],
     ['Released',aired], ['Ended',ended],
     ['Duration',duration],
-    ['Type',a.format||'?'], ['Score',score?`${score}/10`:'?'],
+    ['Type',a.format||'?'], ['Score',hasScore(score)?`${score}/10`:'?'],
     ['Ranked',rankLabel], ['Members',a.popularity?a.popularity.toLocaleString():'?'],
   ].map(([k,v])=>`<div class="info-item"><div class="info-dot"></div><span class="info-k">${escapeHtml(k)}:</span><span class="info-v">${escapeHtml(v)}</span></div>`).join('');
 
@@ -1716,9 +1730,9 @@ function renderDetail(a, error){
       <div class="rec-name">${escapeHtml(recTitle)}</div></div>`;
   }).join('') : '<p style="color:#555;font-size:.8rem">No recommendations.</p>';
 
-  const tgUrl = a.idMal && TG[a.idMal] ? TG[a.idMal] : null;
-  const trailer = trailerUrl(a.trailer);
-  const siteUrl = a.siteUrl || null;
+  const tgUrl = a.idMal && TG[a.idMal] ? sanitizeUrl(TG[a.idMal]) : null;
+  const trailer = sanitizeUrl(trailerUrl(a.trailer));
+  const siteUrl = sanitizeUrl(a.siteUrl);
   const channels = [];
 
   if(tgUrl){
@@ -1800,13 +1814,14 @@ async function openPlayer(animeId){
   document.body.style.overflow = 'hidden';
 
   // Set initial state
-  const tgLink = a.tgLink || DEFAULT_LINK;
+  const tgLink = sanitizeUrl(a.tgLink) || sanitizeUrl(DEFAULT_LINK);
+  const safeTgLink = tgLink || '#';
   document.getElementById('plTitle').textContent = a.title;
   document.getElementById('plAnimeName').textContent = a.title;
   document.getElementById('plEpBadge').textContent = 'WATCH';
   document.getElementById('plEpInfo').textContent = 'Tap ▶ to watch on Telegram';
   document.getElementById('plOverlayTitle').textContent = a.title;
-  document.getElementById('plTgBtn').href = tgLink;
+  document.getElementById('plTgBtn').href = safeTgLink;
 
   // Reset overlay
   document.getElementById('plOverlay').classList.remove('hidden');
@@ -1815,7 +1830,7 @@ async function openPlayer(animeId){
 
   // Show/hide join box
   document.getElementById('plJoinBox').style.display = 'none';
-  document.getElementById('plJoinBtn').href = tgLink;
+  document.getElementById('plJoinBtn').href = safeTgLink;
 
   // Server buttons
   document.querySelectorAll('.pl-srv-btn').forEach(b=>b.classList.remove('active'));
@@ -1837,7 +1852,7 @@ async function openPlayer(animeId){
     document.getElementById('plMetaChips').innerHTML = `
       <span class="pl-chip hl">${a.lang==='hindi'?'🇮🇳 Hindi':'🌐 Multi Language'}</span>
       ${d.format?`<span class="pl-chip">${escapeHtml(d.format)}</span>`:''}
-      <span class="pl-chip">⭐ ${score?score.toFixed(1):'?'}</span>`;
+      <span class="pl-chip">⭐ ${hasScore(score)?score.toFixed(1):'?'}</span>`;
   }
 
   document.getElementById('plEpsGrid').innerHTML = '';
@@ -1872,7 +1887,8 @@ function setServer(srv,buttonEl){
 
 function startPlay(){
   if(!curAnime) return;
-  const tgLink = curAnime.tgLink || DEFAULT_LINK;
+  const tgLink = sanitizeUrl(curAnime.tgLink) || sanitizeUrl(DEFAULT_LINK);
+  if(!tgLink) return;
   const ch = getTgChannel(tgLink);
 
   if(ch && ch.user){
