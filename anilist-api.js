@@ -68,6 +68,7 @@
     endDate { year month day }
     duration
     popularity
+    rankings { rank type allTime }
   `;
 
   const PAGE_QUERY = `

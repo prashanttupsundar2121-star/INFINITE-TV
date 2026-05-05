@@ -1169,12 +1169,6 @@ function langBadge(lang){
   if(lang==='english') return`<div class="acard-badge b-eng">ENG</div>`;
   return`<div class="acard-badge b-multi">MULTI</div>`;
 }
-function apiBadge(a){
-  const lang = a?.title?.english ? 'DUAL' : 'SUB';
-  if(a?.idMal && TG[a.idMal]) return`<div class="acard-badge b-multi">MULTI</div>`;
-  return`<div class="acard-badge b-sub">${lang}</div>`;
-}
-
 // API helpers
 function escapeHtml(str){
   if(str === null || str === undefined) return '';
@@ -1304,7 +1298,7 @@ async function loadHero(){
             <svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16"><polygon points="5,3 19,12 5,21"/></svg>
             WATCH NOW
           </a>
-          <button class="hbtn-info" onclick="openDetailByMalId(${a.malId})">
+          <button class="hbtn-info" onclick="openDetailByMalId(${Number(a.malId)})">
             <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" width="14" height="14"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
             Info
           </button>
@@ -1377,7 +1371,7 @@ function renderOur(){
   const row = document.getElementById('ourRow');
   document.getElementById('ourCount').textContent = ANIME_DB.length + ' anime';
   row.innerHTML = ANIME_DB.map(a=>`
-    <div class="our-card" onclick="openDetailByMalId(${a.malId})">
+    <div class="our-card" onclick="openDetailByMalId(${Number(a.malId)})">
       <div class="our-img">
         <img id="oimg_${a.id}"
           src="${malImg(a.malId)}"
@@ -1422,7 +1416,7 @@ function mkAcard(a){
   const title = titleFromMedia(a);
   const score = scoreFromMedia(a);
   const scoreTag = score ? `<div class="acard-score">⭐${score.toFixed(1)}</div>` : '';
-  return `<div class="acard" onclick="openDetail(${a.id})">
+  return `<div class="acard" onclick="openDetailById(${Number(a.id)})">
     <div class="acard-img">
       <img src="${img}" alt="${escapeHtml(title)}" loading="lazy" onerror="imgFallback(this)"/>
       ${a.idMal && TG[a.idMal] ? '<div class="acard-badge b-multi">MULTI</div>' : '<div class="acard-badge b-sub">SUB</div>'}
@@ -1438,7 +1432,7 @@ function mkGcard(a){
   const title = titleFromMedia(a);
   const score = scoreFromMedia(a);
   const scoreTag = score ? `<div class="gcard-score">⭐${score.toFixed(1)}</div>` : '';
-  return `<div class="gcard" onclick="openDetail(${a.id})">
+  return `<div class="gcard" onclick="openDetailById(${Number(a.id)})">
     <div class="gcard-img">
       <img src="${img}" alt="${escapeHtml(title)}" loading="lazy" onerror="imgFallback(this)"/>
       ${a.idMal && TG[a.idMal] ? '<div class="gcard-badge b-multi">MULTI</div>' : '<div class="gcard-badge b-sub">SUB</div>'}
@@ -1604,15 +1598,17 @@ function statusMeta(status){
   if(!status) return { label: '', cls: 'ch-type' };
   return { label: status.replace(/_/g,' '), cls: 'ch-type' };
 }
+const MAX_SCORE = 10;
+const STAR_SCALE = 5;
 function renderStars(score){
   if(!score) return '';
-  const stars = Math.round((parseFloat(score)/10)*5*2)/2;
+  const stars = Math.round((parseFloat(score)/MAX_SCORE)*STAR_SCALE*2)/2;
   let h = '<div class="det-stars">';
   for(let i=1;i<=5;i++) h += `<span class="det-star${i<=stars?' on':''}">★</span>`;
   return h + `</div><span class="det-score-num">${score}/10</span>`;
 }
 
-async function openDetail(id, malId){
+function resetDetailModal(){
   const modal = document.getElementById('detModal');
   modal.classList.add('active');
   modal.scrollTop = 0;
@@ -1630,12 +1626,29 @@ async function openDetail(id, malId){
   watchBtn.style.display = 'none';
   watchBtn.target = '_blank';
   watchBtn.onclick = null;
+}
 
-  const result = id ? await AniListApi.fetchMediaById(id) : await AniListApi.fetchMediaByMalId(malId);
-  const a = result?.data;
+async function openDetailById(id){
+  const safeId = Number(id);
+  if(!Number.isFinite(safeId)) return;
+  resetDetailModal();
+  const result = await AniListApi.fetchMediaById(safeId);
+  renderDetail(result?.data, result?.error);
+}
+
+async function openDetailByMalId(malId){
+  const safeId = Number(malId);
+  if(!Number.isFinite(safeId)) return;
+  resetDetailModal();
+  const result = await AniListApi.fetchMediaByMalId(safeId);
+  renderDetail(result?.data, result?.error);
+}
+
+function renderDetail(a, error){
+  const watchBtn = document.getElementById('detWatchBtn');
   if(!a){
     document.getElementById('detTitle').textContent='Error loading.';
-    document.getElementById('detChannels').innerHTML = renderEmpty('Unable to load details.');
+    document.getElementById('detChannels').innerHTML = renderEmpty(error || 'Unable to load details.');
     return;
   }
 
@@ -1655,7 +1668,7 @@ async function openDetail(id, malId){
     (year ? `<span class="det-chip ch-type">${escapeHtml(year)}</span>` : '');
 
   const score = scoreFromMedia(a);
-  document.getElementById('detScore').innerHTML = score ? renderStars(score) + (a.popularity ? `<span class="det-votes">(${a.popularity.toLocaleString()})</span>` : '') : '';
+  document.getElementById('detScore').innerHTML = score ? renderStars(score) + (a.popularity ? `<span class="det-votes">(${a.popularity.toLocaleString()} users)</span>` : '') : '';
   const synopsis = cleanDescription(a.description);
   document.getElementById('detSyn').textContent = synopsis || 'No synopsis available.';
   document.getElementById('detGenres').innerHTML = (a.genres||[]).map(g=>`<span class="gtag">${escapeHtml(g)}</span>`).join('');
@@ -1664,12 +1677,14 @@ async function openDetail(id, malId){
   const ended = a.status === 'RELEASING' ? 'Ongoing' : formatAniDate(a.endDate);
   const studio = (a.studios?.nodes||[]).map(s=>s.name).join(', ') || '?';
   const duration = a.duration ? `${a.duration} min/ep` : '?';
+  const rankEntry = (a.rankings||[]).find(r=>r.type==='RATED' && r.allTime) || (a.rankings||[])[0];
+  const rankLabel = rankEntry?.rank ? `#${rankEntry.rank}` : '?';
   document.getElementById('detInfoGrid').innerHTML = [
     ['Status',status.label || '?'], ['Studio',studio],
     ['Released',aired], ['Ended',ended],
     ['Duration',duration],
     ['Type',a.format||'?'], ['Score',score?`${score}/10`:'?'],
-    ['Ranked','?'], ['Members',a.popularity?a.popularity.toLocaleString():'?'],
+    ['Ranked',rankLabel], ['Members',a.popularity?a.popularity.toLocaleString():'?'],
   ].map(([k,v])=>`<div class="info-item"><div class="info-dot"></div><span class="info-k">${escapeHtml(k)}:</span><span class="info-v">${escapeHtml(v)}</span></div>`).join('');
 
   document.getElementById('detLangs').innerHTML = ALL_LANGS.map(l=>`
@@ -1680,7 +1695,7 @@ async function openDetail(id, malId){
   const recNodes = (a.recommendations?.nodes || []).map(n=>n.mediaRecommendation).filter(Boolean).slice(0,6);
   document.getElementById('detRec').innerHTML = recNodes.length ? recNodes.map(r=>{
     const recTitle = titleFromMedia(r);
-    return `<div class="rec-card" onclick="openDetail(${r.id})">
+    return `<div class="rec-card" onclick="openDetailById(${Number(r.id)})">
       <div class="rec-img"><img src="${posterFromAnime(r)}" alt="${escapeHtml(recTitle)}" loading="lazy" onerror="imgFallback(this)"/></div>
       <div class="rec-name">${escapeHtml(recTitle)}</div></div>`;
   }).join('') : '<p style="color:#555;font-size:.8rem">No recommendations.</p>';
@@ -1732,10 +1747,6 @@ async function openDetail(id, malId){
     watchBtn.innerHTML = `<svg viewBox="0 0 24 24"><path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.562 8.248-1.97 9.289c-.145.658-.537.818-1.084.508l-3-2.21-1.447 1.394c-.16.16-.295.295-.605.295l.213-3.053 5.56-5.023c.242-.213-.054-.333-.373-.12L7.19 14.447l-2.95-.924c-.64-.204-.657-.64.136-.95l11.57-4.461c.537-.194 1.006.131.616.136z"/></svg>▶ VIEW ON ANILIST`;
     watchBtn.style.display = 'flex';
   }
-}
-function openDetailByMalId(malId){
-  if(!malId) return;
-  openDetail(null, malId);
 }
 function closeDetail(){ document.getElementById('detModal').classList.remove('active'); }
 
@@ -1874,7 +1885,7 @@ function buildRelated(a){
     <div class="pl-rel-hd">More Anime</div>
     <div style="display:flex;gap:10px;overflow-x:auto;padding-bottom:4px;">
       ${others.map(x=>`
-        <div style="flex-shrink:0;width:100px;cursor:pointer;" onclick="openRelatedDetail(${x.malId})">
+        <div style="flex-shrink:0;width:100px;cursor:pointer;" onclick="openRelatedDetail(${Number(x.malId)})">
           <div style="width:100px;height:140px;border-radius:8px;overflow:hidden;background:#1a1a1a;position:relative;">
             <img src="${malImg(x.malId)}" style="width:100%;height:100%;object-fit:cover;display:block;" onerror="imgFallback(this)" loading="lazy"/>
           </div>
