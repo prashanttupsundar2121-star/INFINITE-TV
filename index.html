@@ -2069,7 +2069,7 @@ function openRelatedDetail(malId){
   }
 
   function hideIntro(){
-    if(intro.style.display === 'none') return;
+    if(intro.style.display === 'none' || getComputedStyle(intro).display === 'none') return;
     intro.style.opacity = '0';
     intro.style.transform = 'scale(1.05)';
     setTimeout(()=>{ intro.style.display = 'none'; }, 600);
