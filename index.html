@@ -28,24 +28,40 @@ html,body{background:var(--bg);color:var(--txt);font-family:'Outfit',sans-serif;
     radial-gradient(circle at 25% 25%, rgba(168,85,247,.34), transparent 46%),
     radial-gradient(circle at 80% 30%, rgba(6,182,212,.3), transparent 42%),
     linear-gradient(145deg,#05060c 0%,#04050a 55%,#020307 100%);
-  transition:opacity .35s ease;
+  perspective:1400px;transform-style:preserve-3d;transition:opacity .6s ease,transform .6s ease;
 }
 #intro::before,#intro::after{
   content:'';position:absolute;border-radius:50%;pointer-events:none;filter:blur(70px);opacity:.8;
 }
 #intro::before{width:48vw;height:48vw;min-width:210px;min-height:210px;background:rgba(168,85,247,.34);left:-12vw;top:-8vw;}
 #intro::after{width:42vw;height:42vw;min-width:180px;min-height:180px;background:rgba(34,211,238,.3);right:-11vw;bottom:-14vw;}
-.ic{position:relative;z-index:2;text-align:center;animation:introLogo 2.5s ease forwards;will-change:opacity,transform;}
+.ic{
+  position:relative;z-index:2;text-align:center;animation:introLogo 2.9s cubic-bezier(.25,.46,.45,.94) forwards;
+  will-change:opacity,transform;transform-style:preserve-3d;
+}
+.ic-stage{position:relative;transform-style:preserve-3d;animation:introSpin 2.9s ease-out forwards;}
+.ic-layer{
+  position:absolute;inset:0;display:block;font-family:'Bebas Neue',sans-serif;font-size:clamp(3rem,16vw,5.5rem);
+  font-weight:700;letter-spacing:7px;white-space:nowrap;opacity:.38;filter:blur(.2px);
+}
+.ic-layer-back{color:rgba(255,80,120,.42);transform:translateZ(-80px) translateY(7px) scale(1.04);}
+.ic-layer-mid{color:rgba(255,255,255,.35);transform:translateZ(-38px) translateY(4px) scale(1.02);}
 .ic-l{
   display:block;font-family:'Bebas Neue',sans-serif;font-size:clamp(3rem,16vw,5.5rem);font-weight:700;letter-spacing:7px;
   color:#f8faff;text-shadow:0 0 14px rgba(168,85,247,.75),0 0 26px rgba(34,211,238,.65),0 0 46px rgba(34,211,238,.34);
-  animation:introGlow 1.05s ease-in-out .45s 2;
+  transform:translateZ(24px);animation:introGlow 1.05s ease-in-out .45s 2;
 }
+.ic-sub{margin-top:10px;font-size:.72rem;letter-spacing:4px;color:rgba(236,241,255,.7);text-transform:uppercase;text-shadow:0 0 14px rgba(255,120,140,.25);}
 @keyframes introLogo{
-  0%{opacity:0;transform:scale(.9)}
-  26%{opacity:1;transform:scale(1)}
-  66%{opacity:1;transform:scale(1.07)}
-  100%{opacity:0;transform:scale(1.13)}
+  0%{opacity:0;transform:translateY(24px) scale(.82) rotateX(22deg)}
+  24%{opacity:1;transform:translateY(0) scale(1) rotateX(0)}
+  70%{opacity:1;transform:translateY(-2px) scale(1.08) rotateX(-3deg)}
+  100%{opacity:0;transform:translateY(-28px) scale(1.15) rotateX(-9deg)}
+}
+@keyframes introSpin{
+  0%{transform:rotateY(-25deg) rotateX(20deg)}
+  45%{transform:rotateY(5deg) rotateX(-2deg)}
+  100%{transform:rotateY(12deg) rotateX(-8deg)}
 }
 @keyframes introGlow{
   0%,100%{text-shadow:0 0 14px rgba(168,85,247,.72),0 0 24px rgba(34,211,238,.58),0 0 44px rgba(34,211,238,.32)}
@@ -67,6 +83,15 @@ html,body{background:var(--bg);color:var(--txt);font-family:'Outfit',sans-serif;
   0%{transform:translateY(100vh) scale(.86);opacity:0}
   12%,78%{opacity:.85}
   100%{transform:translateY(-14vh) scale(1.2);opacity:0}
+}
+.intro-ring{
+  position:absolute;left:50%;top:50%;border-radius:50%;border:1px solid rgba(255,255,255,.18);
+  transform-style:preserve-3d;pointer-events:none;animation:introRing 2.6s ease-out forwards;
+}
+@keyframes introRing{
+  0%{opacity:0;transform:translate(-50%,-50%) rotateX(72deg) scale(.65)}
+  35%{opacity:.55}
+  100%{opacity:0;transform:translate(-50%,-50%) rotateX(72deg) scale(1.5)}
 }
 
 /* ── PAGES ── */
@@ -486,6 +511,7 @@ body::before{
 .hero-wrap{
   height:min(74vw,440px);
   border-bottom:1px solid rgba(229,9,20,.15);
+  box-shadow:inset 0 -20px 50px rgba(0,0,0,.5),0 20px 45px rgba(0,0,0,.3);
 }
 .hero-img{filter:brightness(.38) saturate(1.15);}
 /* Strong black fade gradient overlay */
@@ -545,7 +571,13 @@ body::before{
   background:rgba(10,10,16,.55);
   backdrop-filter:blur(12px);
   -webkit-backdrop-filter:blur(12px);
-  border-radius:18px;
+  border-radius:18px;position:relative;overflow:hidden;
+  box-shadow:0 14px 38px rgba(0,0,0,.28),inset 0 1px 0 rgba(255,255,255,.06);
+}
+.section::before,.det-block::before,.search-top::before,.pl-server-row::before,.pl-info-row::before,.pl-eps-wrap::before,.pl-related::before,.pl-join-box::before{
+  content:'';position:absolute;left:-15%;right:-15%;top:-55%;height:75%;
+  background:linear-gradient(115deg,transparent 15%,rgba(255,255,255,.08) 45%,transparent 75%);
+  transform:translateY(-22px) rotate(-4deg);pointer-events:none;
 }
 .section{margin:12px 10px 0;padding:16px 0 10px;}
 .sec-hd{padding:0 16px;}
@@ -557,7 +589,7 @@ body::before{
 .acard-img,.gcard-img,.our-img,.rec-img{
   border-radius:16px;
   border:1px solid rgba(229,9,20,.12);
-  box-shadow:0 8px 20px rgba(0,0,0,.5);
+  box-shadow:0 8px 20px rgba(0,0,0,.5),0 0 0 1px rgba(255,255,255,.04) inset;
 }
 .acard,.gcard,.our-card,.rec-card{transition:transform .28s ease,filter .28s ease;}
 
@@ -695,7 +727,12 @@ body::before{
 <div id="intro" aria-hidden="true">
   <div class="ic-streaks" id="introStreaks"></div>
   <div class="ic">
-    <span class="ic-l">INFINITE TV</span>
+    <div class="ic-stage">
+      <span class="ic-layer ic-layer-back">INFINITE ANIMES</span>
+      <span class="ic-layer ic-layer-mid">INFINITE ANIMES</span>
+      <span class="ic-l">INFINITE ANIMES</span>
+    </div>
+    <div class="ic-sub">Cinematic Anime Universe</div>
   </div>
 </div>
 
@@ -1945,7 +1982,7 @@ function openRelatedDetail(malId){
   const introStreaks = document.getElementById('introStreaks');
   if(!intro) return;
 
-  const particleColors = ['rgba(168,85,247,.75)','rgba(34,211,238,.75)','rgba(255,255,255,.45)'];
+  const particleColors = ['rgba(229,9,20,.72)','rgba(255,112,112,.62)','rgba(255,255,255,.42)'];
   for(let i=0;i<14;i++){
     const p = document.createElement('div');
     p.className = 'ip';
@@ -1961,6 +1998,16 @@ function openRelatedDetail(malId){
       s.style.animationDelay = `${Math.random()*1.1}s`;
       s.style.opacity = '.45';
       introStreaks.appendChild(s);
+    }
+    for(let i=0;i<3;i++){
+      const ring = document.createElement('span');
+      ring.className = 'intro-ring';
+      const size = 170 + i*90;
+      ring.style.width = `${size}px`;
+      ring.style.height = `${size}px`;
+      ring.style.animationDelay = `${i*.22}s`;
+      ring.style.borderColor = `rgba(255,${140 - i*26},${150 - i*28},${.2 + i*.08})`;
+      intro.appendChild(ring);
     }
   }
 
@@ -2022,13 +2069,15 @@ function openRelatedDetail(malId){
   }
 
   function hideIntro(){
+    if(intro.style.display === 'none') return;
     intro.style.opacity = '0';
-    setTimeout(()=>{ intro.style.display = 'none'; }, 350);
+    intro.style.transform = 'scale(1.05)';
+    setTimeout(()=>{ intro.style.display = 'none'; }, 600);
   }
 
   window.addEventListener('load', ()=>{
     playIntroWhoosh();
-    setTimeout(hideIntro, 2500);
+    setTimeout(hideIntro, 2900);
   }, {once:true});
   window.addEventListener('touchstart', playIntroWhoosh, {once:true, passive:true});
   window.addEventListener('keydown', playIntroWhoosh, {once:true});
