@@ -26,7 +26,7 @@ html,body{height:100%;background:var(--bg);color:var(--text-primary);font-family
 ::-webkit-scrollbar{display:none}
 
 .mesh-bg{position:fixed;inset:0;z-index:-3;pointer-events:none;overflow:hidden}
-.mesh-blob{position:absolute;border-radius:50%;filter:blur(60px);opacity:0.35;will-change:transform}
+.mesh-blob{display:none}
 .mesh-blob:nth-child(1){width:600px;height:600px;background:radial-gradient(circle,rgba(229,9,20,0.35),transparent 65%);top:-10%;left:-5%;animation:blobDrift1 25s ease-in-out infinite alternate}
 .mesh-blob:nth-child(2){width:500px;height:500px;background:radial-gradient(circle,rgba(255,45,85,0.2),transparent 65%);top:20%;right:-8%;animation:blobDrift2 30s ease-in-out infinite alternate}
 .mesh-blob:nth-child(3){width:700px;height:700px;background:radial-gradient(circle,rgba(100,50,180,0.22),transparent 65%);bottom:-15%;left:30%;animation:blobDrift3 28s ease-in-out infinite alternate}
@@ -35,7 +35,7 @@ html,body{height:100%;background:var(--bg);color:var(--text-primary);font-family
 @keyframes blobDrift2{0%{transform:translate3d(0,0,0) scale(1)}100%{transform:translate3d(-50px,60px,0) scale(1.2)}}
 @keyframes blobDrift3{0%{transform:translate3d(0,0,0) scale(1)}100%{transform:translate3d(40px,-40px,0) scale(1.1)}}
 @keyframes blobDrift4{0%{transform:translate3d(0,0,0) scale(1)}100%{transform:translate3d(30px,-30px,0) scale(1.25)}}
-.noise-overlay{position:fixed;inset:0;z-index:-1;pointer-events:none;opacity:0.025;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E");background-repeat:repeat;background-size:256px}
+.noise-overlay{display:none;pointer-events:none;opacity:0;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E");background-repeat:repeat;background-size:256px}
 
 .glass{background:var(--glass);backdrop-filter:blur(32px) saturate(200%);-webkit-backdrop-filter:blur(32px) saturate(200%);border:1px solid var(--border)}
 .glass-hover{transition:var(--transition-base)}
@@ -200,23 +200,23 @@ html,body{height:100%;background:var(--bg);color:var(--text-primary);font-family
 
 /* ═══════════ HOME ═══════════ */
 .hero-wrap{position:relative;overflow:hidden;margin:0 14px 28px;border-radius:var(--radius-xl);min-height:60vw;max-height:680px;background:var(--bg-2);box-shadow:var(--shadow-lg);isolation:isolate}
-.hero-slide{position:absolute;inset:0;opacity:0;transition:opacity 0.8s cubic-bezier(0.25,0.46,0.45,0.94);background-size:cover;background-position:center top}
+.hero-slide{position:absolute;inset:0;opacity:0;transition:opacity 0.5s ease;background-size:cover;background-position:center center}
 .hero-slide.active{opacity:1}
-.hero-slide::before{content:'';position:absolute;inset:0;background:linear-gradient(100deg,rgba(5,5,8,0.95) 0%,rgba(5,5,8,0.2) 50%,rgba(5,5,8,0.9) 100%);z-index:1}
-.hero-slide::after{content:'';position:absolute;bottom:0;left:0;right:0;height:55%;background:linear-gradient(0deg,var(--bg) 0%,transparent 100%);z-index:1}
+.hero-slide::before{content:'';position:absolute;inset:0;background:linear-gradient(180deg,rgba(5,5,8,0.3) 0%,rgba(5,5,8,0.5) 40%,rgba(5,5,8,0.97) 100%);z-index:1}
+.hero-slide::after{display:none}
 
-.hero-content{position:absolute;left:22px;right:22px;bottom:36px;z-index:3;max-width:700px}
-.hero-type{display:inline-flex;align-items:center;gap:6px;background:var(--accent);color:#fff;font-size:0.68rem;font-weight:700;padding:6px 16px;border-radius:var(--radius-full);letter-spacing:0.12em;text-transform:uppercase;margin-bottom:14px;font-family:var(--font-heading);box-shadow:0 4px 16px rgba(229,9,20,0.4);animation:heroBadgeIn 0.5s 0.2s both}
-@keyframes heroBadgeIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
-.hero-title{font-family:var(--font-display);font-size:clamp(2.2rem,7.5vw,4rem);letter-spacing:0.04em;line-height:1.0;margin-bottom:14px;text-shadow:0 4px 40px rgba(0,0,0,0.9);animation:heroTitleIn 0.6s 0.3s both}
-@keyframes heroTitleIn{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
-.hero-tags{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:22px;animation:heroTagsIn 0.5s 0.5s both}
-@keyframes heroTagsIn{from{opacity:0}to{opacity:1}}
-.hero-tag{font-size:0.74rem;background:rgba(255,255,255,0.1);backdrop-filter:blur(8px);padding:5px 14px;border-radius:var(--radius-full);border:1px solid rgba(255,255,255,0.1);font-family:var(--font-heading);font-weight:500;color:rgba(255,255,255,0.85)}
-.hero-cta{display:inline-flex;align-items:center;gap:10px;background:linear-gradient(135deg,var(--accent),var(--accent-2));color:#fff;border:none;border-radius:var(--radius-full);padding:14px 28px;font-family:var(--font-display);font-size:1.2rem;letter-spacing:0.04em;cursor:pointer;transition:var(--transition-base);box-shadow:0 8px 28px rgba(229,9,20,0.45);animation:heroCtaIn 0.5s 0.6s both;position:relative;overflow:hidden}
-.hero-cta:hover{transform:scale(1.06);box-shadow:0 12px 36px rgba(229,9,20,0.6)}
-.hero-cta svg{width:20px;height:20px;fill:currentColor}
-@keyframes heroCtaIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+.hero-content{position:absolute;left:0;right:0;bottom:0;z-index:3;padding:20px 18px 28px}
+.hero-type{display:inline-flex;align-items:center;gap:6px;color:#e50914;font-size:0.78rem;font-weight:700;padding:0;margin-bottom:8px;font-family:var(--font-heading);letter-spacing:0.06em;text-transform:uppercase}
+.hero-title{font-family:var(--font-heading);font-size:clamp(1.3rem,5vw,1.9rem);font-weight:700;line-height:1.25;margin-bottom:10px;color:#fff;text-shadow:0 2px 8px rgba(0,0,0,0.8)}
+.hero-tags{display:none}
+.hero-tag{display:none}
+.hero-synopsis{color:rgba(255,255,255,0.75);font-size:0.85rem;line-height:1.5;margin-bottom:16px;font-family:var(--font-body);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.hero-cta{display:inline-flex;align-items:center;gap:8px;background:#e50914;color:#fff;border:none;border-radius:25px;padding:11px 22px;font-family:var(--font-heading);font-size:0.9rem;font-weight:700;cursor:pointer;transition:background 0.2s}
+.hero-cta:hover{background:#c0392b}
+.hero-cta svg{width:16px;height:16px;fill:currentColor}
+.hero-detail-btn{display:inline-flex;align-items:center;gap:8px;background:rgba(255,255,255,0.15);color:#fff;border:1px solid rgba(255,255,255,0.3);border-radius:25px;padding:11px 22px;font-family:var(--font-heading);font-size:0.9rem;font-weight:700;cursor:pointer;transition:background 0.2s;margin-left:10px}
+.hero-detail-btn:hover{background:rgba(255,255,255,0.25)}
+.hero-actions{display:flex;gap:10px;flex-wrap:wrap}
 
 .hero-nav{position:absolute;top:50%;transform:translateY(-50%);z-index:4;width:40px;height:40px;border-radius:50%;background:rgba(0,0,0,0.5);border:1px solid rgba(255,255,255,0.15);color:#fff;cursor:pointer;display:grid;place-items:center;transition:var(--transition-base);backdrop-filter:blur(8px)}
 .hero-nav:hover{background:rgba(229,9,20,0.7);border-color:var(--accent);transform:translateY(-50%) scale(1.1);box-shadow:0 0 20px rgba(229,9,20,0.3)}
@@ -251,11 +251,9 @@ html,body{height:100%;background:var(--bg);color:var(--text-primary);font-family
 @media(min-width:700px){.anime-grid{grid-template-columns:repeat(5,1fr);gap:16px}}
 @media(min-width:1000px){.anime-grid{grid-template-columns:repeat(6,1fr)}}
 
-.card{position:relative;border-radius:var(--radius-md);overflow:hidden;cursor:pointer;background:var(--bg-2);border:1px solid var(--border);aspect-ratio:2/3;box-shadow:var(--shadow-sm);transition:var(--transition-base);opacity:0;transform:translateY(18px);animation:cardReveal 0.5s forwards}
-@keyframes cardReveal{to{opacity:1;transform:translateY(0)}}
-.card:hover{transform:scale(1.06) translateY(-8px);box-shadow:var(--shadow-lg),0 0 32px rgba(229,9,20,0.15);border-color:rgba(229,9,20,0.3);z-index:2}
-.card img{width:100%;height:100%;object-fit:cover;display:block;transition:var(--transition-slow)}
-.card:hover img{transform:scale(1.12)}
+.card{position:relative;border-radius:var(--radius-md);overflow:hidden;cursor:pointer;background:var(--bg-2);border:1px solid var(--border);aspect-ratio:2/3;box-shadow:var(--shadow-sm);transition:transform 0.2s ease}
+.card:hover{transform:scale(1.04);z-index:2}
+.card img{width:100%;height:100%;object-fit:cover;display:block}
 .card-shine{position:absolute;inset:0;background:linear-gradient(115deg,transparent 30%,rgba(255,255,255,0.18),transparent 70%);transform:translateX(-150%);transition:0.8s;z-index:2;pointer-events:none}
 .card:hover .card-shine{transform:translateX(150%)}
 .card-overlay{position:absolute;bottom:0;left:0;right:0;background:linear-gradient(0deg,rgba(5,5,8,0.98) 0%,rgba(5,5,8,0.7) 40%,transparent);padding:44px 12px 12px;z-index:3}
@@ -1746,13 +1744,18 @@ function buildHeroSlides() {
     d.className = 'hero-slide' + (i === 0 ? ' active' : '');
     d.style.backgroundImage = `url(${a.images?.jpg?.large_image_url || ''})`;
     d.innerHTML = `<div class="hero-content">
-      <div class="hero-type">${escapeHtml(a.type || 'ANIME')}</div>
+      <div class="hero-type">#${i+1} Spotlight</div>
       <div class="hero-title">${escapeHtml(a.title_english || a.title)}</div>
-      <div class="hero-tags">${(a.genres || []).slice(0, 3).map(g => `<span class="hero-tag">${escapeHtml(g.name)}</span>`).join('')}</div>
-      <button class="hero-cta" onclick="openAnime(${a.mal_id})">
-        <svg viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
-        Watch Now
-      </button>
+      <div class="hero-synopsis">${escapeHtml((a.synopsis||'').slice(0,120))}...</div>
+      <div class="hero-actions">
+        <button class="hero-cta" onclick="openAnime(${a.mal_id})">
+          <svg viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
+          Watch Now
+        </button>
+        <button class="hero-detail-btn" onclick="openAnime(${a.mal_id})">
+          Detail &rsaquo;
+        </button>
+      </div>
     </div>`;
     w.appendChild(d);
   });
