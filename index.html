@@ -246,10 +246,10 @@ html,body{height:100%;background:var(--bg);color:var(--text-primary);font-family
 .pill:hover::after{transform:translateX(130%)}
 .pill.active{border-color:rgba(229,9,20,0.7);background:linear-gradient(135deg,rgba(229,9,20,0.15),rgba(229,9,20,0.08));color:#fff;box-shadow:0 0 20px rgba(229,9,20,0.2)}
 
-.anime-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;padding:0 14px;animation:sectionIn 0.6s 0.15s both}
-@media(min-width:480px){.anime-grid{grid-template-columns:repeat(4,1fr)}}
-@media(min-width:700px){.anime-grid{grid-template-columns:repeat(5,1fr);gap:16px}}
-@media(min-width:1000px){.anime-grid{grid-template-columns:repeat(6,1fr)}}
+.anime-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;padding:0 12px}
+@media(min-width:480px){.anime-grid{grid-template-columns:repeat(3,1fr)}}
+@media(min-width:700px){.anime-grid{grid-template-columns:repeat(4,1fr);gap:12px}}
+@media(min-width:1000px){.anime-grid{grid-template-columns:repeat(5,1fr)}}
 
 .card{position:relative;border-radius:var(--radius-md);overflow:hidden;cursor:pointer;background:var(--bg-2);border:1px solid var(--border);aspect-ratio:2/3;box-shadow:var(--shadow-sm);transition:transform 0.2s ease}
 .card:hover{transform:scale(1.04);z-index:2}
@@ -1092,76 +1092,91 @@ measurementId: "G-RX3Z92Y9F2"
 
     <div class="player-meta" id="playerMetaSection">
 
-  <!-- Poster + Title -->
-  <div style="display:flex;flex-direction:column;align-items:center;text-align:center;padding:20px 16px 0">
-    <div id="pPosterThumb" style="width:120px;height:160px;border-radius:12px;overflow:hidden;margin-bottom:16px;box-shadow:0 8px 32px rgba(0,0,0,0.6);flex-shrink:0">
+  <!-- Top Info: Poster + Details side by side -->
+  <div style="display:flex;gap:14px;padding:16px 16px 0;align-items:flex-start">
+    <!-- Poster -->
+    <div style="flex-shrink:0;width:90px;height:120px;border-radius:10px;overflow:hidden;box-shadow:0 6px 20px rgba(0,0,0,0.6)">
       <img id="pPosterImg" src="" alt="" style="width:100%;height:100%;object-fit:cover">
     </div>
-    <div class="player-title" id="pTitle" style="font-size:clamp(1.6rem,6vw,2.4rem);margin-bottom:12px"></div>
-
-    <!-- Info Badges -->
-    <div style="display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-bottom:16px" id="pInfoBadges">
-      <span id="pLangBadge" style="display:none;background:#2a2a2a;color:#fff;padding:5px 14px;border-radius:20px;font-size:0.78rem;font-weight:700;font-family:'Poppins',sans-serif;border:1px solid #444">MULTI</span>
-      <span id="pTypeBadge" style="display:none;background:#2a2a2a;color:#4ade80;padding:5px 14px;border-radius:20px;font-size:0.78rem;font-weight:700;font-family:'Poppins',sans-serif;border:1px solid #444">SERIES</span>
-      <span id="pEpBadge" style="display:none;background:#2a2a2a;color:#60a5fa;padding:5px 14px;border-radius:20px;font-size:0.78rem;font-weight:700;font-family:'Poppins',sans-serif;border:1px solid #444">Ep 0</span>
-      <span id="pDurBadge" style="display:none;background:#2a2a2a;color:#facc15;padding:5px 14px;border-radius:20px;font-size:0.78rem;font-weight:700;font-family:'Poppins',sans-serif;border:1px solid #444">25M</span>
-    </div>
-
-    <!-- Action Buttons -->
-    <div style="display:flex;gap:12px;margin-bottom:20px;width:100%;max-width:360px;justify-content:center">
-      <!-- Share Button -->
-  <div style="padding:0 16px;margin-bottom:8px">
-    <button onclick="shareCurrent()" style="width:100%;padding:13px;background:#e50914;border:none;border-radius:25px;color:#fff;font-family:'Poppins',sans-serif;font-size:0.92rem;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px">
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="5" r="3"></circle><circle cx="6" cy="12" r="3"></circle><circle cx="18" cy="19" r="3"></circle><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line></svg>
-      Share
-    </button>
-  </div>
-      <button onclick="toggleLibCurrent()" id="btnLib" style="width:100%;max-width:280px;padding:13px;background:transparent;border:2px solid #555;border-radius:25px;color:#fff;font-family:'Poppins',sans-serif;font-size:0.92rem;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
-        <span id="btnLibText">Add to List</span>
-      </button>
+    <!-- Title + Badges + Buttons -->
+    <div style="flex:1;min-width:0">
+      <div class="player-title" id="pTitle" style="font-size:clamp(1.2rem,5vw,1.8rem);margin-bottom:10px;text-transform:uppercase"></div>
+      <!-- Badges -->
+      <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px" id="pInfoBadges">
+        <span id="pLangBadge" style="display:none;background:#2a2a2a;color:#fff;padding:4px 12px;border-radius:20px;font-size:0.72rem;font-weight:700;font-family:'Poppins',sans-serif;border:1px solid #444">MULTI</span>
+        <span id="pTypeBadge" style="display:none;background:#2a2a2a;color:#4ade80;padding:4px 12px;border-radius:20px;font-size:0.72rem;font-weight:700;font-family:'Poppins',sans-serif;border:1px solid #444">SERIES</span>
+        <span id="pEpBadge" style="display:none;background:#2a2a2a;color:#60a5fa;padding:4px 12px;border-radius:20px;font-size:0.72rem;font-weight:700;font-family:'Poppins',sans-serif;border:1px solid #444">Ep 0</span>
+        <span id="pDurBadge" style="display:none;background:#2a2a2a;color:#facc15;padding:4px 12px;border-radius:20px;font-size:0.72rem;font-weight:700;font-family:'Poppins',sans-serif;border:1px solid #444">25M</span>
+      </div>
+      <!-- Action Buttons -->
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <button onclick="shareCurrent()" style="padding:9px 16px;background:#e50914;border:none;border-radius:25px;color:#fff;font-family:'Poppins',sans-serif;font-size:0.82rem;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:6px">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="5" r="3"></circle><circle cx="6" cy="12" r="3"></circle><circle cx="18" cy="19" r="3"></circle><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line></svg>
+          Share
+        </button>
+        <button onclick="toggleLibCurrent()" id="btnLib" style="padding:9px 16px;background:transparent;border:2px solid #555;border-radius:25px;color:#fff;font-family:'Poppins',sans-serif;font-size:0.82rem;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:6px">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+          <span id="btnLibText">Add to List</span>
+        </button>
+      </div>
     </div>
   </div>
 
-  <!-- Season Tabs -->
-  <div id="seasonTabsWrap" style="display:none;padding:0 16px;margin-bottom:8px">
-    <div id="seasonTabs" style="display:flex;gap:10px;overflow-x:auto;padding-bottom:8px;scrollbar-width:none"></div>
+  <!-- Season Tabs (horizontal scroll) -->
+  <div id="seasonTabsWrap" style="display:none;padding:14px 16px 0">
+    <div id="seasonTabs" style="display:flex;gap:8px;overflow-x:auto;padding-bottom:6px;scrollbar-width:none;-webkit-overflow-scrolling:touch"></div>
   </div>
 
-  <!-- Overview Section -->
-  <div style="padding:20px 16px 0;border-top:1px solid #1e1e1e;margin-top:8px">
-    <div style="font-family:'Poppins',sans-serif;font-weight:700;font-size:1rem;margin-bottom:10px;color:#fff">Overview:</div>
-    <div class="synopsis collapsed" id="pSynopsis" style="color:#ccc;font-size:0.93rem;line-height:1.75;font-family:'Inter',sans-serif"></div>
+  <!-- Overview -->
+  <div style="padding:14px 16px 0;border-top:1px solid #1e1e1e;margin-top:14px">
+    <div style="font-family:'Poppins',sans-serif;font-weight:700;font-size:0.95rem;margin-bottom:8px;color:#fff">Overview:</div>
+    <div class="synopsis collapsed" id="pSynopsis" style="color:#ccc;font-size:0.88rem;line-height:1.7;font-family:'Inter',sans-serif"></div>
     <button class="read-more-btn hidden" id="readMoreBtn" onclick="toggleSynopsis()" style="margin-top:6px">
       Read More
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
     </button>
   </div>
 
   <!-- Info Details -->
-  <div id="pDetailsSection" style="padding:16px;font-family:'Inter',sans-serif;font-size:0.9rem;line-height:2"></div>
+  <div id="pDetailsSection" style="padding:12px 16px;font-family:'Inter',sans-serif;font-size:0.85rem;line-height:1.9;color:#ccc"></div>
 
   <!-- Genres -->
-  <div style="padding:0 16px 16px">
-    <div style="font-family:'Poppins',sans-serif;font-weight:700;font-size:0.9rem;margin-bottom:10px;color:#fff">Genre:</div>
+  <div style="padding:0 16px 14px">
+    <div style="font-family:'Poppins',sans-serif;font-weight:700;font-size:0.88rem;margin-bottom:8px;color:#fff">Genre:</div>
     <div class="genre-row" id="pGenres" style="padding:0;margin:0;flex-wrap:wrap"></div>
   </div>
 
-  <!-- Related Anime -->
-  <div id="relatedAnimeSection" style="padding:16px;display:none">
-    <div style="font-family:'Bebas Neue',sans-serif;font-size:1.6rem;letter-spacing:0.06em;margin-bottom:16px;display:flex;align-items:center;gap:10px">
-      <span style="width:4px;height:22px;background:linear-gradient(180deg,#e50914,#ffb800);border-radius:4px;display:inline-block"></span>
+  <div class="player-badges" id="pBadges" style="display:none"></div>
+
+  <!-- Related Anime — sabse neeche -->
+  <div id="relatedAnimeSection" style="padding:14px 16px 8px;display:none;border-top:1px solid #1e1e1e;margin-top:4px;order:999">
+    <div style="font-family:'Bebas Neue',sans-serif;font-size:1.4rem;letter-spacing:0.06em;margin-bottom:12px;display:flex;align-items:center;gap:8px">
+      <span style="width:3px;height:20px;background:linear-gradient(180deg,#e50914,#ffb800);border-radius:4px;display:inline-block"></span>
       RELATED ANIME
     </div>
-    <div id="relatedAnimeGrid" style="display:flex;gap:12px;overflow-x:auto;padding-bottom:8px;scrollbar-width:none"></div>
+    <div id="relatedAnimeGrid" style="display:flex;gap:10px;overflow-x:auto;padding-bottom:8px;scrollbar-width:none;-webkit-overflow-scrolling:touch"></div>
   </div>
-
-  <div class="player-badges" id="pBadges" style="display:none"></div>
 </div>
 
     <div class="ep-section" id="pEpisodeSection" style="display:none">
-      <div class="ep-header">Episodes</div>
+      <div class="ep-header" style="display:flex;align-items:center;justify-content:space-between">Episodes</div>
       <div class="ep-list" id="pEpisodeList"></div>
+      <!-- Related Anime — episodes ke neeche -->
+      <div id="relatedAnimeSection" style="padding:14px 16px 8px;display:none;border-top:1px solid #1e1e1e;margin-top:4px">
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:1.4rem;letter-spacing:0.06em;margin-bottom:12px;display:flex;align-items:center;gap:8px">
+          <span style="width:3px;height:20px;background:linear-gradient(180deg,#e50914,#ffb800);border-radius:4px;display:inline-block"></span>
+          RELATED ANIME
+        </div>
+        <div id="relatedAnimeGrid" style="display:flex;gap:10px;overflow-x:auto;padding-bottom:8px;scrollbar-width:none;-webkit-overflow-scrolling:touch"></div>
+      </div>
+    </div>
+
+    <div id="relatedAnimeSection" style="padding:14px 16px 8px;display:none;border-top:1px solid #1e1e1e;margin-top:4px">
+      <div style="font-family:'Bebas Neue',sans-serif;font-size:1.4rem;letter-spacing:0.06em;margin-bottom:12px;display:flex;align-items:center;gap:8px">
+        <span style="width:3px;height:20px;background:linear-gradient(180deg,#e50914,#ffb800);border-radius:4px;display:inline-block"></span>
+        RELATED ANIME
+      </div>
+      <div id="relatedAnimeGrid" style="display:flex;gap:10px;overflow-x:auto;padding-bottom:8px;scrollbar-width:none;-webkit-overflow-scrolling:touch"></div>
     </div>
 
     <div class="movie-section" id="pMovieSection" style="display:none">
@@ -1815,11 +1830,11 @@ async function genreSearch(g, btn) {
 async function loadGrid(type) {
   renderSkeletons('mainGrid', 12);
   const urls = {
-    trending: `${API}/top/anime?filter=bypopularity&limit=12`,
-    top: `${API}/top/anime?limit=12`,
-    airing: `${API}/top/anime?filter=airing&limit=12`,
-    movie: `${API}/top/anime?type=movie&limit=12`,
-    upcoming: `${API}/top/anime?filter=upcoming&limit=12`
+    trending: `${API}/top/anime?filter=bypopularity&limit=24`,
+    top: `${API}/top/anime?limit=24`,
+    airing: `${API}/top/anime?filter=airing&limit=24`,
+    movie: `${API}/top/anime?type=movie&limit=24`,
+    upcoming: `${API}/top/anime?filter=upcoming&limit=24`
   };
   try {
     const j = await jikanFetch(urls[type] || urls.trending);
@@ -1835,7 +1850,64 @@ async function loadGrid(type) {
   }
 }
 
+let _currentTab = 'trending';
+let _currentPage = 1;
+let _loadingMore = false;
+
+async function loadMoreGrid() {
+  if (_loadingMore) return;
+  _loadingMore = true;
+  _currentPage++;
+  const urls = {
+    trending: `${API}/top/anime?filter=bypopularity&limit=24&page=${_currentPage}`,
+    top: `${API}/top/anime?limit=24&page=${_currentPage}`,
+    airing: `${API}/top/anime?filter=airing&limit=24&page=${_currentPage}`,
+    movie: `${API}/top/anime?type=movie&limit=24&page=${_currentPage}`,
+    upcoming: `${API}/top/anime?filter=upcoming&limit=24&page=${_currentPage}`
+  };
+  try {
+    const j = await jikanFetch(urls[_currentTab] || urls.trending);
+    const data = j.data || [];
+    if (data.length) appendCards(data, 'mainGrid');
+  } catch(e) {}
+  _loadingMore = false;
+}
+
+function appendCards(animes, id) {
+  const g = document.getElementById(id);
+  if (!g) return;
+  const frag = document.createDocumentFragment();
+  animes.forEach((a, i) => {
+    const div = document.createElement('div');
+    div.className = 'card';
+    div.style.animationDelay = (i * 30) + 'ms';
+    div.onclick = () => openAnime(a.mal_id);
+    div.innerHTML = `
+      ${a.type ? `<div class="card-type-badge">${escapeHtml(a.type)}</div>` : ''}
+      ${a.episodes ? `<div class="card-ep-badge">${a.episodes} EP</div>` : ''}
+      <img src="${a.images?.jpg?.large_image_url || a.images?.jpg?.image_url || ''}" loading="lazy" alt="${escapeHtml(a.title)}">
+      <div class="card-shine"></div>
+      <div class="card-overlay">
+        <div class="card-title">${escapeHtml(a.title_english || a.title)}</div>
+        ${a.score ? `<div class="card-score"><svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>${a.score}</div>` : ''}
+      </div>`;
+    frag.appendChild(div);
+  });
+  g.appendChild(frag);
+}
+
+// Auto load on scroll
+window.addEventListener('scroll', () => {
+  if (document.getElementById('homePage')?.classList.contains('active')) {
+    const scrolled = window.scrollY + window.innerHeight;
+    const total = document.body.scrollHeight;
+    if (scrolled >= total - 400) loadMoreGrid();
+  }
+});
+
 window.switchTab = btn => {
+  _currentPage = 1;
+  _currentTab = btn.dataset.t;
   haptic();
   document.querySelectorAll('#genreRow .pill').forEach(b => b.classList.remove('active'));
   document.querySelectorAll('#tabRow .pill').forEach(b => b.classList.remove('active'));
@@ -2021,8 +2093,8 @@ window.openAnime = async (malId) => {
   const overlay = document.getElementById('playOverlay');
   if (skeleton) skeleton.style.display = 'block';
   if (frame) frame.innerHTML = '';
-  if (poster) { poster.style.backgroundImage = ''; poster.classList.remove('hidden'); }
-  if (overlay) overlay.classList.remove('hidden');
+  if (poster) { poster.style.backgroundImage = ''; poster.classList.add('hidden'); }
+  if (overlay) overlay.classList.add('hidden');
 
   document.getElementById('pTitle').textContent = '';
   document.getElementById('pBadges').innerHTML = '';
@@ -2056,9 +2128,11 @@ window.openAnime = async (malId) => {
     const epB = document.getElementById('pEpBadge');
     const durB = document.getElementById('pDurBadge');
     if(langB){ langB.style.display='inline-flex'; langB.textContent='MULTI'; }
-    if(typeB){ typeB.style.display='inline-flex'; typeB.textContent = a.type === 'Movie' ? 'MOVIE' : 'SERIES'; }
+    if(typeB){ typeB.style.display='inline-flex'; typeB.textContent = a.type || 'SERIES'; }
     if(epB && a.episodes){ epB.style.display='inline-flex'; epB.textContent='Ep ' + a.episodes; }
     if(durB && a.duration){ durB.style.display='inline-flex'; durB.textContent = a.duration.replace(' per ep','').replace(' min','M'); }
+    const ratingB = document.getElementById('pRatingBadge');
+    if(ratingB && a.rating){ ratingB.style.display='inline-flex'; ratingB.textContent = a.rating.replace(/\s*\(.*\)/,''); }
 
     // Synopsis
     const rawSyn = a.synopsis || 'No synopsis available.';
@@ -2106,6 +2180,7 @@ window.openAnime = async (malId) => {
       if (vData && vData.movieUrl) {
         card.classList.add('playable'); card.classList.remove('locked');
         card.onclick = () => playMovie(vData.movieUrl);
+        setTimeout(() => { playMovie(vData.movieUrl); hidePosterOverlay(); }, 300);
         // Auto-play movie
         setTimeout(() => { playMovie(vData.movieUrl); hidePosterOverlay(); }, 300);
       } else { card.classList.remove('playable'); card.classList.add('locked'); card.onclick = null; }
@@ -2118,8 +2193,21 @@ window.openAnime = async (malId) => {
       if (skeleton) skeleton.style.display = 'none';
       // Auto-play first available episode
       if(vData && vData.episodes) {
-        const firstEp = eps.find(e => vData.episodes[String(e.episode)]);
-        if(firstEp) { setTimeout(() => { playEpisode(malId, firstEp.episode, vData.episodes[String(firstEp.episode)], firstEp.title); hidePosterOverlay(); }, 300); }
+        const continueEp = continueData.find(c => c.malId === parseInt(malId) && c.type === 'tv');
+        let targetEp;
+        if(continueEp) {
+          targetEp = eps.find(e => String(e.episode) === String(continueEp.epNum));
+          if(targetEp && vData.episodes[String(targetEp.episode)]) {
+            playEpisode(malId, targetEp.episode, vData.episodes[String(targetEp.episode)], targetEp.title);
+            hidePosterOverlay();
+          } else {
+            targetEp = eps.find(e => vData.episodes[String(e.episode)]);
+            if(targetEp) { playEpisode(malId, targetEp.episode, vData.episodes[String(targetEp.episode)], targetEp.title); hidePosterOverlay(); }
+          }
+        } else {
+          targetEp = eps.find(e => vData.episodes[String(e.episode)]);
+          if(targetEp) { playEpisode(malId, targetEp.episode, vData.episodes[String(targetEp.episode)], targetEp.title); hidePosterOverlay(); }
+        }
       }
     }
   } catch(e) {
@@ -2291,7 +2379,7 @@ function hidePosterOverlay() {
   if (overlay) overlay.classList.add('hidden');
 }
 
-window.playEpisode = (malId, epNum, url, title) => {
+window.playEpisode = async (malId, epNum, url, title) => {
   haptic();
   hidePosterOverlay();
   const pb = document.querySelector('.player-back'); if (pb) pb.style.display = 'none';
@@ -2307,7 +2395,62 @@ window.playEpisode = (malId, epNum, url, title) => {
   saveContinueWatching({ malId: parseInt(malId), epNum, title: title || ('Episode ' + epNum), img: currentAnime?.images?.jpg?.large_image_url || '', type: 'tv', timestamp: Date.now() });
   if (epPageState.malId === parseInt(malId)) renderEpPage();
   recordView();
+
+  // Episode info + caption bar update
+  updateEpInfoBar(malId, epNum, title);
 };
+
+async function updateEpInfoBar(malId, epNum, epTitle) {
+  // Info bar already hai toh update karo, nahi toh banao
+  let bar = document.getElementById('epInfoBar');
+  if (!bar) {
+    bar = document.createElement('div');
+    bar.id = 'epInfoBar';
+    bar.style.cssText = 'padding:12px 16px;background:rgba(255,255,255,0.03);border-top:1px solid #1e1e1e;border-bottom:1px solid #1e1e1e;margin-bottom:4px;animation:fadeIn 0.4s ease';
+    const metaSection = document.getElementById('playerMetaSection');
+    if (metaSection) metaSection.insertBefore(bar, metaSection.firstChild);
+  }
+
+  // Pehle loading dikhao
+  bar.innerHTML = `<div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px">
+    <div>
+      <div style="font-family:'Poppins',sans-serif;font-size:0.72rem;font-weight:700;color:#e50914;letter-spacing:0.1em;text-transform:uppercase;margin-bottom:4px">Now Playing</div>
+      <div style="font-family:'Poppins',sans-serif;font-size:1rem;font-weight:700;color:#fff">Episode ${epNum}${epTitle ? ' — ' + escapeHtml(epTitle) : ''}</div>
+    </div>
+    <button onclick="toggleLibCurrent()" id="epLibBtn" style="padding:8px 18px;background:transparent;border:2px solid #555;border-radius:25px;color:#fff;font-family:'Poppins',sans-serif;font-size:0.8rem;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:6px;flex-shrink:0">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>
+      Add Library
+    </button>
+  </div>
+  <div id="epSynopsisBar" style="margin-top:10px;color:#aaa;font-size:0.85rem;font-family:'Inter',sans-serif;line-height:1.6">Loading episode info...</div>`;
+
+  // Library button sync
+  const inLib = libData.some(x => x.malId === parseInt(malId));
+  const epLibBtn = document.getElementById('epLibBtn');
+  if (epLibBtn) epLibBtn.innerHTML = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg> ${inLib ? 'Saved ✓' : 'Add Library'}`;
+
+  // Jikan se episode details fetch karo
+  try {
+    const j = await jikanFetch(`${API}/anime/${malId}/episodes/${epNum}`);
+    const ep = j.data;
+    const synEl = document.getElementById('epSynopsisBar');
+    if (!synEl) return;
+    if (ep && ep.synopsis) {
+      synEl.innerHTML = `<div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:8px">
+        ${ep.aired ? `<span style="background:#1e1e1e;border:1px solid #333;color:#aaa;padding:3px 12px;border-radius:20px;font-size:0.72rem;font-family:'Poppins',sans-serif;font-weight:600">📅 ${new Date(ep.aired).toLocaleDateString(undefined,{year:'numeric',month:'short',day:'numeric'})}</span>` : ''}
+        ${ep.score ? `<span style="background:#1e1e1e;border:1px solid #333;color:#ffb800;padding:3px 12px;border-radius:20px;font-size:0.72rem;font-family:'Poppins',sans-serif;font-weight:600">⭐ ${ep.score}</span>` : ''}
+        ${ep.filler ? `<span style="background:rgba(255,184,0,0.1);border:1px solid rgba(255,184,0,0.3);color:#ffb800;padding:3px 12px;border-radius:20px;font-size:0.72rem;font-family:'Poppins',sans-serif;font-weight:600">FILLER</span>` : ''}
+        ${ep.recap ? `<span style="background:rgba(100,100,255,0.1);border:1px solid rgba(100,100,255,0.3);color:#aab;padding:3px 12px;border-radius:20px;font-size:0.72rem;font-family:'Poppins',sans-serif;font-weight:600">RECAP</span>` : ''}
+      </div>
+      <div style="color:#bbb;font-size:0.85rem;line-height:1.7;font-family:'Inter',sans-serif">${escapeHtml(ep.synopsis)}</div>`;
+    } else {
+      synEl.textContent = 'No episode synopsis available.';
+    }
+  } catch(e) {
+    const synEl = document.getElementById('epSynopsisBar');
+    if (synEl) synEl.textContent = 'Could not load episode details.';
+  }
+}
 
 window.playMovie = url => {
   haptic();
@@ -2746,20 +2889,31 @@ window.adminDeleteMovie = async (malId) => {
 };
 
 /* ═══════════ JIKAN CACHE ═══════════ */
-async function jikanFetch(url) {
+async function jikanFetch(url, retry = 3) {
   const key = 'jc_' + btoa(encodeURIComponent(url).slice(0,80));
   const cached = sessionStorage.getItem(key);
   if (cached) { try { return JSON.parse(cached); } catch(e) { sessionStorage.removeItem(key); } }
-  const controller = new AbortController();
-  const timeoutId = setTimeout(() => controller.abort(), 8000);
-  try {
-    const r = await fetch(url, {signal: controller.signal});
-    clearTimeout(timeoutId);
-    if (!r.ok) throw new Error('Jikan API error ' + r.status);
-    const j = await r.json();
-    try { sessionStorage.setItem(key, JSON.stringify(j)); } catch(e) {}
-    return j;
-  } catch(e) { clearTimeout(timeoutId); throw e; }
+  for (let attempt = 1; attempt <= retry; attempt++) {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 10000);
+    try {
+      const r = await fetch(url, {signal: controller.signal});
+      clearTimeout(timeoutId);
+      if (r.status === 429) {
+        // Rate limited — wait and retry
+        await new Promise(res => setTimeout(res, 1500 * attempt));
+        continue;
+      }
+      if (!r.ok) throw new Error('Jikan API error ' + r.status);
+      const j = await r.json();
+      try { sessionStorage.setItem(key, JSON.stringify(j)); } catch(e) {}
+      return j;
+    } catch(e) {
+      clearTimeout(timeoutId);
+      if (attempt === retry) throw e;
+      await new Promise(res => setTimeout(res, 800 * attempt));
+    }
+  }
 }
 
 /* ═══ RELATED & SEASONS (global) ═══ */
@@ -2770,16 +2924,32 @@ window.buildSeasonTabs = async function(malId) {
   try {
     const j = await jikanFetch(`${API}/anime/${malId}/relations`);
     const relations = j.data || [];
-    const seasons = [{ label: 'SEASON 01', malId: malId, active: true }];
-    let n = 2;
+
+    const prequels = [];
+    const sequels = [];
+
     relations.forEach(rel => {
-      if(rel.relation === 'Sequel' || rel.relation === 'Prequel') {
-        rel.entry.forEach(e => { if(e.type==='anime'){ seasons.push({label:`SEASON ${String(n).padStart(2,'0')}`,malId:e.mal_id,active:false}); n++; } });
-      }
+      rel.entry.forEach(e => {
+        if(e.type !== 'anime') return;
+        const r = rel.relation.toLowerCase();
+        const n = e.name.toLowerCase();
+        if(n.includes('ova') || n.includes('special') || n.includes('movie') || r.includes('side') || r.includes('spin') || r.includes('alternative') || r.includes('other') || r.includes('summary') || r.includes('character')) return;
+        if(r === 'prequel') prequels.push({malId: e.mal_id, name: e.name});
+        else if(r === 'sequel') sequels.push({malId: e.mal_id, name: e.name});
+      });
     });
-    if(seasons.length > 1) {
+
+    const currentEntry = {malId: parseInt(malId), name: currentAnime?.title_english || currentAnime?.title || ''};
+    const allSeasons = [...prequels, currentEntry, ...sequels];
+
+    if(allSeasons.length > 1) {
       wrap.style.display = 'block';
-      tabs.innerHTML = seasons.map(s => `<button onclick="switchSeason(${s.malId},this)" style="flex-shrink:0;padding:10px 18px;border-radius:10px;border:2px solid ${s.active?'#e50914':'#333'};background:${s.active?'rgba(229,9,20,0.15)':'transparent'};color:${s.active?'#e50914':'#888'};font-family:'Poppins',sans-serif;font-size:0.82rem;font-weight:700;cursor:pointer;white-space:nowrap">${s.label}</button>`).join('');
+      let sNum = 1;
+      tabs.innerHTML = allSeasons.map(s => {
+        const isActive = s.malId === parseInt(malId);
+        const label = 'SEASON ' + String(sNum++).padStart(2,'0');
+        return `<button onclick="switchSeason(${s.malId},this)" style="flex-shrink:0;padding:8px 16px;border-radius:10px;border:2px solid ${isActive?'#e50914':'#444'};background:${isActive?'rgba(229,9,20,0.15)':'transparent'};color:${isActive?'#e50914':'#888'};font-family:'Poppins',sans-serif;font-size:0.78rem;font-weight:700;cursor:pointer;white-space:nowrap;transition:all 0.2s">${label}</button>`;
+      }).join('');
     } else { wrap.style.display='none'; }
   } catch(e) { if(wrap) wrap.style.display='none'; }
 };
@@ -2982,60 +3152,15 @@ console.log("[IA] Firebase compat loaded successfully");
 
   function $(id){ return document.getElementById(id); }
 
-  /* ═══ SEASON TABS ═══ */
-window.buildSeasonTabs = async function(malId, a) {
-  const wrap = document.getElementById('seasonTabsWrap');
-  const tabs = document.getElementById('seasonTabs');
-  if(!wrap || !tabs) return;
-
-  // Related anime se seasons dhundo
-  try {
-    const j = await jikanFetch(`${API}/anime/${malId}/relations`);
-    const relations = j.data || [];
-    const seasons = [];
-
-    // Current anime as season 1
-    seasons.push({ label: 'SEASON 01', malId: malId, active: true });
-
-    // Sequels/prequels as other seasons
-    let seasonNum = 2;
-    relations.forEach(rel => {
-      if(rel.relation === 'Sequel' || rel.relation === 'Prequel') {
-        rel.entry.forEach(e => {
-          if(e.type === 'anime') {
-            seasons.push({ label: `SEASON ${String(seasonNum).padStart(2,'0')}`, malId: e.mal_id, active: false });
-            seasonNum++;
-          }
-        });
-      }
-    });
-
-    if(seasons.length > 1) {
-      wrap.style.display = 'block';
-      tabs.innerHTML = seasons.map((s,i) => `
-        <button onclick="switchSeason(${s.malId}, this)"
-          style="flex-shrink:0;padding:12px 20px;border-radius:10px;border:2px solid ${s.active ? '#e50914' : '#333'};background:${s.active ? 'rgba(229,9,20,0.15)' : 'transparent'};color:${s.active ? '#e50914' : '#888'};font-family:'Poppins',sans-serif;font-size:0.82rem;font-weight:700;cursor:pointer;white-space:nowrap;transition:all 0.2s;letter-spacing:0.04em">
-          ${s.label}
-        </button>
-      `).join('');
-    } else {
-      wrap.style.display = 'none';
-    }
-  } catch(e) {
-    if(wrap) wrap.style.display = 'none';
-  }
-}
-
+  /* offline fallback — same logic as main */
 window.switchSeason = (malId, btn) => {
   haptic();
   document.querySelectorAll('#seasonTabs button').forEach(b => {
-    b.style.borderColor = '#333';
-    b.style.background = 'transparent';
-    b.style.color = '#888';
+    b.style.borderColor='#2a2a2a'; b.style.background='#111'; b.style.color='#888';
   });
-  btn.style.borderColor = '#e50914';
-  btn.style.background = 'rgba(229,9,20,0.15)';
-  btn.style.color = '#e50914';
+  btn.style.borderColor='#e50914';
+  btn.style.background='rgba(229,9,20,0.18)';
+  btn.style.color='#e50914';
   openAnime(malId);
 };
 
