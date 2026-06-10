@@ -1068,10 +1068,10 @@ measurementId: "G-RX3Z92Y9F2"
   </div>
 
   <div class="page" id="playerPage">
-    <div class="player-hero" id="playerHero">
+    <div class="player-hero" id="playerHero" style="display:none">
       <div class="player-poster" id="playerPoster"></div>
       <div class="player-controls-overlay" id="playerControlsOverlay">
-        <button class="player-back" onclick="closePlayer()">
+        <button class="player-back" onclick="closePlayer(); goBack()">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
           Back
         </button>
@@ -1375,6 +1375,24 @@ let libData = JSON.parse(localStorage.getItem('ia_lib') || '[]');
 let continueData = JSON.parse(localStorage.getItem('ia_continue') || '[]');
 let epPageState = {page: 0, chunk: 10, eps: [], vData: null, malId: null};
 let lastActivePage = 'homePage';
+let pageHistory = [];
+
+window.goBack = () => {
+  haptic();
+  if (pageHistory.length > 1) {
+    pageHistory.pop(); // current page hata
+    const prev = pageHistory[pageHistory.length - 1];
+    // setPage call karo bina history push kiye
+    const id = prev;
+    document.querySelectorAll('.page').forEach(p => p.classList.toggle('active', p.id === id));
+    document.querySelectorAll('.nav-tab').forEach(t => t.classList.toggle('active', t.dataset.p === id));
+    const bottom = document.querySelector('.bottom-nav');
+    if (bottom) bottom.style.display = id === 'playerPage' ? 'none' : 'flex';
+    lastActivePage = id;
+  } else {
+    setPage('homePage');
+  }
+};
 let VERIFICATION_ENABLED = true;
 
 const GENRE_MAP = {'Action':1,'Adventure':2,'Comedy':4,'Drama':8,'Fantasy':10,'Horror':14,'Mecha':18,'Mystery':7,'Romance':22,'Sci-Fi':24,'Slice of Life':36,'Sports':30,'Supernatural':37,'Thriller':41};
@@ -1960,6 +1978,9 @@ window.setPage = btnOrId => {
   haptic();
   const id = typeof btnOrId === 'string' ? btnOrId : btnOrId.dataset?.p;
   if (!id) return;
+  // History mein add karo (duplicate avoid)
+  if (pageHistory[pageHistory.length - 1] !== id) pageHistory.push(id);
+  if (pageHistory.length > 15) pageHistory.shift();
   const isReturningFromPlayer = (lastActivePage === 'playerPage' && id === 'homePage');
   const isMainTabSwitch = ['homePage', 'searchPage', 'libPage', 'adminPage', 'profilePage'].includes(id) && id !== lastActivePage;
 
@@ -2075,10 +2096,18 @@ window.openAnime = async (malId) => {
   const frame = document.getElementById('playerFrame');
   const poster = document.getElementById('playerPoster');
   const overlay = document.getElementById('playOverlay');
-  if (skeleton) skeleton.style.display = 'block';
+  const playerHero = document.getElementById('playerHero');
+  if (playerHero) playerHero.style.display = 'none';
+  if (skeleton) skeleton.style.display = 'none';
   if (frame) frame.innerHTML = '';
-  if (poster) { poster.style.backgroundImage = ''; poster.classList.add('hidden'); }
+  if (poster) poster.classList.add('hidden');
   if (overlay) overlay.classList.add('hidden');
+  // ep info bar reset
+  const oldBar = document.getElementById('epInfoBar');
+  if (oldBar) oldBar.remove();
+  // anime meta wapas dikhao
+  const metaSec = document.getElementById('playerMetaSection');
+  if (metaSec) metaSec.style.display = 'block';
 
   document.getElementById('pTitle').textContent = '';
   document.getElementById('pBadges').innerHTML = '';
@@ -2385,6 +2414,9 @@ window.playEpisode = async (malId, epNum, url, title) => {
 };
 
 function switchToEpMode(malId, epNum, epTitle) {
+  // Player hero dikhao
+  const playerHero = document.getElementById('playerHero');
+  if (playerHero) playerHero.style.display = 'block';
   // Pura anime info section hide
   const metaSection = document.getElementById('playerMetaSection');
   if (metaSection) metaSection.style.display = 'none';
@@ -2511,7 +2543,12 @@ document.addEventListener('webkitfullscreenchange', () => {
 window.closePlayer = () => {
   haptic();
   const ph = document.getElementById('playerHero');
-  if (ph) ph.classList.remove('fullscreen-mode');
+  if (ph) { ph.classList.remove('fullscreen-mode'); ph.style.display = 'none'; }
+  // epInfoBar reset
+  const bar = document.getElementById('epInfoBar');
+  if (bar) bar.remove();
+  const metaSection = document.getElementById('playerMetaSection');
+  if (metaSection) metaSection.style.display = 'block';
   try { if (document.fullscreenElement) document.exitFullscreen(); else if (document.webkitFullscreenElement) document.webkitExitFullscreen(); } catch(e) {}
   try { if (screen.orientation && screen.orientation.unlock) screen.orientation.unlock(); } catch(e) {}
   document.body.style.overflow = '';
@@ -2920,28 +2957,55 @@ window.buildSeasonTabs = async function(malId) {
 
     const prequels = [];
     const sequels = [];
+    const ovas = [];
+    const specials = [];
+    const movies = [];
 
     relations.forEach(rel => {
       rel.entry.forEach(e => {
         if(e.type !== 'anime') return;
         const r = rel.relation.toLowerCase();
         const n = e.name.toLowerCase();
-        if(n.includes('ova') || n.includes('special') || n.includes('movie') || r.includes('side') || r.includes('spin') || r.includes('alternative') || r.includes('other') || r.includes('summary') || r.includes('character')) return;
-        if(r === 'prequel') prequels.push({malId: e.mal_id, name: e.name});
-        else if(r === 'sequel') sequels.push({malId: e.mal_id, name: e.name});
+
+        // Skip summary/recap/character entries
+        if(r.includes('summary') || r.includes('character') || r.includes('alternative') || r.includes('other')) return;
+
+        // OVA
+        if(n.includes('ova') || r.includes('side story') && n.includes('ova')) {
+          ovas.push({malId: e.mal_id, name: e.name, label: 'OVA'});
+          return;
+        }
+        // Special
+        if(n.includes('special') || n.includes('specials')) {
+          specials.push({malId: e.mal_id, name: e.name, label: 'SPECIAL'});
+          return;
+        }
+        // Movie
+        if(n.includes('movie') || n.includes('film') || (r.includes('side') && n.includes('movie'))) {
+          movies.push({malId: e.mal_id, name: e.name, label: 'MOVIE'});
+          return;
+        }
+        // Actual seasons only
+        if(r === 'prequel') prequels.push({malId: e.mal_id, name: e.name, label: ''});
+        else if(r === 'sequel') sequels.push({malId: e.mal_id, name: e.name, label: ''});
       });
     });
 
-    const currentEntry = {malId: parseInt(malId), name: currentAnime?.title_english || currentAnime?.title || ''};
-    const allSeasons = [...prequels, currentEntry, ...sequels];
+    const currentEntry = {malId: parseInt(malId), name: currentAnime?.title_english || currentAnime?.title || '', label: ''};
+    const seasonEntries = [...prequels, currentEntry, ...sequels];
 
-    if(allSeasons.length > 1) {
+    // Season numbers assign karo
+    let sNum = 1;
+    seasonEntries.forEach(s => { s.label = 'SEASON ' + String(sNum++).padStart(2,'0'); });
+
+    // Sab entries — seasons pehle, phir OVA, Special, Movie
+    const allEntries = [...seasonEntries, ...ovas, ...specials, ...movies];
+
+    if(allEntries.length > 1) {
       wrap.style.display = 'block';
-      let sNum = 1;
-      tabs.innerHTML = allSeasons.map(s => {
+      tabs.innerHTML = allEntries.map(s => {
         const isActive = s.malId === parseInt(malId);
-        const label = 'SEASON ' + String(sNum++).padStart(2,'0');
-        return `<button onclick="switchSeason(${s.malId},this)" style="flex-shrink:0;padding:8px 16px;border-radius:10px;border:2px solid ${isActive?'#e50914':'#444'};background:${isActive?'rgba(229,9,20,0.15)':'transparent'};color:${isActive?'#e50914':'#888'};font-family:'Poppins',sans-serif;font-size:0.78rem;font-weight:700;cursor:pointer;white-space:nowrap;transition:all 0.2s">${label}</button>`;
+        return `<button onclick="switchSeason(${s.malId},this)" style="flex-shrink:0;padding:8px 16px;border-radius:10px;border:2px solid ${isActive?'#e50914':'#444'};background:${isActive?'rgba(229,9,20,0.15)':'transparent'};color:${isActive?'#e50914':'#888'};font-family:'Poppins',sans-serif;font-size:0.78rem;font-weight:700;cursor:pointer;white-space:nowrap;transition:all 0.2s">${s.label}</button>`;
       }).join('');
     } else { wrap.style.display='none'; }
   } catch(e) { if(wrap) wrap.style.display='none'; }
