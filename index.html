@@ -6,7 +6,7 @@
 <title>INFINITE ANiMES</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Poppins:wght@400;500;600;700;800;900&family=Bebas+Neue&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Poppins:wght@500;600;700&family=Bebas+Neue&display=swap" rel="stylesheet">
 <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3019984088199024" crossorigin="anonymous"></script>
 <style>
 :root{
@@ -71,7 +71,7 @@ html,body{height:100%;background:var(--bg);color:var(--text-primary);font-family
 #skipBtn:hover{background:rgba(255,255,255,0.12);color:#fff;border-color:rgba(255,255,255,0.3)}
 
 /* ═══════════ AUTH WALL — BULLETPROOF ═══════════ */
-#authWall{position:fixed;inset:0;z-index:200;overflow-y:auto;display:flex;flex-direction:column;background:var(--bg)}
+#authWall{position:fixed;inset:0;z-index:200;overflow-y:auto;display:none;flex-direction:column;background:var(--bg)}
 #authWall.active{display:flex}
 .auth-wrap{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:48px 20px;background:radial-gradient(ellipse at 50% -20%,rgba(229,9,20,0.15),transparent 60%)}
 .auth-brand{font-family:var(--font-display);font-size:clamp(2.4rem,8vw,4.2rem);background:linear-gradient(135deg,var(--accent),var(--gold));-webkit-background-clip:text;-webkit-text-fill-color:transparent;letter-spacing:0.06em;margin-bottom:6px;text-align:center;animation:brandPulse 4s ease-in-out infinite}
@@ -588,6 +588,14 @@ html,body{height:100%;background:var(--bg);color:var(--text-primary);font-family
   .hero-title{font-size:1.8rem}
   .player-title{font-size:1.8rem}
 }
+.timer-chip,#reVerifyBtn,.vip-badge,.status-panel,.profile-actions button[onclick="doLogout()"]{display:none !important}
+.top-bar,.bottom-nav,.glass,.hero-nav,.player-back,.player-fs-btn,.toast,.top-search,.search-box,.ep-num-thumb,.card-ep-badge,#hamMenu{backdrop-filter:none !important;-webkit-backdrop-filter:none !important}
+.top-bar{background:rgba(5,5,8,.97) !important}
+.bottom-nav{background:#050508 !important}
+.card-shine,.pill::after,.btn-primary::before,.v-btn::before{display:none !important}
+.brand::before{animation:none}
+.page{animation-duration:.2s}
+.fab-back{position:fixed;top:calc(72px + env(safe-area-inset-top));left:10px;z-index:1000;background:rgba(0,0,0,.6);color:#fff;border:1px solid rgba(255,255,255,.2);border-radius:20px;padding:6px 14px;font:600 .8rem Poppins,sans-serif;cursor:pointer}
 </style>
 <meta name="theme-color" content="#0b0b0e"/>
 <meta name="apple-mobile-web-app-capable" content="yes"/>
@@ -641,7 +649,7 @@ measurementId: "G-RX3Z92Y9F2"
     el.style.pointerEvents = 'none';
     setTimeout(function(){ el.style.display = 'none'; }, 800);
   }
-  setTimeout(hideIntro, 1200);
+  setTimeout(hideIntro, 600);
   var skipBtn = document.getElementById('skipBtn');
   if(skipBtn) skipBtn.addEventListener('click', hideIntro);
 
@@ -656,7 +664,6 @@ measurementId: "G-RX3Z92Y9F2"
       var verifyVisible = verifyWall && (verifyWall.style.display === 'flex' || getComputedStyle(verifyWall).display === 'flex');
       if(!appVisible && !authVisible && !verifyVisible){
         console.log('[IA] Safety fallback: showing auth wall');
-        if(authWall) authWall.style.display = 'flex';
       }
     }
   }, 3000);
@@ -1069,6 +1076,7 @@ measurementId: "G-RX3Z92Y9F2"
   </div>
 
   <div class="page" id="playerPage">
+    <button class="fab-back" onclick="closePlayer()">‹ Back</button>
     <div class="player-hero" id="playerHero" style="display:none">
       <div class="player-poster" id="playerPoster"></div>
       <div class="player-controls-overlay" id="playerControlsOverlay">
@@ -1411,13 +1419,33 @@ function toast(msg, type) {
 window.showToast = toast;
 
 /* ═══════════ AUTH FLOW — DIRECT & SIMPLE ═══════════ */
-document.getElementById('authLoading').classList.add('active');
+CU = {uid:'guest', email:'', displayName:'Otaku', photoURL:''};
+isAdmin = false;
+showApp();
+setTimeout(function(){ launchApp(CU); }, 0);
+if (location.hash === '#admin') document.getElementById('authWall').style.display = 'flex';
+
+async function handleAdminOnly(user) {
+  if (!user) return;
+  try {
+    let subs = [];
+    const s = await db.collection('config').doc('admins').get();
+    if (s.exists) subs = s.data().emails || [];
+    if (user.email === HEAD_ADMIN || subs.includes(user.email)) {
+      isAdmin = true; CU = user;
+      document.getElementById('authWall').style.display = 'none';
+      document.getElementById('adminTab').classList.remove('hidden');
+    } else {
+      toast('Not an admin', 'err'); setLoading(false); auth.signOut();
+    }
+  } catch(e) { setLoading(false); }
+}
 
 if (FIREBASE_OK && auth) {
   auth.onAuthStateChanged((user) => {
     var loading = document.getElementById('authLoading');
     if(loading) loading.classList.remove('active');
-    handleAuthUser(user);
+    handleAdminOnly(user);
   });
 } else {
   var loading = document.getElementById('authLoading');
@@ -1667,7 +1695,6 @@ window.toggleTut = () => { haptic(); document.getElementById('tutBox').classList
 
 /* ═══════════ APP LAUNCH ═══════════ */
 async function launchApp(u) {
-  await loadShortlink();
   const avatarUrl = u.photoURL || `https://ui-avatars.com/api/?name=${encodeURIComponent(u.displayName || 'User')}&background=ff004c&color=fff`;
   document.getElementById('userAvatar').src = avatarUrl;
   document.getElementById('profAvatar').src = avatarUrl;
@@ -1830,7 +1857,7 @@ async function genreSearch(g, btn) {
 }
 
 /* ═══════════ GRID ═══════════ */
-async function loadGrid(type) {
+async function loadGridOld(type) {
   renderSkeletons('mainGrid', 12);
   try {
     const res = await fetch("https://parshya321-production.up.railway.app/api/anime/catalog");
@@ -1850,6 +1877,7 @@ async function loadGrid(type) {
     document.getElementById('mainGrid').innerHTML = '<p style="color:var(--text-secondary);text-align:center;padding:24px;grid-column:1/-1;">Failed to load from backend.</p>';
   }
 }
+async function loadGrid(type) {
   renderSkeletons('mainGrid', 12);
   const urls = {
     trending: `${API}/top/anime?filter=bypopularity&limit=24`,
@@ -1907,7 +1935,7 @@ function appendCards(animes, id) {
     div.innerHTML = `
       ${a.type ? `<div class="card-type-badge">${escapeHtml(a.type)}</div>` : ''}
       ${a.episodes ? `<div class="card-ep-badge">${a.episodes} EP</div>` : ''}
-      <img src="${a.images?.jpg?.large_image_url || a.images?.jpg?.image_url || ''}" loading="lazy" alt="${escapeHtml(a.title)}">
+      <img src="${a.images?.jpg?.image_url || a.images?.jpg?.large_image_url || ''}" loading="lazy" alt="${escapeHtml(a.title)}">
       <div class="card-shine"></div>
       <div class="card-overlay">
         <div class="card-title">${escapeHtml(a.title_english || a.title)}</div>
@@ -1954,7 +1982,7 @@ function renderCards(animes, id) {
     <div class="card" style="animation-delay:${i * 40}ms" onclick="openAnime(${a.mal_id})">
       ${a.type ? `<div class="card-type-badge">${escapeHtml(a.type)}</div>` : ''}
       ${a.episodes ? `<div class="card-ep-badge">${a.episodes} EP</div>` : ''}
-      <img src="${a.images?.jpg?.large_image_url || a.images?.jpg?.image_url || ''}" loading="lazy" alt="${escapeHtml(a.title)}">
+      <img src="${a.images?.jpg?.image_url || a.images?.jpg?.large_image_url || ''}" loading="lazy" alt="${escapeHtml(a.title)}">
       <div class="card-shine"></div>
       <div class="card-overlay">
         <div class="card-title">${escapeHtml(a.title_english || a.title)}</div>
@@ -2263,7 +2291,7 @@ async function fetchAllEpisodes(malId) {
   let eps = [], page = 1, hasNext = true, consecutiveErrors = 0;
   while (hasNext && page <= 20) {
     try {
-      const res = await fetch(`https://parshya321-production.up.railway.app/api/anime/episodes?url=${encodeURIComponent(animeUrlOrId)}`);
+      const j = await jikanFetch(`${API}/anime/${malId}/episodes?page=${page}`); /*
 const data = await res.json();
 
 if (data.status === "success" && data.episodes.length > 0) {
@@ -2283,7 +2311,7 @@ if (data.status === "success" && data.episodes.length > 0) {
 } else {
   epList.innerHTML = '<p style="color:var(--text-secondary);padding:10px;">No episodes found.</p>';
 }
-      eps.push(...(j.data || []));
+      */ eps.push(...(j.data || []));
       hasNext = j.pagination?.has_next_page;
       page++;
       consecutiveErrors = 0;
@@ -2455,6 +2483,8 @@ window.playBackendStream = async (episodeUrl, epTitle) => {
     if (frame) frame.innerHTML = '<p style="color:var(--accent);text-align:center;padding:20px;">Failed to play episode.</p>';
   }
 };
+
+window.playEpisode = (malId, epNum, url, title) => {
   haptic();
   hidePosterOverlay();
   const pb = document.querySelector('.player-back'); if (pb) pb.style.display = 'none';
@@ -2982,7 +3012,7 @@ window.adminDeleteMovie = async (malId) => {
 
 /* ═══════════ JIKAN CACHE ═══════════ */
 async function jikanFetch(url, retry = 3) {
-  const key = 'jc_' + btoa(encodeURIComponent(url).slice(0,80));
+  const key = 'jc_' + url;
   const cached = sessionStorage.getItem(key);
   if (cached) { try { return JSON.parse(cached); } catch(e) { sessionStorage.removeItem(key); } }
   for (let attempt = 1; attempt <= retry; attempt++) {
@@ -3263,7 +3293,27 @@ console.log("[IA] Firebase compat loaded successfully");
 <!-- ═══════════ OFFLINE FALLBACK (gstatic.com blocked) ═══════════ -->
 <script>
 (function(){
-  if(typeof firebase !== 'undefined') return;
+  CU = {uid:'guest', email:'', displayName:'Otaku', photoURL:''};
+isAdmin = false;
+showApp();
+setTimeout(function(){ launchApp(CU); }, 0);
+if (location.hash === '#admin') document.getElementById('authWall').style.display = 'flex';
+
+async function handleAdminOnly(user) {
+  if (!user) return;
+  try {
+    let subs = [];
+    const s = await db.collection('config').doc('admins').get();
+    if (s.exists) subs = s.data().emails || [];
+    if (user.email === HEAD_ADMIN || subs.includes(user.email)) {
+      isAdmin = true; CU = user;
+      document.getElementById('authWall').style.display = 'none';
+      document.getElementById('adminTab').classList.remove('hidden');
+    } else {
+      toast('Not an admin', 'err'); setLoading(false); auth.signOut();
+    }
+  } catch(e) { setLoading(false); }
+}
   console.log('[IA] gstatic.com blocked — Offline Fallback Active');
 
   var LS_USERS = 'ia_offline_users';
